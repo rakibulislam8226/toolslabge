@@ -1,3 +1,3 @@
 <template>
-    <h3 class="text-3xl font-bold">Test</h3>
+    <h3 class="text-5xl font-bold">Test</h3>
 </template>
