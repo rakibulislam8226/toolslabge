@@ -1,0 +1,25 @@
+{
+  "name": "basetrack",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "rakibulislam8226@gmail.com",
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@tailwindcss/vite": "^4.1.13",
+    "pinia": "^3.0.3",
+    "axios": "^1.8.1",
+    "vue": "^3.5.10",
+    "vue-router": "^4.4.5",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "django-vite-plugin": "^4.1.2",
+    "izitoast": "^1.4.0",
+    "vite": "^5.4.8"
+  }
+}

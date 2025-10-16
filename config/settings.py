@@ -44,7 +44,9 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    "django_vite_plugin",
+]
 
 PROJECT_APPS = [
     "apps.users",
