@@ -11,7 +11,11 @@ class TimeStampedModel(DirtyFieldsMixin, models.Model):
         db_index=True, unique=True, default=uuid.uuid4, editable=False
     )
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

@@ -3,21 +3,19 @@ from django.contrib import admin
 from .models import Task, TaskStatus, TaskComment, TaskAttachment, TaskHistory
 
 
-# Register your models here.
+@admin.register(TaskStatus)
+class TaskStatusAdmin(admin.ModelAdmin):
+    list_display = ("name", "organization")
+    search_fields = ("name",)
+    ordering = ("organization", "name")
+
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     list_display = ("title", "project", "status", "assigned_to", "due_date", "priority")
     search_fields = ("title", "description")
     list_filter = ("status", "priority", "due_date")
     ordering = ("-created_at",)
-
-
-@admin.register(TaskStatus)
-class TaskStatusAdmin(admin.ModelAdmin):
-    list_display = ("name", "organization", "slug")
-    search_fields = ("name",)
-    prepopulated_fields = {"slug": ("name",)}
-    ordering = ("organization", "name")
 
 
 @admin.register(TaskComment)
