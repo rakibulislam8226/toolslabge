@@ -5,7 +5,7 @@ from ..serializers.invitations import (
     SendInvitationSerializer,
     AcceptInvitationSerializer,
 )
-from ...choices import OrganizationMembershipRoleChoices
+from ...choices import OrganizationMemberRoleChoices
 from ...models import Organization
 
 
@@ -24,8 +24,8 @@ class SendInvitationView(generics.CreateAPIView):
             organization=org, is_active=True
         ).first()
         if not membership or membership.role not in [
-            OrganizationMembershipRoleChoices.OWNER,
-            OrganizationMembershipRoleChoices.ADMIN,
+            OrganizationMemberRoleChoices.OWNER,
+            OrganizationMemberRoleChoices.ADMIN,
         ]:
             return Response(
                 {"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN

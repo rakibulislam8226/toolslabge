@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Organization, OrganizationMembership, OrganizationInvitation
+from .models import Organization, OrganizationMember, OrganizationInvitation
 
 
 # Register your models here.
@@ -17,8 +17,8 @@ class OrganizationAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
 
-@admin.register(OrganizationMembership)
-class OrganizationMembershipAdmin(admin.ModelAdmin):
+@admin.register(OrganizationMember)
+class OrganizationMemberAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "organization",

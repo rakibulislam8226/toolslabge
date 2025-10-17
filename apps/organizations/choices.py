@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class OrganizationMembershipRoleChoices(models.TextChoices):
+class OrganizationMemberRoleChoices(models.TextChoices):
     OWNER = "owner", "Owner"
     ADMIN = "admin", "Admin"
     MEMBER = "member", "Member"

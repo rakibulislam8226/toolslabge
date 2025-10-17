@@ -26,7 +26,6 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    members = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
@@ -37,14 +36,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             "start_date",
             "end_date",
             "status",
-            "members",
         ]
         read_only_fields = ["status", "members"]
-
-    def get_members(self, obj):
-
-        members = obj.memberships.all()
-        return ProjectMemberSerializer(members, many=True).data
 
     def validate(self, data):
         start_date = data.get("start_date")
@@ -52,6 +45,16 @@ class ProjectSerializer(serializers.ModelSerializer):
         if start_date and end_date and start_date > end_date:
             raise serializers.ValidationError(
                 {"end_date": "End date must be after start date."}
+            )
+        # Ensure project name is unique within the organization
+        organization = (
+            self.context["request"].user.organization_memberships.first().organization
+        )
+        if Project.objects.filter(
+            organization=organization, name=data["name"]
+        ).exists():
+            raise serializers.ValidationError(
+                {"name": "Project with this name already exists in the organization."}
             )
 
         return data
@@ -61,20 +64,16 @@ class ProjectSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         user = request.user
 
-        # Get user's organizations
-        org_memberships = user.org_memberships.filter(is_active=True)
+        org_memberships = user.organization_memberships.filter(is_active=True)
         if not org_memberships.exists():
             raise serializers.ValidationError(
                 "User does not belong to any active organization."
             )
 
-        # If user belongs to multiple orgs, take the first one (or you can customize)
         organization = org_memberships.first().organization
 
-        # Remove organization from validated_data if somehow present
         validated_data.pop("organization", None)
 
-        # Create project
         project = Project.objects.create(
             organization=organization,
             created_by=user,
@@ -86,6 +85,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             project=project,
             user=user,
             role=ProjectMemberRoleChoices.MANAGER,
+            created_by=user,
         )
 
         return project

@@ -3,8 +3,8 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from ...choices import OrganizationMembershipRoleChoices
-from ...models import Organization, OrganizationMembership
+from ...choices import OrganizationMemberRoleChoices
+from ...models import Organization, OrganizationMember
 
 
 User = get_user_model()
@@ -22,9 +22,9 @@ class OrganizationRegistrationSerializer(serializers.Serializer):
         org_name = validated_data.pop("organization_name")
         user = User.objects.create_user(**validated_data)
         org = Organization.objects.create(name=org_name, created_by=user)
-        OrganizationMembership.objects.create(
+        OrganizationMember.objects.create(
             user=user,
             organization=org,
-            role=OrganizationMembershipRoleChoices.OWNER,
+            role=OrganizationMemberRoleChoices.OWNER,
         )
         return user

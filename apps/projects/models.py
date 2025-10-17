@@ -37,6 +37,7 @@ class Project(TimeStampedModel):
     )
 
     class Meta:
+        unique_together = ("organization", "name")
         ordering = ["-created_at"]
 
     def __str__(self):

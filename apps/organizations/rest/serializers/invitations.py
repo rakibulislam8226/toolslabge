@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
-from ...models import OrganizationInvitation, Organization, OrganizationMembership
-from ...choices import OrganizationMembershipRoleChoices
+from ...models import OrganizationInvitation, Organization, OrganizationMember
+from ...choices import OrganizationMemberRoleChoices
 
 User = get_user_model()
 
@@ -15,8 +15,8 @@ User = get_user_model()
 class SendInvitationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     role = serializers.ChoiceField(
-        choices=OrganizationMembershipRoleChoices.choices,
-        default=OrganizationMembershipRoleChoices.MEMBER,
+        choices=OrganizationMemberRoleChoices.choices,
+        default=OrganizationMemberRoleChoices.MEMBER,
     )
 
     class Meta:
@@ -79,7 +79,7 @@ class AcceptInvitationSerializer(serializers.Serializer):
         user.set_password(validated_data["password"])
         user.save()
 
-        OrganizationMembership.objects.create(
+        OrganizationMember.objects.create(
             user=user,
             organization=invitation.organization,
             role=invitation.role,

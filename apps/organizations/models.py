@@ -6,7 +6,7 @@ from autoslug import AutoSlugField
 
 from common.models import TimeStampedModel
 
-from .choices import OrganizationMembershipRoleChoices
+from .choices import OrganizationMemberRoleChoices
 
 
 class Organization(TimeStampedModel):
@@ -23,7 +23,7 @@ class Organization(TimeStampedModel):
         return self.name
 
 
-class OrganizationMembership(TimeStampedModel):
+class OrganizationMember(TimeStampedModel):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -35,8 +35,8 @@ class OrganizationMembership(TimeStampedModel):
     joined_at = models.DateTimeField(auto_now_add=True)
     role = models.CharField(
         max_length=100,
-        choices=OrganizationMembershipRoleChoices.choices,
-        default=OrganizationMembershipRoleChoices.MEMBER,
+        choices=OrganizationMemberRoleChoices.choices,
+        default=OrganizationMemberRoleChoices.MEMBER,
     )
     is_active = models.BooleanField(default=True)
 
@@ -61,8 +61,8 @@ class OrganizationInvitation(TimeStampedModel):
     )
     role = models.CharField(
         max_length=100,
-        choices=OrganizationMembershipRoleChoices.choices,
-        default=OrganizationMembershipRoleChoices.MEMBER,
+        choices=OrganizationMemberRoleChoices.choices,
+        default=OrganizationMemberRoleChoices.MEMBER,
     )
     token = models.CharField(max_length=64, unique=True)
     accepted = models.BooleanField(default=False)
@@ -73,10 +73,10 @@ class OrganizationInvitation(TimeStampedModel):
 
     def accept(self, user):
         if not self.accepted:
-            OrganizationMembership.objects.create(
+            OrganizationMember.objects.create(
                 user=user,
                 organization=self.organization,
-                role=OrganizationMembershipRoleChoices.MEMBER,
+                role=OrganizationMemberRoleChoices.MEMBER,
             )
             self.accepted = True
             self.accepted_at = timezone.now()
