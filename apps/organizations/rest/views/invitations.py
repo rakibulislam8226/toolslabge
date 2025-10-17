@@ -1,0 +1,54 @@
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+
+from ..serializers.invitations import (
+    SendInvitationSerializer,
+    AcceptInvitationSerializer,
+)
+from ...models import Organization
+
+
+class SendInvitationView(generics.CreateAPIView):
+    serializer_class = SendInvitationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_organization(self):
+        org_id = self.kwargs.get("org_id")
+        return Organization.objects.get(id=org_id)
+
+    def create(self, request, *args, **kwargs):
+        org = self.get_organization()
+
+        membership = request.user.org_memberships.filter(
+            organization=org, is_active=True
+        ).first()
+        if not membership or membership.role not in ["owner", "admin"]:
+            return Response(
+                {"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = self.get_serializer(
+            data=request.data, context={"organization": org, "request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        invitation = serializer.save()
+        return Response(
+            {
+                "detail": f"Invitation sent to {invitation.email}.",
+                "token": invitation.token,  # show for now (remove in prod)
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class AcceptInvitationView(generics.CreateAPIView):
+    serializer_class = AcceptInvitationSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(
+            {"detail": "Invitation accepted successfully. You can now log in."},
+            status=status.HTTP_201_CREATED,
+        )

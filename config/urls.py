@@ -15,6 +15,8 @@ API_V1 = "api/v1"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # rest_framework
+    path("api-auth/", include("rest_framework.urls")),
     # JWT Authentication URLs
     path(f"{API_V1}/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path(f"{API_V1}/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
