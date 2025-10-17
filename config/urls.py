@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -19,6 +19,9 @@ urlpatterns = [
     path(f"{API_V1}/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path(f"{API_V1}/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path(f"{API_V1}/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    # organizations
+    path(f"{API_V1}/organizations/", include("apps.organizations.rest.urls")),
+    # projects
 ]
 
 
