@@ -2,15 +2,15 @@ from django.db.models import Q
 
 from rest_framework import generics, permissions
 
-from ..serializers.projects import ProjectSerializer, ProjectMemberSerializer
+from ..serializers.projects import ProjectListSerializer, ProjectMemberSerializer
 from ...models import Project, ProjectMember
 
-from ...permissions import IsOrgAdminOrManager
+from ....organizations.permissions import IsOrgOwnerAdminOrManager
 
 
 class ProjectListCreateView(generics.ListCreateAPIView):
-    serializer_class = ProjectSerializer
-    permission_classes = [IsOrgAdminOrManager]
+    serializer_class = ProjectListSerializer
+    permission_classes = [IsOrgOwnerAdminOrManager]
 
     def get_queryset(self):
         user = self.request.user
@@ -21,7 +21,7 @@ class ProjectListCreateView(generics.ListCreateAPIView):
 
 class ProjectMemberListCreateView(generics.ListCreateAPIView):
     serializer_class = ProjectMemberSerializer
-    permission_classes = [IsOrgAdminOrManager]
+    permission_classes = [IsOrgOwnerAdminOrManager]
 
     def get_queryset(self):
         return ProjectMember.objects.filter(

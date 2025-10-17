@@ -25,7 +25,7 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProjectSerializer(serializers.ModelSerializer):
+class ProjectListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
