@@ -11,4 +11,8 @@ class TaskListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(project__memberships__user__in=[user]).distinct()
+        return (
+            Task.objects.select_related("project", "project__organization")
+            .filter(project__memberships__user=user)
+            .distinct()
+        )

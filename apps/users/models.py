@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils import timezone
 
+from versatileimagefield.fields import VersatileImageField
+
 from common.models import TimeStampedModel
 from .managers import CustomUserManager
 
@@ -13,6 +15,11 @@ class User(AbstractUser, TimeStampedModel, PermissionsMixin):
     email = models.EmailField(unique=True)
     is_verified = models.BooleanField(default=False)
     last_login_ip = models.GenericIPAddressField(null=True, blank=True)
+    photo = VersatileImageField(
+        upload_to="user_photos/",
+        null=True,
+        blank=True,
+    )
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"

@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     "django_vite_plugin",
     "corsheaders",
+    "versatileimagefield",
 ]
 
 PROJECT_APPS = [
