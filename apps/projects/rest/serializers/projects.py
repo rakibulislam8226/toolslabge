@@ -24,6 +24,44 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+    def validate(self, data):
+        request = self.context["request"]
+        user = request.user
+        project = self.context.get("project_id")
+        organization = (
+            user.organization_memberships.filter(is_active=True).first().organization
+        )
+
+        user_to_add = data.get("user")
+        if not OrganizationMember.objects.filter(
+            organization=organization,
+            user=user_to_add,
+            is_active=True,
+        ).exists():
+            raise serializers.ValidationError(
+                {"user": "The user must be an active member of the organization."}
+            )
+
+        if ProjectMember.objects.filter(project=project, user=user_to_add).exists():
+            raise serializers.ValidationError(
+                {"user": "This user is already a member of the project."}
+            )
+
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        user = request.user
+        project = self.context.get("project_id")
+        project = Project.objects.get(id=project)
+
+        project_member = ProjectMember.objects.create(
+            created_by=user,
+            project=project,
+            **validated_data,
+        )
+        return project_member
+
 
 class ProjectListSerializer(serializers.ModelSerializer):
     project_manager_id = serializers.IntegerField(write_only=True, required=False)
@@ -113,3 +151,24 @@ class ProjectListSerializer(serializers.ModelSerializer):
         )
 
         return project
+
+
+class ProjectDetailSerializer(serializers.ModelSerializer):
+    organization = serializers.StringRelatedField()
+    members = ProjectMemberSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "name",
+            "description",
+            "start_date",
+            "end_date",
+            "status",
+            "organization",
+            "members",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields
