@@ -222,3 +222,11 @@ CORS_ALLOW_HEADERS = (
     "x-requested-with",
     "x-domain",
 )
+
+
+ENABLE_SILK = os.getenv("ENABLE_SILK", False) == "True"
+if ENABLE_SILK:
+    INSTALLED_APPS += ["silk"]
+    MIDDLEWARE += [
+        "silk.middleware.SilkyMiddleware",
+    ]

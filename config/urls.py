@@ -55,6 +55,10 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+if settings.ENABLE_SILK:
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
+
+
 urlpatterns += (
     re_path(
         r"^(?!api|media|static/).*", TemplateView.as_view(template_name="app.html")
