@@ -18,6 +18,8 @@ class TaskStatus(TimeStampedModel):
         Organization, on_delete=models.CASCADE, related_name="task_statuses"
     )
     slug = AutoSlugField(populate_from="name", unique=True)
+    position = models.PositiveSmallIntegerField(default=0)  # for ordering in UI
+    is_default = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ("organization", "slug")
