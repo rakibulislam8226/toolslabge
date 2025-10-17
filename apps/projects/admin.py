@@ -10,10 +10,9 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "organization",
-        "visibility",
         "status",
     )
-    list_filter = ("visibility", "status", "organization")
+    list_filter = ("status", "organization")
     search_fields = ("name", "description")
     ordering = ("-created_at",)
 

@@ -10,7 +10,6 @@ from apps.organizations.models import Organization
 
 
 from .choices import (
-    ProjectVisibilityChoices,
     ProjectStatusChoices,
     ProjectMemberRoleChoices,
 )
@@ -25,11 +24,6 @@ class Project(TimeStampedModel):
     description = models.TextField(null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    visibility = models.CharField(
-        max_length=50,
-        choices=ProjectVisibilityChoices.choices,
-        default=ProjectVisibilityChoices.PRIVATE,
-    )
     status = models.CharField(
         max_length=50,
         choices=ProjectStatusChoices.choices,
