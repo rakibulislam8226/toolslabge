@@ -8,7 +8,7 @@ class IsOrgOwnerAdminOrManager(permissions.BasePermission):
         return request.user and request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-
+        print(obj)
         if request.user.organization_memberships.filter(
             user=request.user, role=OrganizationMemberRoleChoices.OWNER
         ).exists():

@@ -12,6 +12,7 @@ from ...choices import OrganizationMemberRoleChoices
 from ...models import Organization
 
 
+# FIXME:Permissions check exact organizationuser with org_id
 class SendInvitationView(generics.CreateAPIView):
     serializer_class = SendInvitationSerializer
     permission_classes = [IsOrgOwnerAdminOrManager]
@@ -39,6 +40,7 @@ class SendInvitationView(generics.CreateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         invitation = serializer.save()
+        print("invitation token:", invitation.token)
         return Response(
             {
                 "detail": f"Invitation sent to {invitation.email}.",

@@ -21,7 +21,7 @@ class ProjectAdmin(admin.ModelAdmin):
 class ProjectMemberAdmin(admin.ModelAdmin):
     list_display = (
         "project",
-        "user",
+        "user__email",
         "role",
     )
     list_filter = ("role", "project")

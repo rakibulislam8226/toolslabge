@@ -63,6 +63,7 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
         return project_member
 
 
+#FIXME: rethink project manager assignment. currently it take from organization member id. is it take this or user id?
 class ProjectListSerializer(serializers.ModelSerializer):
     project_manager_id = serializers.IntegerField(write_only=True, required=False)
 

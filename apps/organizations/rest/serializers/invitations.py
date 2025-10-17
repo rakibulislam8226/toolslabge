@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
-from ...models import OrganizationInvitation, Organization, OrganizationMember
 from ...choices import OrganizationMemberRoleChoices
+from ...models import OrganizationInvitation, OrganizationMember
 
 User = get_user_model()
 
@@ -34,12 +34,12 @@ class SendInvitationSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         org = self.context["organization"]
-        invited_by = self.context["request"].user
+        created_by = self.context["request"].user
 
         token = secrets.token_urlsafe(32)
         invitation = OrganizationInvitation.objects.create(
             organization=org,
-            invited_by=invited_by,
+            created_by=created_by,
             token=token,
             **validated_data,
         )

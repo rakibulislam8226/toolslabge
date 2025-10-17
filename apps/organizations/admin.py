@@ -20,7 +20,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 @admin.register(OrganizationMember)
 class OrganizationMemberAdmin(admin.ModelAdmin):
     list_display = (
-        "user",
+        "user__email",
         "organization",
         "role",
         "is_active",
@@ -28,7 +28,7 @@ class OrganizationMemberAdmin(admin.ModelAdmin):
         "deleted_at",
     )
     search_fields = ("user__username", "organization__name", "role")
-    list_filter = ("role", "is_active", "joined_at")
+    list_filter = ("organization", "role", "is_active", "joined_at")
     ordering = ("-joined_at",)
 
 
@@ -37,11 +37,10 @@ class OrganizationInvitationAdmin(admin.ModelAdmin):
     list_display = (
         "email",
         "organization",
-        "invited_by",
         "role",
         "created_at",
         "deleted_at",
     )
-    search_fields = ("email", "organization__name", "invited_by__username", "role")
+    search_fields = ("email", "organization__name", "role")
     list_filter = ("role", "created_at")
     ordering = ("-created_at",)

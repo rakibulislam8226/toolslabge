@@ -53,12 +53,6 @@ class OrganizationInvitation(TimeStampedModel):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="invitations"
     )
-    invited_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="sent_organization_invitations",
-    )
     role = models.CharField(
         max_length=100,
         choices=OrganizationMemberRoleChoices.choices,
