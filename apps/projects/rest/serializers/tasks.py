@@ -11,7 +11,6 @@ User = get_user_model()
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    # Input
     project_id = serializers.PrimaryKeyRelatedField(
         source="project", queryset=Project.objects.none(), write_only=True
     )
@@ -29,7 +28,6 @@ class TaskSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    # Output
     project = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
     assigned_members = serializers.SerializerMethodField(read_only=True)
@@ -63,12 +61,10 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def get_fields(self):
         fields = super().get_fields()
-        user = self.context.get("request").user
-        # Limit project choices to projects where user is a member
+        user = self.context["request"].user
         fields["project_id"].queryset = Project.objects.filter(
             memberships__user=user
         ).distinct()
-        # Limit status choices to user's organizations
         org_ids = user.organization_memberships.filter(is_active=True).values_list(
             "organization", flat=True
         )
@@ -101,13 +97,11 @@ class TaskSerializer(serializers.ModelSerializer):
         if not project:
             raise serializers.ValidationError({"project_id": "Project is required."})
 
-        # Ensure user is a project member
         if not ProjectMember.objects.filter(user=user, project=project).exists():
             raise serializers.ValidationError(
                 {"project_id": "You must be a member of this project."}
             )
 
-        # Validate dates
         start, due = data.get("start_date"), data.get("due_date")
         if start and due and start > due:
             raise serializers.ValidationError(
@@ -116,22 +110,19 @@ class TaskSerializer(serializers.ModelSerializer):
 
         # Validate members
         member_ids = self.initial_data.get("members", [])
-        if member_ids:
-            members_qs = ProjectMember.objects.filter(
-                project=project, user__id__in=member_ids
+        members_qs = ProjectMember.objects.filter(
+            project=project, user__id__in=member_ids
+        )
+        if members_qs.count() != len(member_ids):
+            invalid_ids = set(member_ids) - set(
+                members_qs.values_list("user__id", flat=True)
             )
-            if members_qs.count() != len(member_ids):
-                invalid_ids = set(member_ids) - set(
-                    members_qs.values_list("user__id", flat=True)
-                )
-                raise serializers.ValidationError(
-                    {"members": f"Invalid members: {list(invalid_ids)}"}
-                )
-            self.context["validated_members"] = list(members_qs)
-        else:
-            self.context["validated_members"] = []
+            raise serializers.ValidationError(
+                {"members": f"Invalid members: {list(invalid_ids)}"}
+            )
+        self.context["validated_members"] = list(members_qs)
 
-        # Validate status belongs to project organization
+        # Validate status belongs to project org
         status_obj = data.get("status")
         if status_obj and status_obj.organization_id != project.organization_id:
             raise serializers.ValidationError(
@@ -144,32 +135,31 @@ class TaskSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         members = self.context.pop("validated_members", [])
-        project = validated_data["project"]
 
-        # Assign organization and creator
+        validated_data.pop("members", None)
+        project = validated_data.pop("project")
+        status = validated_data.pop("status", None)
+
+        # Set organization and creator
         validated_data["organization"] = project.organization
         validated_data["created_by"] = user
 
-        # Determine status
-        status = validated_data.pop("status", None)
+        # Determine status if not provided
         if not status:
-            status = TaskStatus.objects.filter(
-                organization=project.organization, is_default=True
-            ).first()
-            if not status:
-                status = (
-                    TaskStatus.objects.filter(organization=project.organization)
-                    .order_by("position")
-                    .first()
-                )
+            status = (
+                TaskStatus.objects.filter(
+                    organization=project.organization, is_default=True
+                ).first()
+                or TaskStatus.objects.filter(organization=project.organization)
+                .order_by("position")
+                .first()
+            )
         validated_data["status"] = status
 
-        # Create task
-        task = Task.objects.create(**validated_data)
+        task = Task.objects.create(project=project, **validated_data)
 
-        # Assign members
         TaskMember.objects.bulk_create(
-            [TaskMember(task=task, member=m, assigned_by=user) for m in members]
+            [TaskMember(task=task, member=m, created_by=user) for m in members]
         )
 
         return task
