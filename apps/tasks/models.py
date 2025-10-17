@@ -7,7 +7,7 @@ from autoslug import AutoSlugField
 from common.models import TimeStampedModel
 
 from apps.organizations.models import Organization
-from apps.projects.models import Project
+from apps.projects.models import Project, ProjectMember
 
 from .choices import TasksPriorityChoices
 
@@ -40,13 +40,6 @@ class Task(TimeStampedModel):
     status = models.ForeignKey(
         TaskStatus, on_delete=models.SET_NULL, null=True, related_name="tasks"
     )
-    assigned_to = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="assigned_tasks",
-    )
     due_date = models.DateTimeField(null=True, blank=True)
     start_date = models.DateTimeField(null=True, blank=True)
     priority = models.CharField(
@@ -63,6 +56,24 @@ class Task(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+
+class TaskMember(TimeStampedModel):
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE, related_name="task_members"
+    )
+    member = models.ForeignKey(
+        ProjectMember,
+        on_delete=models.CASCADE,
+        related_name="member_tasks",
+    )
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("task", "member")
+
+    def __str__(self):
+        return f"{self.member} assigned to {self.task}"
 
 
 class TaskComment(TimeStampedModel):

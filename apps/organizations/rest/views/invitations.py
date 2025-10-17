@@ -5,13 +5,16 @@ from ..serializers.invitations import (
     SendInvitationSerializer,
     AcceptInvitationSerializer,
 )
+
+from ...permissions import IsOrgOwnerAdminOrManager
+
 from ...choices import OrganizationMemberRoleChoices
 from ...models import Organization
 
 
 class SendInvitationView(generics.CreateAPIView):
     serializer_class = SendInvitationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsOrgOwnerAdminOrManager]
 
     def get_organization(self):
         org_id = self.kwargs.get("org_id")
@@ -47,6 +50,7 @@ class SendInvitationView(generics.CreateAPIView):
 
 class AcceptInvitationView(generics.CreateAPIView):
     serializer_class = AcceptInvitationSerializer
+    permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

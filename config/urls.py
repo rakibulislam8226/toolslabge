@@ -25,6 +25,8 @@ urlpatterns = [
     path(f"{API_V1}/organizations/", include("apps.organizations.rest.urls")),
     # projects
     path(f"{API_V1}/projects/", include("apps.projects.rest.urls")),
+    # tasks
+    # path(f"{API_V1}/tasks/", include("apps.tasks.rest.urls")),
 ]
 
 
