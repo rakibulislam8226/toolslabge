@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     "django_vite_plugin",
     "corsheaders",
     "versatileimagefield",
+    "drf_yasg",
 ]
 
 PROJECT_APPS = [
