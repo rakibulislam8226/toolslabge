@@ -1,11 +1,11 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-from ..serializers.register import OrganizationOwnerRegistrationSerializer
+from ..serializers.register import OrganizationRegistrationSerializer
 
 
-class RegisterOrganizationOwnerView(generics.CreateAPIView):
-    serializer_class = OrganizationOwnerRegistrationSerializer
+class RegisterOrganizationView(generics.CreateAPIView):
+    serializer_class = OrganizationRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

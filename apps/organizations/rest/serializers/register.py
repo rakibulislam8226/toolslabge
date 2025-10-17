@@ -10,7 +10,7 @@ from ...models import Organization, OrganizationMembership
 User = get_user_model()
 
 
-class OrganizationOwnerRegistrationSerializer(serializers.Serializer):
+class OrganizationRegistrationSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=50)
     last_name = serializers.CharField(max_length=50)
     email = serializers.EmailField()

@@ -1,11 +1,11 @@
 from django.urls import path
 
-from ..views.register import RegisterOrganizationOwnerView
+from ..views.register import RegisterOrganizationView
 
 urlpatterns = [
     path(
-        "owner/",
-        RegisterOrganizationOwnerView.as_view(),
-        name="register_organization_owner",
+        "",
+        RegisterOrganizationView.as_view(),
+        name="register_organization",
     ),
 ]
