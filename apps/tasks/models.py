@@ -21,7 +21,7 @@ class TaskStatus(TimeStampedModel):
 
     class Meta:
         unique_together = ("organization", "slug")
-        ordering = ["position"]
+        ordering = ["organization", "name"]
 
     def __str__(self):
         return self.name

@@ -29,13 +29,16 @@ class TaskCommentAdmin(admin.ModelAdmin):
 
 @admin.register(TaskAttachment)
 class TaskAttachmentAdmin(admin.ModelAdmin):
-    list_display = ("task", "uploaded_at")
+    list_display = (
+        "task",
+        "created_at",
+    )
     search_fields = ("task__title",)
-    ordering = ("-uploaded_at",)
+    ordering = ("-created_at",)
 
 
 @admin.register(TaskHistory)
 class TaskHistoryAdmin(admin.ModelAdmin):
-    list_display = ("task", "changed_at", "changed_by")
+    list_display = ("task", "updated_at", "changed_by")
     search_fields = ("task__title", "changed_by__username", "change_description")
-    ordering = ("-changed_at",)
+    ordering = ("-updated_at",)

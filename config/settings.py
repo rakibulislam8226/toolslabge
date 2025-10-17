@@ -57,6 +57,7 @@ PROJECT_APPS = [
     "apps.organizations",
     "apps.projects",
     "apps.tasks",
+    "apps.notifications",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
