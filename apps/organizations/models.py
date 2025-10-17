@@ -46,3 +46,41 @@ class OrganizationMembership(TimeStampedModel):
 
     def __str__(self):
         return f"{self.user} - {self.organization} ({self.role})"
+
+
+class OrganizationInvitation(TimeStampedModel):
+    email = models.EmailField()
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="invitations"
+    )
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="sent_organization_invitations",
+    )
+    role = models.CharField(
+        max_length=100,
+        choices=OrganizationMembershipRoleChoices.choices,
+        default=OrganizationMembershipRoleChoices.MEMBER,
+    )
+    token = models.CharField(max_length=64, unique=True)
+    accepted = models.BooleanField(default=False)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("email", "organization")
+
+    def accept(self, user):
+        if not self.accepted:
+            OrganizationMembership.objects.create(
+                user=user,
+                organization=self.organization,
+                role=OrganizationMembershipRoleChoices.MEMBER,
+            )
+            self.accepted = True
+            self.accepted_at = timezone.now()
+            self.save()
+
+    def __str__(self):
+        return f"Invitation for {self.email} to join {self.organization}"
