@@ -9,7 +9,7 @@ from common.models import TimeStampedModel
 from apps.organizations.models import Organization
 
 
-from .choices import ProjectVisibilityChoices, ProjectStatusChoices
+from .choices import ProjectVisibilityChoices, ProjectStatusChoices, ProjectRoleChoices
 
 
 class Project(TimeStampedModel):
@@ -35,3 +35,26 @@ class Project(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+
+class ProjectMembership(TimeStampedModel):
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="memberships"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="project_memberships",
+    )
+    role = models.CharField(
+        max_length=100,
+        choices=ProjectRoleChoices.choices,
+        default=ProjectRoleChoices.CONTRIBUTOR,
+    )
+
+    class Meta:
+        unique_together = ("project", "user")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} in {self.project}"

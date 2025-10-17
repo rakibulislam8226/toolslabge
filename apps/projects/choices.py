@@ -12,5 +12,10 @@ class ProjectStatusChoices(models.TextChoices):
     ARCHIVED = "archived", "Archived"
     COMPLETED = "completed", "Completed"
     ON_HOLD = "on_hold", "On Hold"
-    
+
+
+class ProjectRoleChoices(models.TextChoices):
+    MANAGER = "manager", "Manager"
+    CONTRIBUTOR = "contributor", "Contributor"
+    VIEWER = "viewer", "Viewer"
 

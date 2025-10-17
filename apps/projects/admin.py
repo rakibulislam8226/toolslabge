@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Project
+from .models import Project, ProjectMembership
 
 # Register your models here.
 
@@ -15,4 +15,16 @@ class ProjectAdmin(admin.ModelAdmin):
     )
     list_filter = ("visibility", "status", "organization")
     search_fields = ("name", "description")
+    ordering = ("-created_at",)
+
+
+@admin.register(ProjectMembership)
+class ProjectMembershipAdmin(admin.ModelAdmin):
+    list_display = (
+        "project",
+        "user",
+        "role",
+    )
+    list_filter = ("role", "project")
+    search_fields = ("user__username", "user__email", "project__name")
     ordering = ("-created_at",)
