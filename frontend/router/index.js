@@ -6,6 +6,11 @@ const routes = [
     name: "home.index",
     component: () => import("@/views/home/Home.vue"),
   },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: () => import("@views/errors/404.vue"),
+  },
 ];
 
 const router = createRouter({
