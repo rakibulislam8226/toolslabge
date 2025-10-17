@@ -14,7 +14,7 @@ class ProjectStatusChoices(models.TextChoices):
     ON_HOLD = "on_hold", "On Hold"
 
 
-class ProjectRoleChoices(models.TextChoices):
+class ProjectMemberRoleChoices(models.TextChoices):
     MANAGER = "manager", "Manager"
     CONTRIBUTOR = "contributor", "Contributor"
     VIEWER = "viewer", "Viewer"

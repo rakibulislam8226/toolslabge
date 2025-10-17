@@ -9,7 +9,11 @@ from common.models import TimeStampedModel
 from apps.organizations.models import Organization
 
 
-from .choices import ProjectVisibilityChoices, ProjectStatusChoices, ProjectRoleChoices
+from .choices import (
+    ProjectVisibilityChoices,
+    ProjectStatusChoices,
+    ProjectMemberRoleChoices,
+)
 
 
 class Project(TimeStampedModel):
@@ -19,6 +23,8 @@ class Project(TimeStampedModel):
     name = models.CharField(max_length=255)
     slug = AutoSlugField(populate_from="name", unique=True)
     description = models.TextField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
     visibility = models.CharField(
         max_length=50,
         choices=ProjectVisibilityChoices.choices,
@@ -37,7 +43,7 @@ class Project(TimeStampedModel):
         return self.name
 
 
-class ProjectMembership(TimeStampedModel):
+class ProjectMember(TimeStampedModel):
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="memberships"
     )
@@ -48,8 +54,8 @@ class ProjectMembership(TimeStampedModel):
     )
     role = models.CharField(
         max_length=100,
-        choices=ProjectRoleChoices.choices,
-        default=ProjectRoleChoices.CONTRIBUTOR,
+        choices=ProjectMemberRoleChoices.choices,
+        default=ProjectMemberRoleChoices.CONTRIBUTOR,
     )
 
     class Meta:

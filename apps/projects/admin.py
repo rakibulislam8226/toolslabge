@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Project, ProjectMembership
+from .models import Project, ProjectMember
 
 # Register your models here.
 
@@ -18,8 +18,8 @@ class ProjectAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
 
-@admin.register(ProjectMembership)
-class ProjectMembershipAdmin(admin.ModelAdmin):
+@admin.register(ProjectMember)
+class ProjectMemberAdmin(admin.ModelAdmin):
     list_display = (
         "project",
         "user",
