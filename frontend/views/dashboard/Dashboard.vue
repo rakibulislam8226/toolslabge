@@ -23,17 +23,20 @@
             <p class="text-gray-600 text-sm">Add your team members to start collaborating on projects.</p>
           </div>
 
-          <div class="border border-gray-200 rounded-lg p-4">
+          <router-link 
+            to="/projects" 
+            class="border border-gray-200 rounded-lg p-4 hover:border-green-300 hover:bg-green-50 transition-all duration-300 block"
+          >
             <div class="flex items-center mb-3">
               <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
                 <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
               </div>
-              <h3 class="font-semibold text-gray-900">Create First Project</h3>
+              <h3 class="font-semibold text-gray-900">View Projects</h3>
             </div>
-            <p class="text-gray-600 text-sm">Set up your first project and start organizing your work.</p>
-          </div>
+            <p class="text-gray-600 text-sm">View and manage your projects, or create your first one.</p>
+          </router-link>
 
           <div class="border border-gray-200 rounded-lg p-4">
             <div class="flex items-center mb-3">
@@ -52,7 +55,10 @@
 
       <!-- Quick Stats -->
       <div class="grid md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
+        <router-link 
+          to="/projects" 
+          class="bg-white rounded-lg shadow p-6 hover:shadow-lg hover:bg-blue-50 transition-all duration-300 block"
+        >
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
@@ -66,7 +72,7 @@
               <p class="text-2xl font-semibold text-gray-900">0</p>
             </div>
           </div>
-        </div>
+        </router-link>
 
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">

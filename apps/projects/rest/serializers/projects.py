@@ -163,6 +163,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "slug",
             "description",
             "start_date",
             "end_date",
