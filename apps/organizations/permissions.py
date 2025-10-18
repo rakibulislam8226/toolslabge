@@ -22,3 +22,19 @@ class IsOrgOwnerAdminOrManager(permissions.BasePermission):
         ).exists():
             return True
         return False
+    
+class IsOrgOwnerAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        print(obj)
+        if request.user.organization_memberships.filter(
+            user=request.user, role=OrganizationMemberRoleChoices.OWNER
+        ).exists():
+            return True
+        if request.user.organization_memberships.filter(
+            user=request.user, role=OrganizationMemberRoleChoices.ADMIN
+        ).exists():
+            return True
+        return False
