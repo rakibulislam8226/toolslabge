@@ -239,17 +239,17 @@
           </div>
         </div>
 
-        <!-- Team Members -->
+        <!-- Organization Members -->
         <div class="bg-white rounded-lg shadow-sm border p-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">Team Members</h2>
+            <h2 class="text-xl font-semibold text-gray-900">Organization Members</h2>
             <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Manage</button>
           </div>
           <div class="text-center py-8 text-gray-500">
             <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
             </svg>
-            <p>Team members will be displayed here</p>
+            <p>Organization members will be displayed here</p>
           </div>
         </div>
       </div>

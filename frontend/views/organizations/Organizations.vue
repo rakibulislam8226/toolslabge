@@ -6,10 +6,10 @@
         <div class="md:flex md:items-center md:justify-between">
           <div class="flex-1 min-w-0">
             <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-              Team Members
+              Organization Members
             </h2>
             <p class="mt-1 text-sm text-gray-500">
-              Manage your organization's team members and invite new ones.
+              Manage your organization's members and invite new ones.
             </p>
           </div>
           <div class="mt-6 flex space-x-3 md:mt-0 md:ml-4">
@@ -29,7 +29,7 @@
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <!-- Team Members List -->
+      <!-- Organization Members List -->
       <div class="bg-white shadow-lg overflow-hidden sm:rounded-xl border border-gray-200 hover:shadow-xl transition-shadow duration-300">
         <div class="px-6 py-6 sm:p-8">
           <h3 class="text-lg leading-6 font-semibold text-gray-900 mb-6">Current Members</h3>
@@ -44,7 +44,7 @@
           <!-- Loading state -->
           <div v-if="loading" class="text-center py-12">
             <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600 shadow-sm"></div>
-            <p class="mt-4 text-sm text-gray-500 font-medium">Loading team members...</p>
+            <p class="mt-4 text-sm text-gray-500 font-medium">Loading organization members...</p>
           </div>
 
           <!-- Members list -->
@@ -123,8 +123,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">Team Management</h3>
-            <p class="text-gray-600 mb-6 max-w-md mx-auto">Invite team members to collaborate on your projects and build amazing things together.</p>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Organization Management</h3>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">Invite organization members to collaborate on your projects and build amazing things together.</p>
             <button
               @click="openInviteModal = true"
               class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg"
@@ -218,7 +218,7 @@ const organizationId = computed(() => {
   return null
 })
 
-// Fetch team members
+// Fetch organization members
 const fetchMembers = async () => {
   try {
     loading.value = true
@@ -232,7 +232,7 @@ const fetchMembers = async () => {
       console.warn('Unexpected API response structure:', response.data)
     }
   } catch (error) {
-    console.error("Error fetching team members:", error)
+    console.error("Error fetching organization members:", error)
     members.value = []
   } finally {
     loading.value = false

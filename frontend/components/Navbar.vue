@@ -17,9 +17,9 @@
                             class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-blue-50">
                             Projects
                         </router-link>
-                        <router-link to="/teams"
+                        <router-link to="/organization"
                             class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-green-50">
-                            Teams
+                            Organization
                         </router-link>
                         <router-link to="/tasks"
                             class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-purple-50">
@@ -214,9 +214,9 @@
                         class="block text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg text-base font-medium transition-all duration-300">
                         Projects
                     </router-link>
-                    <router-link to="/teams"
+                    <router-link to="/organization"
                         class="block text-gray-700 hover:text-green-600 hover:bg-green-50 px-3 py-2 rounded-lg text-base font-medium transition-all duration-300">
-                        Teams
+                        Organization
                     </router-link>
                     <router-link to="/tasks"
                         class="block text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-3 py-2 rounded-lg text-base font-medium transition-all duration-300">
@@ -251,17 +251,24 @@
             </div>
         </transition>
     </nav>
+
+    <!-- Logout Modal -->
+    <LogoutModal 
+        :is-open="showLogoutModal" 
+        @close="closeLogoutModal" 
+    />
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useAuth } from "@/composables/useAuth.js";
 import { useLogoutModal } from "@/composables/useLogoutModal.js";
+import LogoutModal from "./modals/LogoutModal.vue";
 
 const mobileMenuOpen = ref(false);
 const dropdownOpen = ref(false);
 const { isAuthenticated, user } = useAuth();
-const { openLogoutModal } = useLogoutModal();
+const { showLogoutModal, openLogoutModal, closeLogoutModal } = useLogoutModal();
 
 function handleLogout() {
     openLogoutModal();

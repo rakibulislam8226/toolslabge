@@ -8,7 +8,7 @@
         </h1>
         <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
           Streamline your organization's workflow with our powerful project management and tracking solution. 
-          Get started today and transform how your team collaborates.
+          Get started today and transform how your organization collaborates.
         </p>
         
         <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
@@ -52,8 +52,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold mb-2">Team Collaboration</h3>
-            <p class="text-gray-600">Connect your team members and enhance collaboration with real-time updates.</p>
+            <h3 class="text-xl font-semibold mb-2">Organization Collaboration</h3>
+            <p class="text-gray-600">Connect your organization members and enhance collaboration with real-time updates.</p>
           </div>
           
           <div class="text-center p-6">

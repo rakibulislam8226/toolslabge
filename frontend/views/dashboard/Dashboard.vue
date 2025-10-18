@@ -12,7 +12,7 @@
         
         <div class="grid md:grid-cols-3 gap-6 mt-6">
           <router-link 
-            to="/teams" 
+            to="/organization" 
             class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 block"
           >
             <div class="flex items-center mb-3">
@@ -21,9 +21,9 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
                 </svg>
               </div>
-              <h3 class="font-semibold text-gray-900">Invite Team Members</h3>
+              <h3 class="font-semibold text-gray-900">Organization Members</h3>
             </div>
-            <p class="text-gray-600 text-sm">Add your team members to start collaborating on projects.</p>
+            <p class="text-gray-600 text-sm">Add your organization members to start collaborating on projects.</p>
           </router-link>
 
           <router-link 
@@ -94,7 +94,7 @@
         </div>
 
         <router-link 
-          to="/teams" 
+          to="/organization" 
           class="bg-white rounded-lg shadow p-6 hover:shadow-lg hover:bg-purple-50 transition-all duration-300 block"
         >
           <div class="flex items-center">
@@ -106,7 +106,7 @@
               </div>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Team Members</p>
+              <p class="text-sm font-medium text-gray-500">Organization Members</p>
               <p class="text-2xl font-semibold text-gray-900">1</p>
             </div>
           </div>
