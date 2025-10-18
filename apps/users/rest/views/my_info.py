@@ -16,14 +16,7 @@ class MyInfoView(generics.RetrieveUpdateAPIView):
         """Get the current user's information."""
         user = self.get_object()
         serializer = self.get_serializer(user)
-        return Response(
-            {
-                "success": True,
-                "data": serializer.data,
-                "message": "User information retrieved successfully",
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         """Update the current user's information."""
@@ -33,20 +26,6 @@ class MyInfoView(generics.RetrieveUpdateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response(
-                {
-                    "success": True,
-                    "data": serializer.data,
-                    "message": "User information updated successfully",
-                },
-                status=status.HTTP_200_OK,
-            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response(
-            {
-                "success": False,
-                "errors": serializer.errors,
-                "message": "Validation failed",
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

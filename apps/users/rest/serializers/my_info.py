@@ -25,7 +25,6 @@ class UserOrganizationSerializer(serializers.ModelSerializer):
 
 class MyInfoSerializer(serializers.ModelSerializer):
     organizations = serializers.SerializerMethodField()
-    full_name = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -33,7 +32,6 @@ class MyInfoSerializer(serializers.ModelSerializer):
             "id",
             "first_name",
             "last_name",
-            "full_name",
             "email",
             "username",
             "is_verified",
@@ -51,10 +49,6 @@ class MyInfoSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-
-    def get_full_name(self, user):
-        """Return the user's full name."""
-        return f"{user.first_name} {user.last_name}".strip() or user.email
 
     def get_organizations(self, user):
         memberships = OrganizationMember.objects.filter(user=user, is_active=True)
