@@ -116,11 +116,11 @@ const handleLogin = async () => {
 
     // Handle successful login - check for tokens in nested data structure
     if (response.data.data?.access && response.data.data?.refresh) {
-      // Login with tokens from nested data structure
-      login({
+      // Login with tokens - user info will be fetched automatically
+      await login({
         access: response.data.data.access,
         refresh: response.data.data.refresh
-      }, response.data.data.user || null)
+      })
 
       successMessage.value = 'Login successful! Redirecting...'
 
@@ -131,10 +131,10 @@ const handleLogin = async () => {
 
     } else if (response.data.access && response.data.refresh) {
       // Fallback: Login with tokens from direct structure
-      login({
+      await login({
         access: response.data.access,
         refresh: response.data.refresh
-      }, response.data.user || null)
+      })
 
       successMessage.value = 'Login successful! Redirecting...'
 

@@ -13,8 +13,8 @@ export function useAuth() {
   // Computed property to check if user is authenticated
   const isAuthenticated = computed(() => !!accessToken.value)
 
-  // Login function - sets tokens and user data
-  const login = (tokens, userData = null) => {
+  // Login function - sets tokens and fetches user data
+  const login = async (tokens, userData = null) => {
     if (tokens.access) {
       accessToken.value = tokens.access
       localStorage.setItem('access', tokens.access)
@@ -25,9 +25,20 @@ export function useAuth() {
       localStorage.setItem('refresh', tokens.refresh)
     }
 
-    if (userData) {
-      user.value = userData
-      localStorage.setItem('user', JSON.stringify(userData))
+    // Always fetch fresh user data after login
+    try {
+      const userInfo = await fetchUserProfile()
+      if (userInfo) {
+        user.value = userInfo
+        localStorage.setItem('user', JSON.stringify(userInfo))
+      }
+    } catch (error) {
+      console.error('Failed to fetch user profile after login:', error)
+      // If provided userData is available, use it as fallback
+      if (userData) {
+        user.value = userData
+        localStorage.setItem('user', JSON.stringify(userData))
+      }
     }
   }
 
@@ -56,12 +67,17 @@ export function useAuth() {
     refresh: refreshToken.value
   })
 
-  // Fetch user profile (you can call this after login if user data is not provided)
+  // Fetch user profile (automatically called after login)
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get('users/my-info/')
-      setUser(response.data)
-      return response.data
+      if (response.data.status && response.data.data) {
+        setUser(response.data.data)
+        return response.data.data
+      } else {
+        setUser(response.data)
+        return response.data
+      }
     } catch (error) {
       console.error('Failed to fetch user profile:', error)
       return null

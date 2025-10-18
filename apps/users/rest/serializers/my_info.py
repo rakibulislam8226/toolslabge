@@ -33,6 +33,7 @@ class MyInfoSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
+            "photo",
             "username",
             "is_verified",
             "organizations",
