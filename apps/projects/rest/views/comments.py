@@ -11,5 +11,9 @@ class TaskCommentListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsProjectMemberForComments]
 
     def get_queryset(self):
+        user = self.request.user
         task_id = self.kwargs.get("task_id")
-        return TaskComment.objects.filter(task_id=task_id).select_related("author")
+
+        return TaskComment.objects.filter(
+            task_id=task_id, task__project__memberships__user=user
+        ).select_related("author")

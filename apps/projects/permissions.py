@@ -2,6 +2,7 @@ from rest_framework import permissions
 
 from apps.projects.choices import ProjectMemberRoleChoices
 from apps.projects.models import ProjectMember
+from apps.tasks.models import Task
 
 
 class IsProjectMemberOrManager(permissions.BasePermission):
@@ -36,29 +37,22 @@ class IsProjectMemberForComments(permissions.BasePermission):
     Only project members can view or create comments.
     """
 
-    def has_object_permission(self, request, view, obj):
-        user = request.user
-
-        # Traverse to project via task
-        project = obj.task.project
-
-        # User must be a member of the project
-        if not ProjectMember.objects.filter(user=user, project=project).exists():
+    def has_permission(self, request, view):
+        task_id = view.kwargs.get("task_id")
+        if not task_id:
+            return False
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
             return False
 
-        # Managers or contributors have full access
-        if ProjectMember.objects.filter(
-            user=user,
-            project=project,
-            role__in=[
-                ProjectMemberRoleChoices.MANAGER,
-                ProjectMemberRoleChoices.CONTRIBUTOR,
-            ],
-        ).exists():
-            return True
+        # Check if user is a member of the task's project
+        return ProjectMember.objects.filter(
+            user=request.user, project=task.project
+        ).exists()
 
-        # Read-only methods are allowed for any project member
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        return False
+    def has_object_permission(self, request, view, obj):
+        # Ensure user is a project member for object-level access
+        return ProjectMember.objects.filter(
+            user=request.user, project=obj.task.project
+        ).exists()
