@@ -9,7 +9,7 @@ from common.models import TimeStampedModel
 from apps.organizations.models import Organization
 from apps.projects.models import Project, ProjectMember
 
-from .choices import TasksPriorityChoices
+from .choices import TasksPriorityChoices, TasksActivityTypeChoices
 
 
 class TaskStatus(TimeStampedModel):
@@ -107,16 +107,15 @@ class TaskAttachment(TimeStampedModel):
         return f"Attachment for {self.task} by {self.uploaded_by}"
 
 
-class TaskHistory(TimeStampedModel):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="history")
-    changed_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="task_histories",
+class TaskActivity(TimeStampedModel):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="activity")
+    action = models.CharField(
+        max_length=50,
+        choices=TasksActivityTypeChoices.choices,
     )
-    field = models.CharField(max_length=100)
-    old_value = models.TextField(null=True, blank=True)
-    new_value = models.TextField(null=True, blank=True)
+    details = models.TextField(blank=True, null=True)
+    old_value = models.JSONField(null=True, blank=True)
+    new_value = models.JSONField(null=True, blank=True)
 
     class Meta:
         indexes = [models.Index(fields=["task", "created_at"])]

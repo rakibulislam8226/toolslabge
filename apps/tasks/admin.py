@@ -5,7 +5,7 @@ from .models import (
     TaskStatus,
     TaskComment,
     TaskAttachment,
-    TaskHistory,
+    TaskActivity,
     TaskMember,
 )
 
@@ -50,8 +50,8 @@ class TaskAttachmentAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
 
-@admin.register(TaskHistory)
-class TaskHistoryAdmin(admin.ModelAdmin):
-    list_display = ("task", "updated_at", "changed_by")
-    search_fields = ("task__title", "changed_by__username", "change_description")
+@admin.register(TaskActivity)
+class TaskActivityAdmin(admin.ModelAdmin):
+    list_display = ("task", "updated_at", "created_by", "action")
+    search_fields = ("task__title", "created_by__username", "details")
     ordering = ("-updated_at",)
