@@ -2,7 +2,7 @@ from rest_framework import generics
 
 from apps.tasks.models import TaskComment
 
-from ...permissions import IsProjectMemberForComments
+from ...permissions import IsProjectMemberForComments, IsCommentAuthor
 from ..serializers.comments import TaskCommentListSerializer
 
 
@@ -11,9 +11,11 @@ class TaskCommentListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsProjectMemberForComments]
 
     def get_queryset(self):
-        user = self.request.user
         task_id = self.kwargs.get("task_id")
+        return TaskComment.objects.filter(task_id=task_id).select_related("author")
 
-        return TaskComment.objects.filter(
-            task_id=task_id, task__project__memberships__user=user
-        ).select_related("author")
+
+class TaskCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TaskCommentListSerializer
+    permission_classes = [IsCommentAuthor]
+    queryset = TaskComment.objects.select_related("task", "author")

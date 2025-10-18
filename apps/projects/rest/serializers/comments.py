@@ -30,6 +30,7 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
         task = Task.objects.get(id=task_id)
 
         return TaskComment.objects.create(
+            created_by=user,
             author=user,
             task=task,
             **validated_data,

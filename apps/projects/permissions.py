@@ -46,13 +46,18 @@ class IsProjectMemberForComments(permissions.BasePermission):
         except Task.DoesNotExist:
             return False
 
-        # Check if user is a member of the task's project
         return ProjectMember.objects.filter(
             user=request.user, project=task.project
         ).exists()
 
     def has_object_permission(self, request, view, obj):
-        # Ensure user is a project member for object-level access
         return ProjectMember.objects.filter(
             user=request.user, project=obj.task.project
         ).exists()
+
+
+class IsCommentAuthor(permissions.BasePermission):
+    """Only comment authors can edit or delete their comments."""
+
+    def has_object_permission(self, request, view, obj):
+        return obj.author == request.user

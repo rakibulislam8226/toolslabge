@@ -32,11 +32,7 @@ class User(AbstractUser, TimeStampedModel, PermissionsMixin):
         ]
 
     def __str__(self):
-        return f"UID: {self.uid}, Email: {self.email}"
-
-    # def get_full_name(self):
-    #     name = " ".join([self.first_name, self.last_name])
-    #     return name.strip()
+        return f"{self.email}"
 
     def save(self, *args, **kwargs):
         if not self.pk:
