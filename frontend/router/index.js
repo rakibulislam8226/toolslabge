@@ -8,8 +8,13 @@ const routes = [
   },
   {
     path: "/home",
-    name: "home.index",
+    name: "home",
     component: () => import("@/views/home/Home.vue"),
+  },
+  {
+    path: "/register",
+    name: "auth.register",
+    component: () => import("@/views/auth/Register.vue"),
   },
   {
     path: "/:pathMatch(.*)*",
