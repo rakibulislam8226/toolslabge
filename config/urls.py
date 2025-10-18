@@ -49,6 +49,8 @@ urlpatterns = [
     path(f"{API_V1}/projects/", include("apps.projects.rest.urls")),
     # tasks
     path(f"{API_V1}/tasks/", include("apps.tasks.rest.urls")),
+    # users
+    path(f"{API_V1}/users/", include("apps.users.rest.urls")),
 ]
 
 
