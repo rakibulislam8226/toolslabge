@@ -16,6 +16,7 @@ export default defineConfig({
       "@views": "/frontend/views",
       "@constants": "/frontend/constants",
       "@plugins": "/frontend/plugins",
+      "@components": "/frontend/components",
     },
   },
 });
