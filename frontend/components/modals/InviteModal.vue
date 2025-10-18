@@ -104,21 +104,6 @@
         </div>
       </div>
 
-      <!-- Debug Info (temporary) -->
-      <div class="mt-4 p-3 bg-gray-100 border rounded-md text-xs">
-        <p><strong>Debug Info:</strong></p>
-        <p>User exists: {{ !!user }}</p>
-        <p>Organization ID: {{ organizationId }}</p>
-        <p>User has data: {{ !!user?.data }}</p>
-        <p>User.data organizations: {{ user?.data?.organizations?.length || 0 }}</p>
-        <p>User organizations: {{ user?.organizations?.length || 0 }}</p>
-        <p>User.data org memberships: {{ user?.data?.organization_memberships?.length || 0 }}</p>
-        <p>User org memberships: {{ user?.organization_memberships?.length || 0 }}</p>
-        <div class="mt-2 p-2 bg-white rounded text-xs max-h-20 overflow-y-auto">
-          <p><strong>Full user data:</strong></p>
-          <pre>{{ JSON.stringify(user, null, 2) }}</pre>
-        </div>
-      </div>
     </div>
   </div>
 </template>
