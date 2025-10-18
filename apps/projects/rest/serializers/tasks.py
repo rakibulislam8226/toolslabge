@@ -163,3 +163,140 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
         return task
+
+
+class TaskDetailSerializer(serializers.ModelSerializer):
+    status_id = serializers.PrimaryKeyRelatedField(
+        source="status",
+        queryset=TaskStatus.objects.none(),
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+    members = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        allow_empty=True,
+        required=False,
+    )
+
+    # Read-only fields
+    project = serializers.SerializerMethodField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
+    assigned_members = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "project",
+            "title",
+            "description",
+            "start_date",
+            "due_date",
+            "status_id",
+            "status",
+            "members",
+            "assigned_members",
+            "created_by",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "created_by",
+            "created_at",
+            "updated_at",
+            "project",
+            "status",
+            "assigned_members",
+        ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        user = self.context["request"].user
+        org_ids = user.organization_memberships.filter(is_active=True).values_list(
+            "organization", flat=True
+        )
+        fields["status_id"].queryset = TaskStatus.objects.filter(
+            organization__in=org_ids
+        )
+        return fields
+
+    def get_project(self, obj):
+        return {"id": obj.project.id, "name": obj.project.name}
+
+    def get_status(self, obj):
+        if not obj.status:
+            return None
+        return {
+            "id": obj.status.id,
+            "name": obj.status.name,
+            "slug": getattr(obj.status, "slug", None),
+        }
+
+    def get_assigned_members(self, obj):
+        task_members = obj.task_members.select_related("member__user")
+        users = [tm.member.user for tm in task_members]
+        return UserSlimSerializer(users, many=True).data
+
+    def validate(self, data):
+        user = self.context["request"].user
+        instance = self.instance
+
+        start, due = data.get("start_date"), data.get("due_date")
+        if start and due and start > due:
+            raise serializers.ValidationError(
+                {"due_date": "Due date must be after start date."}
+            )
+
+        # Validate members (if given)
+        member_ids = self.initial_data.get("members", [])
+        if member_ids:
+            members_qs = ProjectMember.objects.filter(
+                project=instance.project, user__id__in=member_ids
+            )
+            if members_qs.count() != len(member_ids):
+                invalid_ids = set(member_ids) - set(
+                    members_qs.values_list("user__id", flat=True)
+                )
+                raise serializers.ValidationError(
+                    {"members": f"Invalid members: {list(invalid_ids)}"}
+                )
+            self.context["validated_members"] = list(members_qs)
+        else:
+            self.context["validated_members"] = []
+
+        # Validate status belongs to same org
+        status_obj = data.get("status")
+        if status_obj and status_obj.organization_id != instance.organization_id:
+            raise serializers.ValidationError(
+                {"status_id": "Status must belong to this project's organization."}
+            )
+
+        return data
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        user = self.context["request"].user
+        members = self.context.pop("validated_members", [])
+
+        # Handle member reassignment
+        if "members" in self.initial_data:
+            instance.task_members.all().delete()
+            TaskMember.objects.bulk_create(
+                [TaskMember(task=instance, member=m, created_by=user) for m in members]
+            )
+
+        # Handle status
+        status = validated_data.get("status")
+        if status and status.organization_id != instance.organization_id:
+            raise serializers.ValidationError(
+                {"status_id": "Status must belong to this project's organization."}
+            )
+
+        # Update allowed fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance

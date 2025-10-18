@@ -2,7 +2,9 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from apps.tasks.models import Task
-from ..serializers.tasks import TaskSerializer
+
+from ..serializers.tasks import TaskSerializer, TaskDetailSerializer
+from ...permissions import IsProjectMemberOrManager
 
 
 class TaskListCreateView(generics.ListCreateAPIView):
@@ -16,3 +18,9 @@ class TaskListCreateView(generics.ListCreateAPIView):
             .filter(project__memberships__user=user)
             .distinct()
         )
+
+
+class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TaskDetailSerializer
+    permission_classes = [IsProjectMemberOrManager]
+    queryset = Task.objects.select_related("project", "status", "organization")
