@@ -4,7 +4,7 @@
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <!-- Welcome Section -->
       <div class="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">🎉 Welcome to BaseTrack!</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Welcome to BaseTrack!</h2>
         <p class="text-gray-600 mb-4">
           Your organization has been successfully created and you're now logged in. 
           Here's what you can do next:
