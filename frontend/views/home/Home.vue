@@ -18,9 +18,12 @@
           >
             Create Your Organization
           </router-link>
-          <button class="inline-block border border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition duration-300">
-            Learn More
-          </button>
+          <router-link 
+            to="/login" 
+            class="inline-block border border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition duration-300"
+          >
+            Already have an account? Login
+          </router-link>
         </div>
       </div>
     </div>
@@ -75,12 +78,20 @@
         <p class="text-blue-100 mb-8 max-w-2xl mx-auto">
           Join thousands of organizations already using BaseTrack to streamline their operations and boost productivity.
         </p>
-        <router-link 
-          to="/register" 
-          class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300 shadow-lg"
-        >
-          Start Your Free Organization
-        </router-link>
+        <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+          <router-link 
+            to="/register" 
+            class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300 shadow-lg"
+          >
+            Start Your Free Organization
+          </router-link>
+          <router-link 
+            to="/login" 
+            class="inline-block border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
+          >
+            Login to Existing Account
+          </router-link>
+        </div>
       </div>
     </div>
   </div>

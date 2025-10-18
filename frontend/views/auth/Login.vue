@@ -3,42 +3,12 @@
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Create Organization</h1>
-        <p class="text-gray-600">Start your journey with BaseTrack</p>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+        <p class="text-gray-600">Sign in to your BaseTrack account</p>
       </div>
 
-      <!-- Registration Form -->
-      <form @submit.prevent="createOrganization" class="space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2" for="first_name">
-              First Name
-            </label>
-            <input
-              type="text"
-              id="first_name"
-              v-model="form.first_name"
-              placeholder="Enter your first name"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2" for="last_name">
-              Last Name
-            </label>
-            <input
-              type="text"
-              id="last_name"
-              v-model="form.last_name"
-              placeholder="Enter your last name"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-        </div>
-
+      <!-- Login Form -->
+      <form @submit.prevent="handleLogin" class="space-y-6">
         <div>
           <label class="block text-gray-700 text-sm font-medium mb-2" for="email">
             Email Address
@@ -67,20 +37,6 @@
           />
         </div>
 
-        <div>
-          <label class="block text-gray-700 text-sm font-medium mb-2" for="organization_name">
-            Organization Name
-          </label>
-          <input
-            type="text"
-            id="organization_name"
-            v-model="form.organization_name"
-            placeholder="Enter organization name"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
-        </div>
-
         <button
           type="submit"
           class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -91,9 +47,9 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Creating...
+            Signing in...
           </span>
-          <span v-else>Create Organization</span>
+          <span v-else>Sign In</span>
         </button>
       </form>
 
@@ -106,11 +62,21 @@
         <p class="text-red-600 text-center font-medium">{{ errorMessage }}</p>
       </div>
 
-      <!-- Back to Home -->
-      <div class="mt-6 text-center">
+      <!-- Links -->
+      <div class="mt-6 text-center space-y-2">
+        <p class="text-gray-600 text-sm">
+          Don't have an account?
+          <router-link 
+            to="/register" 
+            class="text-blue-600 hover:text-blue-800 font-medium transition duration-300"
+          >
+            Create Organization
+          </router-link>
+        </p>
+        
         <router-link 
           to="/" 
-          class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-300"
+          class="block text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-300"
         >
           ← Back to Home
         </router-link>
@@ -129,57 +95,64 @@ const router = useRouter()
 const { login } = useAuth()
 
 const form = reactive({
-  first_name: '',
-  last_name: '',
   email: '',
-  password: '',
-  organization_name: ''
+  password: ''
 })
 
 const loading = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-const createOrganization = async () => {
+const handleLogin = async () => {
   successMessage.value = ''
   errorMessage.value = ''
   loading.value = true
 
   try {
-    const response = await axios.post('organizations/register/', { ...form })
-    successMessage.value = response.data.data.detail || response.data.message || 'Organization created successfully!'
+    const response = await axios.post('token/', {
+      email: form.email,
+      password: form.password
+    })
 
-    // Handle authentication tokens if provided
-    if (response.data.access && response.data.refresh) {
-      // Login the user with tokens
-      login({
-        access: response.data.access,
-        refresh: response.data.refresh
-      }, response.data.user || null)
-
-      // Show success message briefly then redirect to dashboard
-      setTimeout(() => {
-        router.push('/dashboard') // Redirect to dashboard after login
-      }, 1500)
-    } else if (response.data.data?.access && response.data.data?.refresh) {
-      // Handle nested token structure
+    // Handle successful login - check for tokens in nested data structure
+    if (response.data.data?.access && response.data.data?.refresh) {
+      // Login with tokens from nested data structure
       login({
         access: response.data.data.access,
         refresh: response.data.data.refresh
       }, response.data.data.user || null)
 
+      successMessage.value = 'Login successful! Redirecting...'
+
+      // Redirect to dashboard
       setTimeout(() => {
         router.push('/dashboard')
-      }, 1500)
+      }, 1000)
+
+    } else if (response.data.access && response.data.refresh) {
+      // Fallback: Login with tokens from direct structure
+      login({
+        access: response.data.access,
+        refresh: response.data.refresh
+      }, response.data.user || null)
+
+      successMessage.value = 'Login successful! Redirecting...'
+
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1000)
+
     } else {
-      // No tokens provided, just show success message
-      // Reset form
-      Object.keys(form).forEach(key => (form[key] = ''))
+      errorMessage.value = 'Invalid response from server. Please try again.'
     }
 
   } catch (error) {
-    if (error.response?.data?.detail) {
+    if (error.response?.status === 401) {
+      errorMessage.value = 'Invalid email or password. Please try again.'
+    } else if (error.response?.data?.detail) {
       errorMessage.value = error.response.data.detail
+    } else if (error.response?.data?.non_field_errors) {
+      errorMessage.value = error.response.data.non_field_errors[0]
     } else if (error.response?.data) {
       // Handle field-specific errors
       const errors = Object.values(error.response.data).flat()
