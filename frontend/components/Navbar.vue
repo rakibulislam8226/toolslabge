@@ -17,6 +17,10 @@
                             class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-blue-50">
                             Projects
                         </router-link>
+                        <router-link to="/teams"
+                            class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-green-50">
+                            Teams
+                        </router-link>
                         <router-link to="/tasks"
                             class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-purple-50">
                             Tasks
@@ -78,6 +82,10 @@
                     <router-link to="/projects"
                         class="block text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg text-base font-medium transition-all duration-300">
                         Projects
+                    </router-link>
+                    <router-link to="/teams"
+                        class="block text-gray-700 hover:text-green-600 hover:bg-green-50 px-3 py-2 rounded-lg text-base font-medium transition-all duration-300">
+                        Teams
                     </router-link>
                     <router-link to="/tasks"
                         class="block text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-3 py-2 rounded-lg text-base font-medium transition-all duration-300">

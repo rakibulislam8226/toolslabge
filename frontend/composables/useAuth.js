@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from '@/plugins/axiosConfig.js'
 
 // Global authentication state (you could also use Pinia for this)
 const accessToken = ref(localStorage.getItem('access') || null)
@@ -58,10 +59,9 @@ export function useAuth() {
   // Fetch user profile (you can call this after login if user data is not provided)
   const fetchUserProfile = async () => {
     try {
-      // You can uncomment this when you have a profile endpoint
-      // const response = await axios.get('user/profile/')
-      // setUser(response.data)
-      // return response.data
+      const response = await axios.get('users/my-info/')
+      setUser(response.data)
+      return response.data
     } catch (error) {
       console.error('Failed to fetch user profile:', error)
       return null

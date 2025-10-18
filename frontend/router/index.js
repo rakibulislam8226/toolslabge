@@ -48,6 +48,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/teams",
+    name: "teams.index",
+    component: () => import("@/views/teams/Teams.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import("@views/errors/404.vue"),

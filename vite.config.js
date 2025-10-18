@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { djangoVitePlugin } from "django-vite-plugin";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
+import path from "path";
 
 export default defineConfig({
   server: {
@@ -12,11 +13,11 @@ export default defineConfig({
   resolve: {
     alias: {
       vue: "vue/dist/vue.esm-bundler.js",
-      "@": "/frontend",
-      "@views": "/frontend/views",
-      "@constants": "/frontend/constants",
-      "@plugins": "/frontend/plugins",
-      "@components": "/frontend/components",
+      "@": path.resolve(__dirname, "frontend"),
+      "@views": path.resolve(__dirname, "frontend/views"),
+      "@constants": path.resolve(__dirname, "frontend/constants"),
+      "@plugins": path.resolve(__dirname, "frontend/plugins"),
+      "@components": path.resolve(__dirname, "frontend/components"),
     },
   },
 });

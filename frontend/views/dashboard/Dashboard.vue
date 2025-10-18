@@ -11,7 +11,10 @@
         </p>
         
         <div class="grid md:grid-cols-3 gap-6 mt-6">
-          <div class="border border-gray-200 rounded-lg p-4">
+          <router-link 
+            to="/teams" 
+            class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 block"
+          >
             <div class="flex items-center mb-3">
               <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                 <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +24,7 @@
               <h3 class="font-semibold text-gray-900">Invite Team Members</h3>
             </div>
             <p class="text-gray-600 text-sm">Add your team members to start collaborating on projects.</p>
-          </div>
+          </router-link>
 
           <router-link 
             to="/projects" 
@@ -90,7 +93,10 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
+        <router-link 
+          to="/teams" 
+          class="bg-white rounded-lg shadow p-6 hover:shadow-lg hover:bg-purple-50 transition-all duration-300 block"
+        >
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
@@ -104,7 +110,7 @@
               <p class="text-2xl font-semibold text-gray-900">1</p>
             </div>
           </div>
-        </div>
+        </router-link>
 
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">
