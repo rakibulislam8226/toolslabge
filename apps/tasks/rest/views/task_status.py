@@ -12,7 +12,9 @@ class TaskStatusListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return TaskStatus.objects.filter(organization__memberships__user=user)
+        return TaskStatus.objects.filter(organization__memberships__user=user).order_by(
+            "position"
+        )
 
     def perform_create(self, serializer):
         org = self.request.user.organization_memberships.first().organization
