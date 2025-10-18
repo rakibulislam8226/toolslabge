@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :is-open="true" title="Invite Organization Member" @close="$emit('close')">
+  <BaseModal :is-open="true" title="Invite Organization's Member" @close="$emit('close')">
     <div class="space-y-4">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>

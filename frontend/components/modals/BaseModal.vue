@@ -4,8 +4,8 @@
     class="fixed inset-0 z-50 overflow-y-auto"
     @click.self="handleBackdropClick"
   >
-    <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"></div>
+    <!-- Backdrop with blur effect -->
+    <div class="fixed inset-0 backdrop-blur-md bg-black/20 transition-all duration-300"></div>
     
     <!-- Modal Content -->
     <div class="flex min-h-full items-center justify-center p-4">
