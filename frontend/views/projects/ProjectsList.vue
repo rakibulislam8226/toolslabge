@@ -291,8 +291,7 @@ const viewProject = (project) => {
 const editProject = (project) => {
   // Navigate to edit project page using slug-id format
   const slug = project.slug ? `${project.slug}-${project.id}` : project.id
-  console.log('Edit project:', project)
-  // router.push(`/projects/${slug}/edit`)
+  router.push(`/projects/${slug}/edit`)
 }
 
 // Fetch projects on component mount

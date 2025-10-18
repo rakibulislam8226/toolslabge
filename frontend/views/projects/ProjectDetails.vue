@@ -443,10 +443,9 @@ const getDaysLabel = () => {
 
 // Action functions
 const editProject = () => {
-  // Navigate to edit project page using slug-id format (implement later)
+  // Navigate to edit project page using slug-id format
   const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
-  console.log('Edit project:', project.value)
-  // router.push(`/projects/${slug}/edit`)
+  router.push(`/projects/${slug}/edit`)
 }
 
 const deleteProject = async () => {
@@ -455,15 +454,26 @@ const deleteProject = async () => {
     const id = projectId.value
     if (!id) {
       error.value = 'Cannot delete - invalid project ID'
+      showDeleteModal.value = false
       return
     }
     
     await axios.delete(`projects/${id}/`)
     showDeleteModal.value = false
+    
+    // Redirect to projects list after successful deletion
     router.push('/projects')
+    
   } catch (err) {
     console.error('Failed to delete project:', err)
-    // Handle error - maybe show a toast notification
+    showDeleteModal.value = false
+    
+    // Show error message in the main error state
+    if (err.response?.data?.detail) {
+      error.value = err.response.data.detail
+    } else {
+      error.value = 'Failed to delete project. Please try again.'
+    }
   }
 }
 

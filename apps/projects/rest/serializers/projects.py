@@ -63,7 +63,7 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
         return project_member
 
 
-#FIXME: rethink project manager assignment. currently it take from organization member id. is it take this or user id?
+# FIXME: rethink project manager assignment. currently it take from organization member id. is it take this or user id?
 class ProjectListSerializer(serializers.ModelSerializer):
     project_manager_id = serializers.IntegerField(write_only=True, required=False)
 
@@ -155,7 +155,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
 
 
 class ProjectDetailSerializer(serializers.ModelSerializer):
-    organization = serializers.StringRelatedField()
+    organization = serializers.StringRelatedField(read_only=True)
     members = ProjectMemberSerializer(many=True, read_only=True)
 
     class Meta:
@@ -173,4 +173,43 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = fields
+        read_only_fields = [
+            "id",
+            "organization",
+            "members",
+            "created_at",
+            "updated_at",
+        ]
+
+    def validate(self, data):
+        # fallback to existing values if partial update
+        start_date = data.get("start_date", getattr(self.instance, "start_date", None))
+        end_date = data.get("end_date", getattr(self.instance, "end_date", None))
+
+        if start_date and end_date and start_date > end_date:
+            raise serializers.ValidationError(
+                {"end_date": "End date must be after start date."}
+            )
+        return data
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        """
+        Only update allowed fields safely and trigger timestamp update.
+        """
+        allowed_fields = [
+            "name",
+            "description",
+            "start_date",
+            "end_date",
+            "status",
+        ]
+
+        for field, value in validated_data.items():
+            if field in allowed_fields:
+                setattr(instance, field, value)
+
+        instance.updated_at = timezone.now()
+        instance.save(update_fields=allowed_fields + ["updated_at"])
+
+        return instance

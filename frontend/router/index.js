@@ -42,6 +42,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/projects/:slug/edit",
+    name: "projects.edit",
+    component: () => import("@/views/projects/ProjectEdit.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import("@views/errors/404.vue"),

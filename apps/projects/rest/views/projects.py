@@ -25,15 +25,16 @@ class ProjectListCreateView(generics.ListCreateAPIView):
         )
 
 
-class ProjectDetailView(generics.RetrieveAPIView):
+class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProjectDetailSerializer
     permission_classes = [IsOrgOwnerAdminOrManager]
 
     def get_queryset(self):
         user = self.request.user
+        # Fetch all projects under organizations where user has membership
         return (
             Project.objects.select_related("organization")
-            .filter(organization=user.organization_memberships.first().organization)
+            .filter(organization__memberships__user=user)
             .distinct()
         )
 
