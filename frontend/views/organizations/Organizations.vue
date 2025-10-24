@@ -189,40 +189,17 @@ import { useAuth } from '@/composables/useAuth.js'
 import axios from '@/plugins/axiosConfig.js'
 import InviteModal from '@/components/modals/InviteModal.vue'
 
-const { user, fetchUserProfile } = useAuth()
+const { fetchUserProfile } = useAuth()
 const loading = ref(true)
 const members = ref([])
 const pendingInvitations = ref([])
 const openInviteModal = ref(false)
 
-// Get current organization ID from user data
-const organizationId = computed(() => {
-  // Try different possible paths for organization data
-  if (user.value?.data?.organizations?.[0]?.organization_id) {
-    return user.value.data.organizations[0].organization_id
-  }
-  if (user.value?.organizations?.[0]?.organization_id) {
-    return user.value.organizations[0].organization_id
-  }
-  if (user.value?.data?.organization_memberships?.[0]?.organization_id) {
-    return user.value.data.organization_memberships[0].organization_id
-  }
-  if (user.value?.organization_memberships?.[0]?.organization_id) {
-    return user.value.organization_memberships[0].organization_id
-  }
-  if (user.value?.data?.organization_id) {
-    return user.value.data.organization_id
-  }
-  
-  console.log('Organization ID not found in user data:', user.value)
-  return null
-})
-
 // Fetch organization members
 const fetchMembers = async () => {
   try {
     loading.value = true
-    const response = await axios.get(`organizations/${organizationId.value}/members/`)
+    const response = await axios.get(`organizations/members/`)
     
     // Handle the API response structure
     if (response.data.status && response.data.data) {
@@ -319,18 +296,8 @@ const formatDate = (dateString) => {
 }
 
 onMounted(async () => {
-  // If no organization ID is found, try to fetch user profile first
-  if (!organizationId.value) {
-    console.log('No organization ID found, fetching user profile...')
-    await fetchUserProfile()
-  }
-  
-  if (organizationId.value) {
-    await fetchMembers()
-    await fetchPendingInvitations()
-  } else {
-    console.error('Still no organization ID found after fetching user profile')
-    loading.value = false
-  }
+  await fetchUserProfile()
+  await fetchMembers()
+  await fetchPendingInvitations()
 })
 </script>

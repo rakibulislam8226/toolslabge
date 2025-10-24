@@ -8,9 +8,10 @@ urlpatterns = [
         MyOrganizationMembersListView.as_view(),
         name="my-organization-members",
     ),
-    path(
-        "<int:org_id>/members/",
-        OrganizationMembersListView.as_view(),
-        name="list-members",
-    ),
+    # FIXME: remove in future versions
+    # path(
+    #     "<int:org_id>/members/",
+    #     OrganizationMembersListView.as_view(),
+    #     name="list-members",
+    # ),
 ]
