@@ -46,10 +46,18 @@ class ProjectMemberListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         project_id = self.kwargs.get("project_id")
-        return ProjectMember.objects.select_related("project", "user").filter(
+        search = self.request.query_params.get("search", "")
+        qs = ProjectMember.objects.select_related("project", "user").filter(
             project__organization=user.organization_memberships.first().organization,
             project__id=project_id,
         )
+        if search:
+            qs = qs.filter(
+                Q(user__first_name__icontains=search)
+                | Q(user__last_name__icontains=search)
+                | Q(user__email__icontains=search)
+            )
+        return qs
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

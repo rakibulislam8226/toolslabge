@@ -1,12 +1,13 @@
 <template>
     <div v-if="isOpen" class="fixed inset-0 overflow-y-auto z-50">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay -->
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal"></div>
+            <!-- Background overlay with blur -->
+            <div class="fixed inset-0 backdrop-blur-md bg-black/20 transition-all duration-300" @click="closeModal">
+            </div>
 
             <!-- Modal panel -->
             <div
-                class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
                 <!-- Header -->
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex items-center justify-between mb-4">
@@ -115,27 +116,51 @@
                             <label for="edit-members" class="block text-sm font-medium text-gray-700 mb-1">
                                 Assign Members
                             </label>
+
+                            <!-- Search Input -->
+                            <div class="mb-2">
+                                <input type="text" placeholder="Search members..."
+                                    @input="debouncedMemberSearch($event.target.value)"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            </div>
+
+                            <!-- Selected Members Display -->
+                            <div v-if="form.members.length > 0" class="mb-2 p-2 bg-blue-50 rounded-lg">
+                                <div class="text-xs font-medium text-blue-700 mb-1">Selected Members:</div>
+                                <div class="flex flex-wrap gap-1">
+                                    <span v-for="memberId in form.members" :key="memberId"
+                                        class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                                        {{ getSelectedMemberName(memberId) }}
+                                        <button @click="removeMember(memberId)"
+                                            class="ml-1 text-blue-600 hover:text-blue-800">
+                                            ×
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Members List -->
                             <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-2">
-                                <div v-if="projectMembers.length === 0" class="text-sm text-gray-500 text-center py-2">
+                                <div v-if="projectMembers.length === 0 && !memberSearchQuery"
+                                    class="text-sm text-gray-500 text-center py-2">
                                     No project members available
+                                </div>
+                                <div v-else-if="projectMembers.length === 0 && memberSearchQuery"
+                                    class="text-sm text-gray-500 text-center py-2">
+                                    No members found matching "{{ memberSearchQuery }}"
                                 </div>
                                 <label v-for="member in projectMembers" :key="member.id"
                                     class="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
-                                    <input type="checkbox" :value="member.user.id" v-model="form.members"
+                                    <input type="checkbox" :value="member.user" v-model="form.members"
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                                     <div class="flex items-center space-x-2 flex-1 min-w-0">
-                                        <img v-if="member.user.photo" :src="member.user.photo"
-                                            :alt="member.user.first_name || member.user.email"
-                                            class="w-6 h-6 rounded-full" />
-                                        <div v-else
-                                            class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
                                             <span class="text-xs font-medium text-gray-600">
-                                                {{ getInitials(member.user) }}
+                                                {{ getInitials(member) }}
                                             </span>
                                         </div>
                                         <span class="text-sm font-medium text-gray-900 truncate">
-                                            {{ member.user.first_name || member.user.email }}
-                                            {{ member.user.last_name }}
+                                            {{ member.user_name || member.user_email }}
                                         </span>
                                     </div>
                                 </label>
@@ -174,7 +199,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue'
+import { ref, reactive, watch, computed, onMounted, nextTick } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
 
 // Props
@@ -201,6 +226,8 @@ const loading = ref(false)
 const updating = ref(false)
 const error = ref('')
 const projectMembers = ref([])
+const memberSearchQuery = ref('')
+const searchTimeout = ref(null)
 
 const form = reactive({
     title: '',
@@ -227,10 +254,17 @@ watch(() => props.task, (newTask) => {
 
 // Watch for dialog open/close
 watch(() => props.isOpen, (isOpen) => {
-    if (isOpen && props.task) {
-        fetchTaskDetails()
-        fetchProjectMembers()
-    }
+    nextTick(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'
+            if (props.task) {
+                fetchTaskDetails()
+                fetchProjectMembers()
+            }
+        } else {
+            document.body.style.overflow = ''
+        }
+    })
 })
 
 // Fetch detailed task information
@@ -250,6 +284,18 @@ const fetchTaskDetails = async () => {
     } finally {
         loading.value = false
     }
+}
+
+// Debounced search for members
+const debouncedMemberSearch = (query) => {
+    if (searchTimeout.value) {
+        clearTimeout(searchTimeout.value)
+    }
+
+    searchTimeout.value = setTimeout(() => {
+        memberSearchQuery.value = query
+        fetchProjectMembers(query)
+    }, 300)
 }
 
 // Methods
@@ -283,11 +329,16 @@ const closeModal = () => {
     }
 }
 
-const fetchProjectMembers = async () => {
+const fetchProjectMembers = async (searchQuery = '') => {
     if (!projectId.value) return
 
     try {
-        const response = await axios.get(`projects/${projectId.value}/members/`)
+        let url = `projects/${projectId.value}/members/`
+        if (searchQuery.trim()) {
+            url += `?search=${encodeURIComponent(searchQuery.trim())}`
+        }
+
+        const response = await axios.get(url)
         projectMembers.value = response.data.data || response.data || []
     } catch (err) {
         console.error('Failed to fetch project members:', err)
@@ -361,15 +412,35 @@ const updateTask = async () => {
     }
 }
 
-const getInitials = (user) => {
-    if (user.first_name && user.last_name) {
-        return `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase()
-    } else if (user.first_name) {
-        return user.first_name.charAt(0).toUpperCase()
-    } else if (user.email) {
-        return user.email.charAt(0).toUpperCase()
+const getInitials = (member) => {
+    if (member.user_name) {
+        const nameParts = member.user_name.trim().split(' ')
+        if (nameParts.length >= 2) {
+            return `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`.toUpperCase()
+        } else {
+            return nameParts[0].charAt(0).toUpperCase()
+        }
+    } else if (member.user_email) {
+        return member.user_email.charAt(0).toUpperCase()
     }
     return '?'
+}
+
+const getSelectedMemberName = (memberId) => {
+    const member = projectMembers.value.find(m => m.user === memberId)
+    if (member) {
+        return member.user_name ?
+            member.user_name.trim() :
+            member.user_email || 'Unknown'
+    }
+    return 'Unknown'
+}
+
+const removeMember = (memberId) => {
+    const index = form.members.indexOf(memberId)
+    if (index > -1) {
+        form.members.splice(index, 1)
+    }
 }
 
 // Initialize on mount
