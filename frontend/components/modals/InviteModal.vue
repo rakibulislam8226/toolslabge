@@ -106,10 +106,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { useAuth } from '@/composables/useAuth.js'
 import axios from '@/plugins/axiosConfig.js'
 import BaseModal from './BaseModal.vue'
+const $toast = inject("toast");
 
 const emit = defineEmits(['close', 'invited'])
 const { user } = useAuth()
@@ -148,9 +149,10 @@ const send = async () => {
     message.value = 'Invitation sent!'
     isError.value = false
     emit('invited', form.value)
-    setTimeout(() => emit('close'), 1500)
+    $toast.success('Invitation sent successfully')
   } catch (error) {
     message.value = 'Failed to send invitation'
+    $toast.error('Failed to send invitation')
     isError.value = true
   } finally {
     loading.value = false
