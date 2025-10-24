@@ -1,17 +1,16 @@
 <template>
-    <div v-if="isOpen" class="fixed inset-0 overflow-y-auto" style="z-index: 9999; background: rgba(0,0,0,0.5);">
+    <div v-if="isOpen" class="fixed inset-0 overflow-y-auto z-50">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!-- Background overlay -->
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal"
-                style="z-index: 9999;"></div>
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal"></div>
 
             <!-- Modal panel -->
-            <div class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-                style="z-index: 10000;">
+            <div
+                class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <!-- Header -->
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Create New Task</h3>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Create New Task</h3>
                         <button @click="closeModal"
                             class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,7 +28,7 @@
                                 Title <span class="text-red-500">*</span>
                             </label>
                             <input id="title" v-model="form.title" type="text" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="Enter task title" />
                         </div>
 
@@ -39,7 +38,7 @@
                                 Description
                             </label>
                             <textarea id="description" v-model="form.description" rows="3"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="Enter task description"></textarea>
                         </div>
 
@@ -51,7 +50,7 @@
                                     Status
                                 </label>
                                 <select id="status" v-model="form.status_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     <option value="">Select status</option>
                                     <option v-for="status in statuses" :key="status.id" :value="status.id">
                                         {{ status.name }}
@@ -65,7 +64,7 @@
                                     Priority
                                 </label>
                                 <select id="priority" v-model="form.priority"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     <option value="low">Low</option>
                                     <option value="medium">Medium</option>
                                     <option value="high">High</option>
@@ -81,7 +80,7 @@
                                     Start Date
                                 </label>
                                 <input id="start_date" v-model="form.start_date" type="datetime-local"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
 
                             <!-- Due Date -->
@@ -90,7 +89,7 @@
                                     Due Date
                                 </label>
                                 <input id="due_date" v-model="form.due_date" type="datetime-local"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
                         </div>
 
@@ -101,44 +100,86 @@
                             </label>
                             <input id="estimated_hours" v-model.number="form.estimated_hours" type="number" step="0.5"
                                 min="0" max="999"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="e.g., 4.5" />
                         </div>
 
                         <!-- Assign Members -->
                         <div>
-                            <label for="members" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Assign Members
+                                <span class="ml-2 text-xs text-gray-500">({{ form.members.length }} selected)</span>
                             </label>
-                            <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-2">
-                                <div v-if="projectMembers.length === 0" class="text-sm text-gray-500 text-center py-2">
-                                    No project members available
+
+                            <!-- Search -->
+                            <div class="mb-3">
+                                <input v-model="memberSearchQuery" type="text"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                    placeholder="Search members..." />
+                            </div>
+
+                            <!-- Members List -->
+                            <div class="border border-gray-300 rounded-md max-h-48 overflow-y-auto">
+                                <div v-if="filteredProjectMembers.length === 0"
+                                    class="p-4 text-center text-gray-500 text-sm">
+                                    {{ memberSearchQuery ? 'No members found' : 'No project members available' }}
                                 </div>
-                                <label v-for="member in projectMembers" :key="member.id"
-                                    class="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+
+                                <label v-for="member in filteredProjectMembers" :key="member.id"
+                                    class="flex items-center space-x-3 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-200 last:border-b-0">
                                     <input type="checkbox" :value="member.user.id" v-model="form.members"
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                    <div class="flex items-center space-x-2 flex-1 min-w-0">
+
+                                    <!-- Avatar -->
+                                    <div class="flex-shrink-0">
                                         <img v-if="member.user.photo" :src="member.user.photo"
                                             :alt="member.user.first_name || member.user.email"
-                                            class="w-6 h-6 rounded-full" />
+                                            class="w-8 h-8 rounded-full" />
                                         <div v-else
-                                            class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                                            class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
                                             <span class="text-xs font-medium text-gray-600">
                                                 {{ getInitials(member.user) }}
                                             </span>
                                         </div>
-                                        <span class="text-sm font-medium text-gray-900 truncate">
+                                    </div>
+
+                                    <!-- Member Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">
                                             {{ member.user.first_name || member.user.email }}
                                             {{ member.user.last_name }}
-                                        </span>
+                                        </p>
+                                        <p class="text-xs text-gray-500 truncate">{{ member.user.email }}</p>
                                     </div>
+
+                                    <!-- Role Badge -->
+                                    <span
+                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        {{ formatRole(member.role) }}
+                                    </span>
                                 </label>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="flex justify-between items-center mt-2">
+                                <div class="flex space-x-2">
+                                    <button type="button" @click="selectAllMembers"
+                                        class="text-xs text-blue-600 hover:text-blue-800">
+                                        Select All
+                                    </button>
+                                    <button type="button" @click="clearAllMembers"
+                                        class="text-xs text-gray-600 hover:text-gray-800">
+                                        Clear All
+                                    </button>
+                                </div>
+                                <span class="text-xs text-gray-500">
+                                    {{ form.members.length }} of {{ projectMembers.length }} selected
+                                </span>
                             </div>
                         </div>
 
                         <!-- Error message -->
-                        <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-3">
                             <p class="text-sm text-red-600">{{ error }}</p>
                         </div>
                     </form>
@@ -147,7 +188,7 @@
                 <!-- Footer -->
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button @click="createTask" :disabled="creating || !form.title.trim()"
-                        class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg v-if="creating" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
@@ -159,7 +200,7 @@
                         {{ creating ? 'Creating...' : 'Create Task' }}
                     </button>
                     <button @click="closeModal" :disabled="creating" type="button"
-                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                         Cancel
                     </button>
                 </div>
@@ -169,7 +210,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted, computed } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
 
 // Debug logging
@@ -202,6 +243,7 @@ const emit = defineEmits(['close', 'created'])
 const creating = ref(false)
 const error = ref('')
 const projectMembers = ref([])
+const memberSearchQuery = ref('')
 
 const form = reactive({
     title: '',
@@ -212,6 +254,22 @@ const form = reactive({
     due_date: '',
     estimated_hours: null,
     members: []
+})
+
+// Computed properties
+const filteredProjectMembers = computed(() => {
+    if (!memberSearchQuery.value) {
+        return projectMembers.value
+    }
+
+    const query = memberSearchQuery.value.toLowerCase()
+    return projectMembers.value.filter(member => {
+        const fullName = `${member.user.first_name || ''} ${member.user.last_name || ''}`.toLowerCase()
+        const email = member.user.email.toLowerCase()
+        const role = member.role.toLowerCase()
+
+        return fullName.includes(query) || email.includes(query) || role.includes(query)
+    })
 })
 
 // Watch for initial status changes
@@ -240,6 +298,7 @@ const resetForm = () => {
     form.estimated_hours = null
     form.members = []
     error.value = ''
+    memberSearchQuery.value = ''
 }
 
 const closeModal = () => {
@@ -334,6 +393,47 @@ const getInitials = (user) => {
         return user.email.charAt(0).toUpperCase()
     }
     return '?'
+}
+
+const getAvatarColor = (user) => {
+    const colors = [
+        'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
+        'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-cyan-500'
+    ]
+    const index = (user.id || user.email.length) % colors.length
+    return colors[index]
+}
+
+const formatRole = (role) => {
+    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()
+}
+
+const getRoleBadgeClass = (role) => {
+    const roleClasses = {
+        'manager': 'bg-purple-100 text-purple-800',
+        'developer': 'bg-blue-100 text-blue-800',
+        'designer': 'bg-pink-100 text-pink-800',
+        'tester': 'bg-green-100 text-green-800',
+        'member': 'bg-gray-100 text-gray-800'
+    }
+    return roleClasses[role.toLowerCase()] || 'bg-gray-100 text-gray-800'
+}
+
+const toggleMember = (userId) => {
+    const index = form.members.indexOf(userId)
+    if (index > -1) {
+        form.members.splice(index, 1)
+    } else {
+        form.members.push(userId)
+    }
+}
+
+const selectAllMembers = () => {
+    form.members = filteredProjectMembers.value.map(member => member.user.id)
+}
+
+const clearAllMembers = () => {
+    form.members = []
 }
 
 // Initialize on mount

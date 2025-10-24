@@ -1,12 +1,12 @@
 <template>
-    <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto">
+    <div v-if="isOpen" class="fixed inset-0 overflow-y-auto z-50">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!-- Background overlay -->
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal"></div>
 
             <!-- Modal panel -->
             <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <!-- Header -->
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex items-center justify-between mb-4">
@@ -20,8 +20,14 @@
                         </button>
                     </div>
 
+                    <!-- Loading State -->
+                    <div v-if="loading" class="flex items-center justify-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <span class="ml-2 text-gray-600">Loading task details...</span>
+                    </div>
+
                     <!-- Form -->
-                    <form @submit.prevent="updateTask" class="space-y-4">
+                    <form v-else @submit.prevent="updateTask" class="space-y-4">
                         <!-- Title -->
                         <div>
                             <label for="edit-title" class="block text-sm font-medium text-gray-700 mb-1">
@@ -191,6 +197,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'updated'])
 
 // Reactive data
+const loading = ref(false)
 const updating = ref(false)
 const error = ref('')
 const projectMembers = ref([])
@@ -221,10 +228,29 @@ watch(() => props.task, (newTask) => {
 // Watch for dialog open/close
 watch(() => props.isOpen, (isOpen) => {
     if (isOpen && props.task) {
-        populateForm(props.task)
+        fetchTaskDetails()
         fetchProjectMembers()
     }
 })
+
+// Fetch detailed task information
+const fetchTaskDetails = async () => {
+    if (!props.task?.id || !projectId.value) return
+
+    try {
+        loading.value = true
+        const response = await axios.get(`projects/${projectId.value}/tasks/${props.task.id}/`)
+        const taskDetails = response.data.data || response.data
+        populateForm(taskDetails)
+    } catch (err) {
+        console.error('Failed to fetch task details:', err)
+        error.value = 'Failed to load task details'
+        // Fallback to basic task data
+        populateForm(props.task)
+    } finally {
+        loading.value = false
+    }
+}
 
 // Methods
 const populateForm = (task) => {
