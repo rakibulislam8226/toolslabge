@@ -1,10 +1,5 @@
 <template>
-  <BaseModal
-    :is-open="isOpen"
-    title="Add Project Member"
-    size="lg"
-    @close="handleClose"
-  >
+  <BaseModal :is-open="isOpen" title="Add Project Member" size="lg" @close="handleClose">
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- User Selection -->
       <div>
@@ -12,37 +7,34 @@
           Team Member <span class="text-red-500">*</span>
         </label>
         <div class="relative">
-          <input
-            id="user"
-            v-model="userSearch"
-            type="text"
-            required
+          <input id="user" v-model="userSearch" type="text" required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-            :class="{ 'border-red-500': errors.user }"
-            placeholder="Search for an organization member..."
-            @focus="showUserDropdown = true"
-            @input="handleUserSearch"
-          />
+            :class="{ 'border-red-500': errors.user }" placeholder="Search for an organization member..."
+            @focus="showUserDropdown = true" @input="handleUserSearch" />
           <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-            <svg v-if="loadingUsers" class="w-4 h-4 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="loadingUsers" class="w-4 h-4 animate-spin text-gray-400" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-              <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+              <path fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                class="opacity-75"></path>
             </svg>
             <svg v-else class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
           </div>
-          
+
           <!-- User Dropdown -->
-          <div 
-            v-if="showUserDropdown && (filteredUsers.length > 0 || userSearch.length > 0)"
-            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-          >
+          <div v-if="showUserDropdown && (filteredUsers.length > 0 || userSearch.length > 0)"
+            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             <div v-if="loadingUsers" class="p-3 text-center text-gray-500">
               <div class="flex items-center justify-center">
                 <svg class="w-4 h-4 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                  <path fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    class="opacity-75"></path>
                 </svg>
                 Loading members...
               </div>
@@ -51,13 +43,8 @@
               No members found
             </div>
             <div v-else>
-              <button
-                v-for="user in filteredUsers"
-                :key="user.id"
-                type="button"
-                @click="selectUser(user)"
-                class="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none flex items-center"
-              >
+              <button v-for="user in filteredUsers" :key="user.id" type="button" @click="selectUser(user)"
+                class="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none flex items-center">
                 <div class="flex-1">
                   <div class="font-medium text-gray-900">
                     <span v-if="user.user.first_name && user.user.last_name">
@@ -72,7 +59,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Selected User Display -->
         <div v-if="selectedUser" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
           <div class="flex items-center justify-between">
@@ -86,18 +73,14 @@
               <div class="text-sm text-blue-700">{{ selectedUser.user.email }}</div>
               <div class="text-xs text-blue-600 capitalize">{{ selectedUser.role }} in organization</div>
             </div>
-            <button
-              type="button"
-              @click="clearUser"
-              class="text-blue-600 hover:text-blue-800"
-            >
+            <button type="button" @click="clearUser" class="text-blue-600 hover:text-blue-800">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
         </div>
-        
+
         <p v-if="errors.user" class="mt-1 text-sm text-red-600">
           {{ errors.user[0] }}
         </p>
@@ -108,13 +91,9 @@
         <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
           Project Role <span class="text-red-500">*</span>
         </label>
-        <select
-          id="role"
-          v-model="form.role"
-          required
+        <select id="role" v-model="form.role" required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.role }"
-        >
+          :class="{ 'border-red-500': errors.role }">
           <option value="contributor">Contributor</option>
           <option value="manager">Manager</option>
           <option value="viewer">Viewer</option>
@@ -134,7 +113,8 @@
       <div v-if="generalError" class="bg-red-50 border border-red-200 rounded-lg p-4">
         <div class="flex">
           <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <div>
             <h3 class="text-sm font-medium text-red-800">Error adding member</h3>
@@ -146,23 +126,19 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <button
-          type="button"
-          @click="handleClose"
+        <button type="button" @click="handleClose"
           class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          :disabled="loading"
-        >
+          :disabled="loading">
           Cancel
         </button>
-        <button
-          type="submit"
-          @click="handleSubmit"
+        <button type="submit" @click="handleSubmit"
           class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          :disabled="loading || !selectedUser || !form.role"
-        >
+          :disabled="loading || !selectedUser || !form.role">
           <svg v-if="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-            <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+            <path fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              class="opacity-75"></path>
           </svg>
           {{ loading ? 'Adding...' : 'Add Member' }}
         </button>
@@ -172,9 +148,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, reactive, watch, computed, inject } from 'vue'
 import BaseModal from './BaseModal.vue'
 import axios from "@/plugins/axiosConfig.js"
+
+const $toast = inject('toast')
 
 // Debounce utility function
 function debounce(func, wait) {
@@ -225,7 +203,7 @@ const filteredUsers = computed(() => {
   if (!userSearch.value.trim()) {
     return orgMembers.value
   }
-  
+
   const search = userSearch.value.toLowerCase()
   return orgMembers.value.filter(member => {
     const fullName = `${member.user.first_name} ${member.user.last_name}`.toLowerCase()
@@ -252,7 +230,7 @@ watch(() => showUserDropdown.value, (isOpen) => {
         document.removeEventListener('click', handleClickOutside)
       }
     }
-    
+
     setTimeout(() => {
       document.addEventListener('click', handleClickOutside)
     }, 100)
@@ -299,7 +277,7 @@ const handleUserSearch = () => {
 const selectUser = (member) => {
   selectedUser.value = member
   form.user = member.user.id
-  userSearch.value = member.user.first_name && member.user.last_name 
+  userSearch.value = member.user.first_name && member.user.last_name
     ? `${member.user.first_name} ${member.user.last_name}`
     : member.user.email
   showUserDropdown.value = false
@@ -327,7 +305,7 @@ const handleSubmit = async () => {
       errors.value.user = ['Please select a user']
       return
     }
-    
+
     if (!form.role) {
       errors.value.role = ['Please select a role']
       return
@@ -340,18 +318,19 @@ const handleSubmit = async () => {
     }
 
     const response = await axios.post(`projects/${props.projectId}/members/`, formData)
-    
+
     // Success - emit added event with new member data
     emit('added', response.data.data || response.data)
+    $toast.success(response.data.message || 'Project member added successfully')
     handleClose()
-    
+
   } catch (err) {
     console.error('Failed to add project member:', err)
-    
+
     if (err.response?.status === 400 && err.response?.data) {
       // Handle validation errors
       const responseData = err.response.data
-      
+
       if (responseData.data?.errors && Array.isArray(responseData.data.errors)) {
         const errorObj = {}
         responseData.data.errors.forEach(errorItem => {
@@ -396,6 +375,7 @@ const handleClose = () => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

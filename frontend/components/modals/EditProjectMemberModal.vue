@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, inject } from 'vue'
 import BaseModal from './BaseModal.vue'
 import axios from "@/plugins/axiosConfig.js"
 
@@ -126,6 +126,7 @@ const form = reactive({
 const loading = ref(false)
 const errors = ref({})
 const generalError = ref('')
+const $toast = inject("toast");
 
 // Watch for member changes to populate form
 watch(() => props.member, (newMember) => {
@@ -179,15 +180,11 @@ const handleSubmit = async () => {
       role: form.role
     }
 
-    console.log('Sending PATCH request to:', `projects/${props.projectId}/members/${props.member.id}/`)
-    console.log('With data:', formData)
-    console.log('Member object:', props.member)
-    console.log('Project ID:', props.projectId)
-
     const response = await axios.patch(`projects/${props.projectId}/members/${props.member.id}/`, formData)
     
     // Success - emit updated event with member data
     const updatedMember = response.data.data || response.data
+    $toast.success(response.data.message || 'Project member updated successfully')
     emit('updated', updatedMember)
     
   } catch (err) {

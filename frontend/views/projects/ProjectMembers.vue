@@ -258,7 +258,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
 import { extractIdFromSlug } from "@/utils/slugUtils.js"
@@ -275,6 +275,7 @@ const loading = ref(true)
 const error = ref('')
 const showAddMemberModal = ref(false)
 const projectName = ref('')
+const $toast = inject('toast')
 
 // Get project slug from route
 const projectSlug = computed(() => route.params.slug)
@@ -403,6 +404,8 @@ const editMember = (member) => {
 const removeMember = (member) => {
   removingMember.value = member
   showRemoveModal.value = true
+  console.log("test");
+  
 }
 
 // Additional modal states for edit and remove
@@ -427,20 +430,18 @@ const confirmRemoveMember = async () => {
   
   try {
     await axios.delete(`projects/${projectId.value}/members/${removingMember.value.id}/`)
-    
-    // Remove from local state
     members.value = members.value.filter(m => m.id !== removingMember.value.id)
     
     showRemoveModal.value = false
     removingMember.value = null
-    
+    $toast.success('Member removed successfully')
   } catch (err) {
     console.error('Failed to remove member:', err)
     error.value = 'Failed to remove member'
+    $toast.error('Failed to remove member')
   }
 }
 
-// Fetch members on component mount
 onMounted(() => {
   fetchMembers()
 })
