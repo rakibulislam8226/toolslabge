@@ -26,6 +26,17 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "user_name", "user_email", "created_at"]
 
+    def validate_role(self, value):
+        """Validate that the role is one of the allowed choices."""
+        from ...choices import ProjectMemberRoleChoices
+
+        valid_roles = [choice[0] for choice in ProjectMemberRoleChoices.choices]
+        if value not in valid_roles:
+            raise serializers.ValidationError(
+                f"Invalid role. Must be one of: {', '.join(valid_roles)}"
+            )
+        return value
+
     def validate(self, data):
         request = self.context["request"]
         user = request.user
@@ -60,6 +71,12 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
             ):
                 raise serializers.ValidationError(
                     {"user": "This user is already a member of the project."}
+                )
+        else:
+            # For updates, ensure we don't allow changing the user
+            if "user" in data and data["user"] != self.instance.user:
+                raise serializers.ValidationError(
+                    {"user": "Cannot change the user of an existing project member."}
                 )
 
         return data

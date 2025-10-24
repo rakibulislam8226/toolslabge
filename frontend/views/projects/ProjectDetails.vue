@@ -239,7 +239,7 @@
         <div class="bg-white rounded-lg shadow-sm border p-6">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-gray-900">Recent Tasks</h2>
-            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</button>
+            <button class="text-blue-600 hover:text-blue-800 text-md font-medium">View All</button>
           </div>
           <div class="text-center py-8 text-gray-500">
             <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@
             <h2 class="text-xl font-semibold text-gray-900">Project Members</h2>
             <button 
               @click="manageMembers"
-              class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              class="text-blue-600 hover:text-blue-800 text-md font-medium"
             >
               Manage
             </button>
