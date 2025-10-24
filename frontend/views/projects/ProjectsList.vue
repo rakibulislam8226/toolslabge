@@ -15,7 +15,7 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            New Project
+            Create Project
           </button>
         </div>
       </div>
@@ -164,6 +164,13 @@
         </button>
       </div>
     </div>
+
+    <!-- Create Project Modal -->
+    <CreateProjectModal
+      :is-open="showCreateModal"
+      @close="closeCreateModal"
+      @created="onProjectCreated"
+    />
   </div>
 </template>
 
@@ -171,6 +178,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
+import CreateProjectModal from '@/components/modals/CreateProjectModal.vue'
 
 const router = useRouter()
 
@@ -180,6 +188,7 @@ const loading = ref(true)
 const error = ref('')
 const hasMore = ref(false)
 const currentPage = ref(1)
+const showCreateModal = ref(false)
 
 // Fetch projects from API
 const fetchProjects = async (page = 1) => {
@@ -275,9 +284,24 @@ const getStaticProgress = (project) => {
 
 // Navigation functions
 const createNewProject = () => {
-  // Navigate to create project page (you can implement this later)
-  console.log('Navigate to create project page')
-  // router.push('/projects/create')
+  showCreateModal.value = true
+}
+
+// Modal functions
+const closeCreateModal = () => {
+  showCreateModal.value = false
+}
+
+const onProjectCreated = (newProject) => {
+  // Navigate to the newly created project's details page
+  const slug = newProject.slug ? `${newProject.slug}-${newProject.id}` : newProject.id
+  router.push(`/projects/${slug}`)
+  
+  // Show success message (you can use your notification system)
+  console.log('Project created successfully:', newProject.name)
+  
+  // You can add a toast notification here if you have one
+  // For example: showNotification('Project created successfully!', 'success')
 }
 
 const viewProject = (project) => {

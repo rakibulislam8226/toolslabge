@@ -105,9 +105,17 @@
       <div v-if="errorMessage" class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
         <p class="text-red-600 text-center font-medium">{{ errorMessage }}</p>
       </div>
-
-      <!-- Back to Home -->
-      <div class="mt-6 text-center">
+      <div class="mt-6 text-center space-y-2">
+        <p class="text-gray-600 text-sm">
+          Already have an account?
+          <router-link 
+          to="/login" 
+          class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-300"
+        >
+          ← Back to Login
+        </router-link>
+        </p>
+        
         <router-link 
           to="/" 
           class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-300"
