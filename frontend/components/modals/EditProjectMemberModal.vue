@@ -39,7 +39,6 @@
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           :class="{ 'border-red-500': errors.role }"
         >
-          <option value="">Select a role</option>
           <option value="manager">Manager</option>
           <option value="contributor">Contributor</option>
           <option value="viewer">Viewer</option>
