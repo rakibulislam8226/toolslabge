@@ -29,17 +29,18 @@
     </div>
 
     <!-- Project Details Content -->
-    <div v-else-if="project" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div v-else-if="project" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
       <!-- Header Section -->
-      <div class="bg-white rounded-lg shadow-sm border mb-8">
-        <div class="px-6 py-6 border-b border-gray-200">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
+      <div
+        class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-100 mb-6 sm:mb-8 overflow-hidden">
+        <div class="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-200">
+          <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
+            <div class="flex-1 lg:mr-6">
               <!-- Breadcrumb -->
-              <nav class="mb-4">
+              <nav class="mb-3 sm:mb-4">
                 <ol class="flex items-center space-x-2 text-sm text-gray-500">
                   <li>
-                    <router-link to="/projects" class="hover:text-blue-600 transition duration-300">
+                    <router-link to="/projects" class="hover:text-blue-600 transition duration-300 font-medium">
                       Projects
                     </router-link>
                   </li>
@@ -48,138 +49,157 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                   </li>
-                  <li class="text-gray-900 font-medium">{{ project.name }}</li>
+                  <li class="text-gray-900 font-semibold truncate">{{ project.name }}</li>
                 </ol>
               </nav>
 
               <!-- Project Title and Status -->
-              <div class="flex items-center mb-4">
-                <h1 class="text-3xl font-bold text-gray-900 mr-4">{{ project.name }}</h1>
-                <span :class="getStatusBadgeClass(project.status)" class="px-3 py-1 text-sm font-medium rounded-full">
+              <div class="flex flex-col sm:flex-row sm:items-center mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 sm:mr-4 leading-tight">
+                  {{ project.name }}
+                </h1>
+                <span :class="getStatusBadgeClass(project.status)"
+                  class="px-3 py-1.5 text-sm font-semibold rounded-full self-start shadow-sm">
                   {{ formatStatus(project.status) }}
                 </span>
               </div>
 
               <!-- Project Description -->
-              <p class="text-gray-600 text-lg leading-relaxed">
+              <p class="text-gray-600 text-base sm:text-lg leading-relaxed max-w-3xl">
                 {{ project.description || 'No description available for this project.' }}
               </p>
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center space-x-3 ml-6">
+            <div
+              class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
               <button @click="editProject"
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center">
+                class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                   </path>
                 </svg>
-                Edit Project
+                <span class="font-medium">Edit Project</span>
               </button>
-              <button @click="createTask"
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center">
+              <router-link :to="`/projects/${project.slug ? project.slug + '-' + project.id : project.id}/tasks`"
+                class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-4 py-2.5 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
                   </path>
                 </svg>
-                Create Task
-              </button>
+                <span class="font-medium">View Tasks</span>
+              </router-link>
             </div>
           </div>
         </div>
 
         <!-- Project Stats -->
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="px-4 sm:px-6 py-4 sm:py-6 bg-gradient-to-r from-gray-50 to-white">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <!-- Tasks -->
-            <div class="text-center">
-              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-gray-900">{{ getStaticTasksCount(project) }}</p>
-              <p class="text-sm text-gray-600">Tasks</p>
+              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ getStaticTasksCount(project) }}</p>
+              <p class="text-sm font-medium text-gray-600">Tasks</p>
             </div>
 
             <!-- Members -->
-            <div class="text-center">
-              <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-gray-900">{{ getStaticMembersCount(project) }}</p>
-              <p class="text-sm text-gray-600">Members</p>
+              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ getStaticMembersCount(project) }}</p>
+              <p class="text-sm font-medium text-gray-600">Members</p>
             </div>
 
             <!-- Progress -->
-            <div class="text-center">
-              <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                   </path>
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-gray-900">{{ getStaticProgress(project) }}%</p>
-              <p class="text-sm text-gray-600">Complete</p>
+              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ getStaticProgress(project) }}%</p>
+              <p class="text-sm font-medium text-gray-600">Complete</p>
             </div>
 
             <!-- Status Days -->
-            <div class="text-center">
-              <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              class="text-center p-4 rounded-xl bg-white shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 col-span-2 lg:col-span-1">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-amber-100 to-amber-200 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <p class="text-2xl font-bold text-gray-900">{{ getDaysRemaining() }}</p>
-              <p class="text-sm text-gray-600">{{ getDaysLabel() }}</p>
+              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ getDaysRemaining() }}</p>
+              <p class="text-sm font-medium text-gray-600">{{ getDaysLabel() }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Project Dates and Details -->
-      <div class="grid md:grid-cols-2 gap-8 mb-8">
+      <div class="grid lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
         <!-- Project Timeline -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
+        <div
+          class="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg border border-blue-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
             Project Timeline
           </h2>
 
           <div class="space-y-4">
-            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Start Date</span>
-              <span class="font-medium text-gray-900">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-blue-100 shadow-sm">
+              <span class="text-gray-600 font-medium mb-1 sm:mb-0">Start Date</span>
+              <span class="font-semibold text-gray-900 text-sm sm:text-base">
                 {{ project.start_date ? formatDate(project.start_date) : 'Not set' }}
               </span>
             </div>
 
-            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">End Date</span>
-              <span class="font-medium text-gray-900">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-blue-100 shadow-sm">
+              <span class="text-gray-600 font-medium mb-1 sm:mb-0">End Date</span>
+              <span class="font-semibold text-gray-900 text-sm sm:text-base">
                 {{ project.end_date ? formatDate(project.end_date) : 'Not set' }}
               </span>
             </div>
 
             <!-- Progress Bar -->
-            <div class="mt-6">
-              <div class="flex justify-between text-sm text-gray-600 mb-2">
+            <div class="mt-6 p-4 bg-white bg-opacity-70 rounded-xl border border-blue-100 shadow-sm">
+              <div class="flex justify-between text-sm font-medium text-gray-700 mb-3">
                 <span>Overall Progress</span>
-                <span>{{ getStaticProgress(project) }}%</span>
+                <span class="text-blue-600 font-bold">{{ getStaticProgress(project) }}%</span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-3">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500"
+              <div class="w-full bg-gray-200 rounded-full h-4 shadow-inner">
+                <div
+                  class="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 h-4 rounded-full transition-all duration-700 shadow-sm"
                   :style="{ width: `${getStaticProgress(project)}%` }"></div>
               </div>
             </div>
@@ -187,19 +207,24 @@
         </div>
 
         <!-- Project Information -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+        <div
+          class="bg-gradient-to-br from-white to-indigo-50 rounded-xl shadow-lg border border-indigo-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
             Project Information
           </h2>
 
           <div class="space-y-4">
-            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Project Manager</span>
-              <span class="font-medium text-gray-900">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-indigo-100 shadow-sm">
+              <span class="text-gray-600 font-medium mb-1 sm:mb-0">Project Manager</span>
+              <span class="font-semibold text-gray-900 text-sm sm:text-base break-words">
                 <template v-if="project?.manager">
                   <span v-if="project.manager.first_name && project.manager.last_name">
                     {{ project.manager.first_name }} {{ project.manager.last_name }}
@@ -212,16 +237,19 @@
               </span>
             </div>
 
-            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Status</span>
-              <span :class="getStatusBadgeClass(project.status)" class="px-2 py-1 text-xs font-medium rounded-full">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-indigo-100 shadow-sm">
+              <span class="text-gray-600 font-medium mb-2 sm:mb-0">Status</span>
+              <span :class="getStatusBadgeClass(project.status)"
+                class="px-3 py-1.5 text-sm font-semibold rounded-full shadow-sm self-start sm:self-center">
                 {{ formatStatus(project.status) }}
               </span>
             </div>
 
-            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Created</span>
-              <span class="font-medium text-gray-900">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-indigo-100 shadow-sm">
+              <span class="text-gray-600 font-medium mb-1 sm:mb-0">Created</span>
+              <span class="font-semibold text-gray-900 text-sm sm:text-base">
                 {{ project.created_at ? formatDate(project.created_at) : 'Unknown' }}
               </span>
             </div>
@@ -230,43 +258,76 @@
       </div>
 
       <!-- Placeholder sections for future features -->
-      <div class="grid md:grid-cols-2 gap-8">
+      <div class="grid lg:grid-cols-2 gap-6 sm:gap-8">
         <!-- Recent Tasks -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">Recent Tasks</h2>
-            <button @click="viewAllTasks" class="text-blue-600 hover:text-blue-800 text-md font-medium">
-              View All
+        <div
+          class="bg-gradient-to-br from-white to-green-50 rounded-xl shadow-lg border border-green-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                  </path>
+                </svg>
+              </div>
+              Recent Tasks
+            </h2>
+            <button @click="viewAllTasks"
+              class="text-green-600 hover:text-green-800 text-md font-semibold transition-colors duration-200 hover:underline self-start sm:self-center">
+              View All →
             </button>
           </div>
-          <div class="text-center py-8 text-gray-500">
-            <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-              </path>
-            </svg>
-            <p>Tasks will be displayed here</p>
+          <div class="text-center py-8 sm:py-12 text-gray-500">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                </path>
+              </svg>
+            </div>
+            <p class="text-gray-600 font-medium mb-4">Tasks will be displayed here</p>
             <button @click="viewAllTasks"
-              class="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+              class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
               View Tasks
             </button>
           </div>
         </div>
 
-        <!-- Organization Members -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">Project Members</h2>
-            <button @click="manageMembers" class="text-blue-600 hover:text-blue-800 text-md font-medium">
-              Manage
+        <!-- Project Members -->
+        <div
+          class="bg-gradient-to-br from-white to-purple-50 rounded-xl shadow-lg border border-purple-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
+                </svg>
+              </div>
+              Project Members
+            </h2>
+            <button @click="manageMembers"
+              class="text-purple-600 hover:text-purple-800 text-md font-semibold transition-colors duration-200 hover:underline self-start sm:self-center">
+              Manage →
             </button>
           </div>
-          <div class="text-center py-8 text-gray-500">
-            <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
-            </svg>
-            <p>Project members will be displayed here</p>
+          <div class="text-center py-8 sm:py-12 text-gray-500">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
+              </svg>
+            </div>
+            <p class="text-gray-600 font-medium mb-4">Project members will be displayed here</p>
+            <button @click="manageMembers"
+              class="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              Manage Members
+            </button>
           </div>
         </div>
       </div>
@@ -431,12 +492,6 @@ const editProject = () => {
   router.push(`/projects/${slug}/edit`)
 }
 
-const createTask = () => {
-  // Navigate to tasks page for this project
-  const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
-  router.push(`/projects/${slug}/tasks`)
-}
-
 const viewAllTasks = () => {
   // Navigate to tasks page for this project
   const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
@@ -467,6 +522,133 @@ onMounted(() => {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Additional animations and effects */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.8s ease-out;
+}
+
+/* Hover effects for cards */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Progress bar animation */
+.progress-bar {
+  transition: width 1s ease-in-out;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8, #2563eb);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Button hover effects */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 4px 15px 0 rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Glass morphism effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  .mobile-stack {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mobile-full-width {
+    width: 100%;
+  }
+}
+
+/* Loading skeleton animation */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
   }
 }
 </style>
