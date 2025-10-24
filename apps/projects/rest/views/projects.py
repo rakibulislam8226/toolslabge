@@ -55,3 +55,22 @@ class ProjectMemberListCreateView(generics.ListCreateAPIView):
         context = super().get_serializer_context()
         context["project_id"] = self.kwargs.get("project_id")
         return context
+
+
+class ProjectMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProjectMemberSerializer
+    permission_classes = [IsOrgOwnerAdminOrManager]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        user = self.request.user
+        project_id = self.kwargs.get("project_id")
+        return ProjectMember.objects.select_related("project", "user").filter(
+            project__organization=user.organization_memberships.first().organization,
+            project__id=project_id,
+        )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["project_id"] = self.kwargs.get("project_id")
+        return context

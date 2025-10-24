@@ -252,14 +252,19 @@
         <!-- Organization Members -->
         <div class="bg-white rounded-lg shadow-sm border p-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">Organization Members</h2>
-            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Manage</button>
+            <h2 class="text-xl font-semibold text-gray-900">Project Members</h2>
+            <button 
+              @click="manageMembers"
+              class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              Manage
+            </button>
           </div>
           <div class="text-center py-8 text-gray-500">
             <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
             </svg>
-            <p>Organization members will be displayed here</p>
+            <p>Project members will be displayed here</p>
           </div>
         </div>
       </div>
@@ -456,6 +461,12 @@ const editProject = () => {
   // Navigate to edit project page using slug-id format
   const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
   router.push(`/projects/${slug}/edit`)
+}
+
+const manageMembers = () => {
+  // Navigate to project members management page
+  const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
+  router.push({ name: 'projects.members', params: { slug } })
 }
 
 const deleteProject = async () => {

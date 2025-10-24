@@ -24,29 +24,43 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
             "role",
             "created_at",
         ]
+        read_only_fields = ["id", "user_name", "user_email", "created_at"]
 
     def validate(self, data):
         request = self.context["request"]
         user = request.user
-        project = self.context.get("project_id")
-        organization = (
-            user.organization_memberships.filter(is_active=True).first().organization
-        )
+        project_id = self.context.get("project_id")
 
-        user_to_add = data.get("user")
-        if not OrganizationMember.objects.filter(
-            organization=organization,
-            user=user_to_add,
-            is_active=True,
-        ).exists():
-            raise serializers.ValidationError(
-                {"user": "The user must be an active member of the organization."}
+        # Only validate user membership during creation, not updates
+        if not self.instance:  # This is a create operation
+            organization = (
+                user.organization_memberships.filter(is_active=True)
+                .first()
+                .organization
             )
 
-        if ProjectMember.objects.filter(project=project, user=user_to_add).exists():
-            raise serializers.ValidationError(
-                {"user": "This user is already a member of the project."}
-            )
+            user_to_add = data.get("user")
+            if (
+                user_to_add
+                and not OrganizationMember.objects.filter(
+                    organization=organization,
+                    user=user_to_add,
+                    is_active=True,
+                ).exists()
+            ):
+                raise serializers.ValidationError(
+                    {"user": "The user must be an active member of the organization."}
+                )
+
+            if (
+                user_to_add
+                and ProjectMember.objects.filter(
+                    project_id=project_id, user=user_to_add
+                ).exists()
+            ):
+                raise serializers.ValidationError(
+                    {"user": "This user is already a member of the project."}
+                )
 
         return data
 
@@ -62,6 +76,12 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
             **validated_data,
         )
         return project_member
+
+    def update(self, instance, validated_data):
+        # Only allow updating the role field
+        instance.role = validated_data.get("role", instance.role)
+        instance.save()
+        return instance
 
 
 class ProjectListSerializer(serializers.ModelSerializer):
