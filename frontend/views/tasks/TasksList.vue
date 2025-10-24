@@ -123,7 +123,7 @@
                                 </path>
                             </svg>
                         </div>
-                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Task Overview</h2>
+                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Tasks Overview</h2>
                     </div>
                     <div class="text-sm text-gray-600 font-medium">
                         {{ tasks.length }} total tasks
@@ -276,27 +276,61 @@ const projectId = computed(() => {
     return extractIdFromSlug(slug)
 })
 
-// Status color mapping
-const statusColors = [
-    { bg: 'bg-gray-100', text: 'text-gray-700' },
-    { bg: 'bg-blue-100', text: 'text-blue-700' },
-    { bg: 'bg-yellow-100', text: 'text-yellow-700' },
-    { bg: 'bg-green-100', text: 'text-green-700' },
-    { bg: 'bg-purple-100', text: 'text-purple-700' },
-    { bg: 'bg-pink-100', text: 'text-pink-700' },
-    { bg: 'bg-indigo-100', text: 'text-indigo-700' },
+// Status color mapping based on status names
+const statusColorMapping = {
+    // Fixed status colors
+    'todo': { bg: 'bg-gray-100', text: 'text-gray-700', gradient: 'from-gray-50 to-gray-100', border: 'border-gray-200' },
+    'in progress': { bg: 'bg-blue-100', text: 'text-blue-700', gradient: 'from-blue-50 to-blue-100', border: 'border-blue-200' },
+    'review': { bg: 'bg-yellow-100', text: 'text-yellow-700', gradient: 'from-yellow-50 to-yellow-100', border: 'border-yellow-200' },
+    'done': { bg: 'bg-green-100', text: 'text-green-700', gradient: 'from-green-50 to-green-100', border: 'border-green-200' },
+    'closed': { bg: 'bg-red-100', text: 'text-red-700', gradient: 'from-red-50 to-red-100', border: 'border-red-200' },
+}
+
+// Fallback colors for dynamic statuses
+const fallbackColors = [
+    { bg: 'bg-purple-100', text: 'text-purple-700', gradient: 'from-purple-50 to-purple-100', border: 'border-purple-200' },
+    { bg: 'bg-pink-100', text: 'text-pink-700', gradient: 'from-pink-50 to-pink-100', border: 'border-pink-200' },
+    { bg: 'bg-indigo-100', text: 'text-indigo-700', gradient: 'from-indigo-50 to-indigo-100', border: 'border-indigo-200' },
+    { bg: 'bg-teal-100', text: 'text-teal-700', gradient: 'from-teal-50 to-teal-100', border: 'border-teal-200' },
+    { bg: 'bg-orange-100', text: 'text-orange-700', gradient: 'from-orange-50 to-orange-100', border: 'border-orange-200' },
+    { bg: 'bg-cyan-100', text: 'text-cyan-700', gradient: 'from-cyan-50 to-cyan-100', border: 'border-cyan-200' },
+    { bg: 'bg-emerald-100', text: 'text-emerald-700', gradient: 'from-emerald-50 to-emerald-100', border: 'border-emerald-200' },
+    { bg: 'bg-violet-100', text: 'text-violet-700', gradient: 'from-violet-50 to-violet-100', border: 'border-violet-200' },
 ]
+
+// Default color for unknown statuses
+const defaultColor = { bg: 'bg-slate-100', text: 'text-slate-700', gradient: 'from-slate-50 to-slate-100', border: 'border-slate-200' }
 
 // Get tasks for specific status
 const getTasksInStatus = (statusId) => {
     return tasks.value.filter(task => task.status?.id === statusId)
 }
 
-// Get status color based on index
+// Get status color based on status name
 const getStatusColor = (statusId, type) => {
+    if (!statusId || !taskStatuses.value) {
+        return defaultColor[type] || ''
+    }
+
+    // Find the status object
+    const status = taskStatuses.value.find(s => s.id === statusId)
+    if (!status) {
+        return defaultColor[type] || ''
+    }
+
+    // Convert status name to lowercase for matching
+    const statusName = status.name.toLowerCase().trim()
+
+    // Check if it's a fixed status
+    if (statusColorMapping[statusName]) {
+        return statusColorMapping[statusName][type] || ''
+    }
+
+    // Use fallback colors for dynamic statuses
     const statusIndex = taskStatuses.value.findIndex(s => s.id === statusId)
-    const colorIndex = statusIndex % statusColors.length
-    return statusColors[colorIndex][type]
+    const colorIndex = statusIndex >= 0 ? statusIndex % fallbackColors.length : 0
+
+    return fallbackColors[colorIndex][type] || ''
 }
 
 // Fetch project details

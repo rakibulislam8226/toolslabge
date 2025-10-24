@@ -10,7 +10,7 @@
                 </h4>
                 <div class="flex items-center justify-between">
                     <!-- Priority Badge -->
-                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
+                    <span class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full"
                         :class="getPriorityColor(task.priority)">
                         {{ formatPriority(task.priority) }}
                     </span>
@@ -18,7 +18,7 @@
                     <!-- Status Change Dropdown -->
                     <div class="relative">
                         <select :value="task.status?.id || ''" @change="onStatusChange"
-                            class="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                            :class="`text-sm bg-gradient-to-r ${getStatusColorClasses(task.status?.id, 'gradient')} border ${getStatusColorClasses(task.status?.id, 'border')} rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-md font-medium ${getStatusColorClasses(task.status?.id, 'text')} shadow-sm cursor-pointer`">
                             <option v-for="status in statuses" :key="status.id" :value="status.id">
                                 {{ status.name }}
                             </option>
@@ -71,23 +71,22 @@
         <!-- Task Metadata -->
         <div class="space-y-2">
             <!-- Dates -->
-            <div v-if="task.due_date || task.start_date"
-                class="flex items-center justify-between text-xs text-gray-500">
-                <div v-if="task.start_date" class="flex items-center">
+            <div class="flex items-center justify-between text-xs text-gray-500">
+                <div class="flex items-center">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                         </path>
                     </svg>
-                    <span>Start: {{ formatDate(task.start_date) }}</span>
+                    <span>Start: {{ task.start_date ? formatDate(task.start_date) : '-' }}</span>
                 </div>
-                <div v-if="task.due_date" class="flex items-center" :class="{ 'text-red-500': isOverdue }">
+                <div class="flex items-center" :class="{ 'text-red-500': isOverdue }">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                         </path>
                     </svg>
-                    <span>Due: {{ formatDate(task.due_date) }}</span>
+                    <span>Due: {{ task.due_date ? formatDate(task.due_date) : '-' }}</span>
                 </div>
             </div>
 
@@ -147,6 +146,31 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['edit', 'delete', 'status-change'])
 
+// Status color mapping based on status names
+const statusColorMapping = {
+    // Fixed status colors
+    'todo': { bg: 'bg-gray-100', text: 'text-gray-700', gradient: 'from-gray-50 to-gray-100', border: 'border-gray-200' },
+    'in progress': { bg: 'bg-blue-100', text: 'text-blue-700', gradient: 'from-blue-50 to-blue-100', border: 'border-blue-200' },
+    'review': { bg: 'bg-yellow-100', text: 'text-yellow-700', gradient: 'from-yellow-50 to-yellow-100', border: 'border-yellow-200' },
+    'done': { bg: 'bg-green-100', text: 'text-green-700', gradient: 'from-green-50 to-green-100', border: 'border-green-200' },
+    'closed': { bg: 'bg-red-100', text: 'text-red-700', gradient: 'from-red-50 to-red-100', border: 'border-red-200' },
+}
+
+// Fallback colors for dynamic statuses
+const fallbackColors = [
+    { bg: 'bg-purple-100', text: 'text-purple-700', gradient: 'from-purple-50 to-purple-100', border: 'border-purple-200' },
+    { bg: 'bg-pink-100', text: 'text-pink-700', gradient: 'from-pink-50 to-pink-100', border: 'border-pink-200' },
+    { bg: 'bg-indigo-100', text: 'text-indigo-700', gradient: 'from-indigo-50 to-indigo-100', border: 'border-indigo-200' },
+    { bg: 'bg-teal-100', text: 'text-teal-700', gradient: 'from-teal-50 to-teal-100', border: 'border-teal-200' },
+    { bg: 'bg-orange-100', text: 'text-orange-700', gradient: 'from-orange-50 to-orange-100', border: 'border-orange-200' },
+    { bg: 'bg-cyan-100', text: 'text-cyan-700', gradient: 'from-cyan-50 to-cyan-100', border: 'border-cyan-200' },
+    { bg: 'bg-emerald-100', text: 'text-emerald-700', gradient: 'from-emerald-50 to-emerald-100', border: 'border-emerald-200' },
+    { bg: 'bg-violet-100', text: 'text-violet-700', gradient: 'from-violet-50 to-violet-100', border: 'border-violet-200' },
+]
+
+// Default color for unknown statuses
+const defaultColor = { bg: 'bg-slate-100', text: 'text-slate-700', gradient: 'from-slate-50 to-slate-100', border: 'border-slate-200' }
+
 // Reactive data
 const showDropdown = ref(false)
 
@@ -157,6 +181,35 @@ const isOverdue = computed(() => {
 })
 
 // Methods
+// Get status color classes based on status name
+const getStatusColorClasses = (statusId, type = 'all') => {
+    if (!statusId || !props.statuses) {
+        return type === 'all' ? defaultColor : defaultColor[type] || ''
+    }
+
+    // Find the status object
+    const status = props.statuses.find(s => s.id === statusId)
+    if (!status) {
+        return type === 'all' ? defaultColor : defaultColor[type] || ''
+    }
+
+    // Convert status name to lowercase for matching
+    const statusName = status.name.toLowerCase().trim()
+
+    // Check if it's a fixed status
+    if (statusColorMapping[statusName]) {
+        const colors = statusColorMapping[statusName]
+        return type === 'all' ? colors : colors[type] || ''
+    }
+
+    // Use fallback colors for dynamic statuses
+    const statusIndex = props.statuses.findIndex(s => s.id === statusId)
+    const colorIndex = statusIndex >= 0 ? statusIndex % fallbackColors.length : 0
+    const colors = fallbackColors[colorIndex]
+
+    return type === 'all' ? colors : colors[type] || ''
+}
+
 const toggleDropdown = () => {
     showDropdown.value = !showDropdown.value
 }
@@ -203,11 +256,21 @@ const formatPriority = (priority) => {
 const formatDate = (dateString) => {
     if (!dateString) return ''
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
+    const dateOptions = {
         month: 'short',
         day: 'numeric',
         year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
-    })
+    }
+    const timeOptions = {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    }
+
+    const dateStr = date.toLocaleDateString('en-US', dateOptions)
+    const timeStr = date.toLocaleTimeString('en-US', timeOptions)
+
+    return `${dateStr} at ${timeStr}`
 }
 
 const getInitials = (member) => {

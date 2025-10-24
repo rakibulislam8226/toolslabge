@@ -73,28 +73,30 @@
                             </div>
                         </div>
 
-                        <!-- Dates Row -->
+                        <!-- Scheduling Section -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Start Date -->
+                            <!-- Scheduled Start -->
                             <div>
-                                <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Start Date
+                                <label for="create-scheduled-start"
+                                    class="block text-sm font-medium text-gray-700 mb-1">
+                                    Scheduled Start
                                 </label>
-                                <input id="start_date" v-model="form.start_date" type="datetime-local"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                                <flat-pickr id="create-scheduled-start" v-model="form.scheduled_start"
+                                    :config="flatpickrConfig" placeholder="Select start date & time"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
 
-                            <!-- Due Date -->
+                            <!-- Target Completion -->
                             <div>
-                                <label for="due_date" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Due Date
+                                <label for="create-target-completion"
+                                    class="block text-sm font-medium text-gray-700 mb-1">
+                                    Target Completion
                                 </label>
-                                <input id="due_date" v-model="form.due_date" type="datetime-local"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                                <flat-pickr id="create-target-completion" v-model="form.target_completion"
+                                    :config="flatpickrConfig" placeholder="Select completion date & time"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
-                        </div>
-
-                        <!-- Estimated Hours -->
+                        </div> <!-- Estimated Hours -->
                         <div>
                             <label for="estimated_hours" class="block text-sm font-medium text-gray-700 mb-1">
                                 Estimated Hours
@@ -106,24 +108,24 @@
                         </div>
 
                         <!-- Assign Members -->
-                        <!-- Assign Members -->
+                        <!-- Team Assignment -->
                         <div>
-                            <label for="create-members" class="block text-sm font-medium text-gray-700 mb-1">
-                                Assign Members
+                            <label for="create-assigned-members" class="block text-sm font-medium text-gray-700 mb-1">
+                                Team Assignment
                             </label>
 
                             <!-- Search Input -->
                             <div class="mb-2">
-                                <input type="text" placeholder="Search members..."
+                                <input type="text" placeholder="Search team members..."
                                     @input="debouncedMemberSearch($event.target.value)"
                                     class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                             </div>
 
                             <!-- Selected Members Display -->
-                            <div v-if="form.members.length > 0" class="mb-2 p-2 bg-blue-50 rounded-lg">
-                                <div class="text-xs font-medium text-blue-700 mb-1">Selected Members:</div>
+                            <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-blue-50 rounded-lg">
+                                <div class="text-xs font-medium text-blue-700 mb-1">Assigned Team Members:</div>
                                 <div class="flex flex-wrap gap-1">
-                                    <span v-for="memberId in form.members" :key="memberId"
+                                    <span v-for="memberId in form.assigned_members" :key="memberId"
                                         class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
                                         {{ getSelectedMemberName(memberId) }}
                                         <button @click="removeMember(memberId)"
@@ -146,7 +148,7 @@
                                 </div>
                                 <label v-for="member in projectMembers" :key="member.id"
                                     class="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
-                                    <input type="checkbox" :value="member.user" v-model="form.members"
+                                    <input type="checkbox" :value="member.user" v-model="form.assigned_members"
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                                     <div class="flex items-center space-x-2 flex-1 min-w-0">
                                         <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
@@ -194,9 +196,8 @@
 <script setup>
 import { ref, reactive, watch, computed, onMounted, nextTick } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
-
-// Debug logging
-console.log('CreateTaskModal script loaded')
+import flatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 
 // Props
 const props = defineProps({
@@ -221,6 +222,19 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['close', 'created'])
 
+// Flatpickr configuration
+const flatpickrConfig = {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i',
+    altInput: true,
+    altFormat: 'F j, Y \\a\\t H:i',
+    time_24hr: false,
+    allowInput: true,
+    clickOpens: true,
+    defaultDate: null,
+    minuteIncrement: 30
+}
+
 // Reactive data
 const creating = ref(false)
 const error = ref('')
@@ -233,10 +247,10 @@ const form = reactive({
     description: '',
     status_id: props.initialStatusId || '',
     priority: 'medium',
-    start_date: '',
-    due_date: '',
+    scheduled_start: null,
+    target_completion: null,
     estimated_hours: null,
-    members: []
+    assigned_members: []
 })
 
 // Computed properties
@@ -281,10 +295,10 @@ const resetForm = () => {
     form.description = ''
     form.status_id = props.initialStatusId || ''
     form.priority = 'medium'
-    form.start_date = ''
-    form.due_date = ''
+    form.scheduled_start = null
+    form.target_completion = null
     form.estimated_hours = null
-    form.members = []
+    form.assigned_members = []
     error.value = ''
     memberSearchQuery.value = ''
 }
@@ -337,11 +351,10 @@ const createTask = async () => {
 
         // Prepare payload
         const payload = {
-            project_id: parseInt(props.projectId),
             title: form.title.trim(),
             description: form.description.trim() || null,
             priority: form.priority,
-            members: form.members
+            members: form.assigned_members
         }
 
         // Add optional fields
@@ -349,12 +362,30 @@ const createTask = async () => {
             payload.status_id = parseInt(form.status_id)
         }
 
-        if (form.start_date) {
-            payload.start_date = new Date(form.start_date).toISOString()
+        if (form.scheduled_start) {
+            // Handle date conversion properly
+            let startDate
+            if (typeof form.scheduled_start === 'string') {
+                startDate = new Date(form.scheduled_start)
+            } else if (form.scheduled_start instanceof Date) {
+                startDate = form.scheduled_start
+            }
+            if (startDate && !isNaN(startDate.getTime())) {
+                payload.start_date = startDate.toISOString()
+            }
         }
 
-        if (form.due_date) {
-            payload.due_date = new Date(form.due_date).toISOString()
+        if (form.target_completion) {
+            // Handle date conversion properly
+            let endDate
+            if (typeof form.target_completion === 'string') {
+                endDate = new Date(form.target_completion)
+            } else if (form.target_completion instanceof Date) {
+                endDate = form.target_completion
+            }
+            if (endDate && !isNaN(endDate.getTime())) {
+                payload.due_date = endDate.toISOString()
+            }
         }
 
         if (form.estimated_hours) {
@@ -414,9 +445,9 @@ const getSelectedMemberName = (memberId) => {
 }
 
 const removeMember = (memberId) => {
-    const index = form.members.indexOf(memberId)
+    const index = form.assigned_members.indexOf(memberId)
     if (index > -1) {
-        form.members.splice(index, 1)
+        form.assigned_members.splice(index, 1)
     }
 }
 
@@ -444,23 +475,6 @@ const getRoleBadgeClass = (role) => {
     return roleClasses[role.toLowerCase()] || 'bg-gray-100 text-gray-800'
 }
 
-const toggleMember = (userId) => {
-    const index = form.members.indexOf(userId)
-    if (index > -1) {
-        form.members.splice(index, 1)
-    } else {
-        form.members.push(userId)
-    }
-}
-
-const selectAllMembers = () => {
-    form.members = filteredProjectMembers.value.map(member => member.user.id)
-}
-
-const clearAllMembers = () => {
-    form.members = []
-}
-
 // Initialize on mount
 onMounted(() => {
     if (props.isOpen) {
@@ -482,5 +496,27 @@ onMounted(() => {
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Custom flatpickr styling */
+:deep(.flatpickr-input) {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+:deep(.flatpickr-input:focus) {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+:deep(.flatpickr-calendar) {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-radius: 0.75rem;
+    border: none;
 }
 </style>

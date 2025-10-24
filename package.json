@@ -9,13 +9,15 @@
   },
   "author": "rakibulislam8226@gmail.com",
   "dependencies": {
-    "@vitejs/plugin-vue": "^5.1.4",
     "@tailwindcss/vite": "^4.1.13",
-    "pinia": "^3.0.3",
+    "@vitejs/plugin-vue": "^5.1.4",
     "axios": "^1.8.1",
+    "flatpickr": "^4.6.13",
+    "pinia": "^3.0.3",
+    "tailwindcss": "^4.1.13",
     "vue": "^3.5.10",
-    "vue-router": "^4.4.5",
-    "tailwindcss": "^4.1.13"
+    "vue-flatpickr-component": "^12.0.0",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "django-vite-plugin": "^4.1.2",

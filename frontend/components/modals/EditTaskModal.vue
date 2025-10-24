@@ -79,23 +79,27 @@
                             </div>
                         </div>
 
-                        <!-- Dates Row -->
+                        <!-- Scheduling Section -->
+                        <!-- Scheduling Section -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Start Date -->
+                            <!-- Scheduled Start -->
                             <div>
-                                <label for="edit-start_date" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Start Date
+                                <label for="edit-scheduled-start" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Scheduled Start
                                 </label>
-                                <input id="edit-start_date" v-model="form.start_date" type="datetime-local"
+                                <flat-pickr id="edit-scheduled-start" v-model="form.scheduled_start"
+                                    :config="flatpickrConfig" placeholder="Select start date & time"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
 
-                            <!-- Due Date -->
+                            <!-- Target Completion -->
                             <div>
-                                <label for="edit-due_date" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Due Date
+                                <label for="edit-target-completion"
+                                    class="block text-sm font-medium text-gray-700 mb-1">
+                                    Target Completion
                                 </label>
-                                <input id="edit-due_date" v-model="form.due_date" type="datetime-local"
+                                <flat-pickr id="edit-target-completion" v-model="form.target_completion"
+                                    :config="flatpickrConfig" placeholder="Select completion date & time"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
                         </div>
@@ -111,24 +115,24 @@
                                 placeholder="e.g., 4.5" />
                         </div>
 
-                        <!-- Assign Members -->
+                        <!-- Team Assignment -->
                         <div>
-                            <label for="edit-members" class="block text-sm font-medium text-gray-700 mb-1">
-                                Assign Members
+                            <label for="edit-assigned-members" class="block text-sm font-medium text-gray-700 mb-1">
+                                Team Assignment
                             </label>
 
                             <!-- Search Input -->
                             <div class="mb-2">
-                                <input type="text" placeholder="Search members..."
+                                <input type="text" placeholder="Search team members..."
                                     @input="debouncedMemberSearch($event.target.value)"
                                     class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                             </div>
 
                             <!-- Selected Members Display -->
-                            <div v-if="form.members.length > 0" class="mb-2 p-2 bg-blue-50 rounded-lg">
-                                <div class="text-xs font-medium text-blue-700 mb-1">Selected Members:</div>
+                            <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-blue-50 rounded-lg">
+                                <div class="text-xs font-medium text-blue-700 mb-1">Assigned Team Members:</div>
                                 <div class="flex flex-wrap gap-1">
-                                    <span v-for="memberId in form.members" :key="memberId"
+                                    <span v-for="memberId in form.assigned_members" :key="memberId"
                                         class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
                                         {{ getSelectedMemberName(memberId) }}
                                         <button @click="removeMember(memberId)"
@@ -151,7 +155,7 @@
                                 </div>
                                 <label v-for="member in projectMembers" :key="member.id"
                                     class="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
-                                    <input type="checkbox" :value="member.user" v-model="form.members"
+                                    <input type="checkbox" :value="member.user" v-model="form.assigned_members"
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                                     <div class="flex items-center space-x-2 flex-1 min-w-0">
                                         <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
@@ -201,6 +205,8 @@
 <script setup>
 import { ref, reactive, watch, computed, onMounted, nextTick } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
+import flatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 
 // Props
 const props = defineProps({
@@ -221,6 +227,19 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['close', 'updated'])
 
+// Flatpickr configuration
+const flatpickrConfig = {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i',
+    altInput: true,
+    altFormat: 'F j, Y \\a\\t H:i',
+    time_24hr: false,
+    allowInput: true,
+    clickOpens: true,
+    defaultDate: null,
+    minuteIncrement: 30
+}
+
 // Reactive data
 const loading = ref(false)
 const updating = ref(false)
@@ -234,10 +253,10 @@ const form = reactive({
     description: '',
     status_id: '',
     priority: 'medium',
-    start_date: '',
-    due_date: '',
+    scheduled_start: null,
+    target_completion: null,
     estimated_hours: null,
-    members: []
+    assigned_members: []
 })
 
 // Computed
@@ -304,10 +323,24 @@ const populateForm = (task) => {
     form.description = task.description || ''
     form.status_id = task.status?.id || ''
     form.priority = task.priority || 'medium'
-    form.start_date = task.start_date ? formatDateForInput(task.start_date) : ''
-    form.due_date = task.due_date ? formatDateForInput(task.due_date) : ''
+
+    // Format dates for flatpickr (expects Date objects)
+    if (task.start_date) {
+        const startDate = new Date(task.start_date)
+        if (!isNaN(startDate.getTime())) {
+            form.scheduled_start = startDate
+        }
+    }
+
+    if (task.due_date) {
+        const dueDate = new Date(task.due_date)
+        if (!isNaN(dueDate.getTime())) {
+            form.target_completion = dueDate
+        }
+    }
+
     form.estimated_hours = task.estimated_hours || null
-    form.members = task.assigned_members ? task.assigned_members.map(m => m.id) : []
+    form.assigned_members = task.assigned_members ? task.assigned_members.map(m => m.id) : []
     error.value = ''
 }
 
@@ -358,7 +391,7 @@ const updateTask = async () => {
             title: form.title.trim(),
             description: form.description.trim() || null,
             priority: form.priority,
-            members: form.members
+            members: form.assigned_members
         }
 
         // Add optional fields
@@ -366,19 +399,39 @@ const updateTask = async () => {
             payload.status_id = parseInt(form.status_id)
         }
 
-        if (form.start_date) {
-            payload.start_date = new Date(form.start_date).toISOString()
+        if (form.scheduled_start) {
+            // Handle date conversion properly
+            let startDate
+            if (typeof form.scheduled_start === 'string') {
+                startDate = new Date(form.scheduled_start)
+            } else if (form.scheduled_start instanceof Date) {
+                startDate = form.scheduled_start
+            }
+            if (startDate && !isNaN(startDate.getTime())) {
+                payload.start_date = startDate.toISOString()
+            } else {
+                payload.start_date = null
+            }
         } else {
             payload.start_date = null
         }
 
-        if (form.due_date) {
-            payload.due_date = new Date(form.due_date).toISOString()
+        if (form.target_completion) {
+            // Handle date conversion properly
+            let endDate
+            if (typeof form.target_completion === 'string') {
+                endDate = new Date(form.target_completion)
+            } else if (form.target_completion instanceof Date) {
+                endDate = form.target_completion
+            }
+            if (endDate && !isNaN(endDate.getTime())) {
+                payload.due_date = endDate.toISOString()
+            } else {
+                payload.due_date = null
+            }
         } else {
             payload.due_date = null
-        }
-
-        if (form.estimated_hours) {
+        } if (form.estimated_hours) {
             payload.estimated_hours = form.estimated_hours
         } else {
             payload.estimated_hours = null
@@ -437,9 +490,9 @@ const getSelectedMemberName = (memberId) => {
 }
 
 const removeMember = (memberId) => {
-    const index = form.members.indexOf(memberId)
+    const index = form.assigned_members.indexOf(memberId)
     if (index > -1) {
-        form.members.splice(index, 1)
+        form.assigned_members.splice(index, 1)
     }
 }
 
@@ -465,5 +518,27 @@ onMounted(() => {
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Custom flatpickr styling */
+:deep(.flatpickr-input) {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+:deep(.flatpickr-input:focus) {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+:deep(.flatpickr-calendar) {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-radius: 0.75rem;
+    border: none;
 }
 </style>
