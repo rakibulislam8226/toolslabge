@@ -12,7 +12,7 @@
         
         <div class="grid md:grid-cols-3 gap-6 mt-6">
           <router-link 
-            to="/organization" 
+            to="/organizations/members" 
             class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 block"
           >
             <div class="flex items-center mb-3">

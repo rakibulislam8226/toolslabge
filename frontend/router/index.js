@@ -6,11 +6,11 @@ const routes = [
     name: "home.index",
     component: () => import("@/views/home/Home.vue"),
   },
-  {
-    path: "/home",
-    name: "home",
-    component: () => import("@/views/home/Home.vue"),
-  },
+  // {
+  //   path: "/home",
+  //   name: "home",
+  //   component: () => import("@/views/home/Home.vue"),
+  // },
   {
     path: "/register",
     name: "auth.register",
@@ -54,9 +54,15 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: "/organization",
-    name: "organization.index",
+    path: "/organizations",
+    name: "organizations.index",
     component: () => import("@/views/organizations/Organizations.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/organizations/members",
+    name: "organizations.members.index",
+    component: () => import("@/views/organizations/Members.vue"),
     meta: { requiresAuth: true }
   },
   {
