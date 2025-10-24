@@ -13,9 +13,10 @@ class TaskListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
+        project_id = self.kwargs.get("project_id")
         return (
-            Task.objects.select_related("project", "project__organization")
-            .filter(project__memberships__user=user)
+            Task.objects.select_related("project", "project__organization", "status")
+            .filter(project__id=project_id, project__memberships__user=user)
             .distinct()
         )
 
@@ -23,4 +24,10 @@ class TaskListCreateView(generics.ListCreateAPIView):
 class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskDetailSerializer
     permission_classes = [IsProjectMemberOrManager]
-    queryset = Task.objects.select_related("project", "status", "organization")
+
+    def get_queryset(self):
+        user = self.request.user
+        project_id = self.kwargs.get("project_id")
+        return Task.objects.select_related("project", "status", "organization").filter(
+            project__id=project_id, project__memberships__user=user
+        )

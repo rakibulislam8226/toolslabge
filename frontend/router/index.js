@@ -54,6 +54,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/projects/:slug/tasks",
+    name: "projects.tasks",
+    component: () => import("@/views/tasks/TasksList.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/organizations",
     name: "organizations.index",
     component: () => import("@/views/organizations/Organizations.vue"),
