@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from apps.organizations.models import Organization, OrganizationMember
+from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
 
 from ...choices import ProjectMemberRoleChoices
 from ...models import Project, ProjectMember
@@ -63,9 +64,8 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
         return project_member
 
 
-# FIXME: rethink project manager assignment. currently it take from organization member id. is it take this or user id?
 class ProjectListSerializer(serializers.ModelSerializer):
-    project_manager_id = serializers.IntegerField(write_only=True, required=False)
+    manager_id = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = Project
@@ -76,9 +76,9 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "start_date",
             "end_date",
             "status",
-            "project_manager_id",
+            "manager_id",
         ]
-        read_only_fields = ["status", "members"]
+        read_only_fields = ["status"]
 
     def validate(self, data):
         request = self.context["request"]
@@ -110,22 +110,23 @@ class ProjectListSerializer(serializers.ModelSerializer):
                 {"name": "Project with this name already exists in the organization."}
             )
 
-        # Validate project_manager_id, if provided
-        project_manager_id = self.initial_data.get("project_manager_id")
-        if project_manager_id:
+        # Validate manager_id, if provided
+        manager_id = self.initial_data.get("manager_id")
+        if manager_id:
             try:
                 org_member = OrganizationMember.objects.get(
-                    id=project_manager_id, organization=organization
+                    id=manager_id, organization=organization, is_active=True
                 )
-                data["project_manager_user"] = org_member.user
+                data["manager_user"] = org_member.user
             except OrganizationMember.DoesNotExist:
                 raise serializers.ValidationError(
                     {
-                        "project_manager_id": "Invalid ID or user is not part of the organization."
+                        "manager_id": "Invalid ID or user is not part of the organization."
                     }
                 )
         else:
-            data["project_manager_user"] = user
+            # Default to current user as manager
+            data["manager_user"] = user
 
         return data
 
@@ -135,8 +136,8 @@ class ProjectListSerializer(serializers.ModelSerializer):
         user = request.user
 
         organization = validated_data.pop("organization")
-        project_manager_user = validated_data.pop("project_manager_user")
-        validated_data.pop("project_manager_id", None)
+        manager_user = validated_data.pop("manager_user")
+        validated_data.pop("manager_id", None)
 
         project = Project.objects.create(
             organization=organization,
@@ -144,9 +145,10 @@ class ProjectListSerializer(serializers.ModelSerializer):
             **validated_data,
         )
 
+        # Create a ProjectMember entry for the manager with MANAGER role
         ProjectMember.objects.create(
             project=project,
-            user=project_manager_user,
+            user=manager_user,
             role=ProjectMemberRoleChoices.MANAGER,
             created_by=user,
         )
@@ -156,6 +158,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
 
 class ProjectDetailSerializer(serializers.ModelSerializer):
     organization = serializers.StringRelatedField(read_only=True)
+    manager = serializers.SerializerMethodField()
     members = ProjectMemberSerializer(many=True, read_only=True)
 
     class Meta:
@@ -165,6 +168,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
+            "manager",
             "start_date",
             "end_date",
             "status",
@@ -176,10 +180,20 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "organization",
+            "manager",
             "members",
             "created_at",
             "updated_at",
         ]
+
+    def get_manager(self, obj):
+        """Get the project manager from ProjectMember with MANAGER role."""
+        manager_member = obj.memberships.filter(
+            role=ProjectMemberRoleChoices.MANAGER
+        ).first()
+        if manager_member:
+            return UserSlimSerializer(manager_member.user).data
+        return None
 
     def validate(self, data):
         # fallback to existing values if partial update

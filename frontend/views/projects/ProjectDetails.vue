@@ -199,8 +199,18 @@
           
           <div class="space-y-4">
             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Project ID</span>
-              <span class="font-medium text-gray-900">#{{ project.id }}</span>
+              <span class="text-gray-600">Project Manager</span>
+              <span class="font-medium text-gray-900">
+                <template v-if="project?.manager">
+                  <span v-if="project.manager.first_name && project.manager.last_name">
+                    {{ project.manager.first_name }} {{ project.manager.last_name }}
+                  </span>
+                  <span v-else>
+                    {{ project.manager.email }}
+                  </span>
+                </template>
+                <span v-else class="text-gray-500 italic">No manager assigned</span>
+              </span>
             </div>
             
             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">

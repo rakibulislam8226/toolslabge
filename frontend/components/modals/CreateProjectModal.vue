@@ -79,6 +79,96 @@
         </div>
       </div>
 
+      <!-- Project Manager -->
+      <div>
+        <label for="manager" class="block text-sm font-medium text-gray-700 mb-2">
+          Project Manager
+        </label>
+        <div class="relative">
+          <input
+            id="manager"
+            v-model="managerSearch"
+            type="text"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+            :class="{ 'border-red-500': errors.manager_id }"
+            placeholder="Search for a team member..."
+            @focus="showManagerDropdown = true"
+            @input="handleManagerSearch"
+          />
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+            <svg v-if="loadingMembers" class="w-4 h-4 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+              <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+            </svg>
+            <svg v-else class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          
+          <!-- Manager Dropdown -->
+          <div 
+            v-if="showManagerDropdown && (filteredMembers.length > 0 || managerSearch.length > 0)"
+            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+          >
+            <div v-if="loadingMembers" class="p-3 text-center text-gray-500">
+              <div class="flex items-center justify-center">
+                <svg class="w-4 h-4 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                </svg>
+                Loading members...
+              </div>
+            </div>
+            <div v-else-if="filteredMembers.length === 0" class="p-3 text-center text-gray-500">
+              No members found
+            </div>
+            <div v-else>
+              <button
+                v-for="member in filteredMembers"
+                :key="member.id"
+                type="button"
+                @click="selectManager(member)"
+                class="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none flex items-center"
+              >
+                <div class="flex-1">
+                  <div class="font-medium text-gray-900">
+                    {{ member.user.first_name }} {{ member.user.last_name }}
+                  </div>
+                  <div class="text-sm text-gray-500">{{ member.user.email }}</div>
+                  <div class="text-xs text-blue-600 capitalize">{{ member.role }}</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Selected Manager Display -->
+        <div v-if="selectedManager" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="font-medium text-blue-900">
+                {{ selectedManager.user.first_name }} {{ selectedManager.user.last_name }}
+              </div>
+              <div class="text-sm text-blue-700">{{ selectedManager.user.email }}</div>
+              <div class="text-xs text-blue-600 capitalize">{{ selectedManager.role }}</div>
+            </div>
+            <button
+              type="button"
+              @click="clearManager"
+              class="text-blue-600 hover:text-blue-800"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <p v-if="errors.manager_id" class="mt-1 text-sm text-red-600">
+          {{ errors.manager_id[0] }}
+        </p>
+      </div>
+
       <!-- Project Status -->
       <div>
         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
@@ -142,9 +232,22 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed, onMounted } from 'vue'
 import BaseModal from './BaseModal.vue'
 import axios from "@/plugins/axiosConfig.js"
+
+// Debounce utility function
+function debounce(func, wait) {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
+}
 
 const props = defineProps({
   isOpen: {
@@ -162,7 +265,7 @@ const form = reactive({
   start_date: '',
   end_date: '',
   status: 'active',
-  organization: null
+  manager_id: null
 })
 
 // State
@@ -171,11 +274,51 @@ const errors = ref({})
 const generalError = ref('')
 const userOrganizations = ref([])
 
+// Manager search state
+const members = ref([])
+const loadingMembers = ref(false)
+const managerSearch = ref('')
+const selectedManager = ref(null)
+const showManagerDropdown = ref(false)
+
+// Computed property for filtered members
+const filteredMembers = computed(() => {
+  if (!managerSearch.value.trim()) {
+    return members.value
+  }
+  
+  const search = managerSearch.value.toLowerCase()
+  return members.value.filter(member => {
+    const fullName = `${member.user.first_name} ${member.user.last_name}`.toLowerCase()
+    const email = member.user.email.toLowerCase()
+    return fullName.includes(search) || email.includes(search)
+  })
+})
+
 // Reset form when modal opens/closes
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     resetForm()
     fetchOrganizations()
+    fetchMembers()
+  }
+})
+
+// Close dropdown when clicking outside
+watch(() => showManagerDropdown.value, (isOpen) => {
+  if (isOpen) {
+    // Add click outside listener
+    const handleClickOutside = (event) => {
+      const dropdown = event.target.closest('.relative')
+      if (!dropdown) {
+        showManagerDropdown.value = false
+        document.removeEventListener('click', handleClickOutside)
+      }
+    }
+    
+    setTimeout(() => {
+      document.addEventListener('click', handleClickOutside)
+    }, 100)
   }
 })
 
@@ -186,7 +329,10 @@ const resetForm = () => {
   form.start_date = ''
   form.end_date = ''
   form.status = 'active'
-  // Keep the organization auto-selected
+  form.manager_id = null
+  managerSearch.value = ''
+  selectedManager.value = null
+  showManagerDropdown.value = false
   errors.value = {}
   generalError.value = ''
 }
@@ -205,14 +351,50 @@ const fetchOrganizations = async () => {
       slug: org.organization_slug
     }))
     
-    // Auto-select the first organization (or the only one)
-    if (userOrganizations.value.length > 0) {
-      form.organization = userOrganizations.value[0].id
-    }
   } catch (err) {
     console.error('Failed to fetch organizations:', err)
     generalError.value = 'Failed to load organization information'
   }
+}
+
+// Fetch organization members
+const fetchMembers = async () => {
+  try {
+    loadingMembers.value = true
+    const response = await axios.get('organizations/members/')
+    members.value = response.data.data || []
+  } catch (err) {
+    console.error('Failed to fetch members:', err)
+  } finally {
+    loadingMembers.value = false
+  }
+}
+
+// Debounced member search
+const debouncedFetchMembers = debounce(fetchMembers, 300)
+
+// Handle manager search input
+const handleManagerSearch = () => {
+  showManagerDropdown.value = true
+  if (members.value.length === 0 && !loadingMembers.value) {
+    debouncedFetchMembers()
+  }
+}
+
+// Select a manager
+const selectManager = (member) => {
+  selectedManager.value = member
+  form.manager_id = member.id
+  managerSearch.value = `${member.user.first_name} ${member.user.last_name}`
+  showManagerDropdown.value = false
+}
+
+// Clear selected manager
+const clearManager = () => {
+  selectedManager.value = null
+  form.manager_id = null
+  managerSearch.value = ''
+  showManagerDropdown.value = false
 }
 
 // Handle form submission
@@ -231,7 +413,7 @@ const handleSubmit = async () => {
       start_date: form.start_date || null,
       end_date: form.end_date || null,
       status: form.status,
-      organization: form.organization
+      manager_id: form.manager_id
     }
 
     // Remove empty fields
