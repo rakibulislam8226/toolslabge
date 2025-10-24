@@ -11,7 +11,7 @@
                 <!-- Header -->
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Edit Task</h3>
+                        <h3 class="text-lg font-semibold text-gray-900">Edit Task - </h3>
                         <button @click="closeModal"
                             class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
