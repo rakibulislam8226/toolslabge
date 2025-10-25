@@ -1,0 +1,271 @@
+/* MINIMAL THEME SYSTEM - CSS Variables Only */
+
+:root {
+  /* Light theme (default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --accent-primary: #3b82f6;
+  --accent-secondary: #6366f1;
+}
+
+/* Dark theme overrides */
+html.dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-primary: #475569;
+  --border-secondary: #64748b;
+  --accent-primary: #06b6d4;
+  --accent-secondary: #8b5cf6;
+}
+
+/* Theme-aware utility classes */
+.theme-bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.theme-bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.theme-border-primary {
+  border-color: var(--border-primary);
+}
+
+.theme-border-secondary {
+  border-color: var(--border-secondary);
+}
+
+.theme-accent-primary {
+  color: var(--accent-primary);
+}
+
+.theme-accent-secondary {
+  color: var(--accent-secondary);
+}
+
+/* Card components */
+.theme-card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-light);
+  transition: all var(--transition-normal);
+}
+
+.theme-card:hover {
+  box-shadow: var(--shadow-medium);
+}
+
+/* Input components */
+.theme-input {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+.theme-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 20%, transparent);
+}
+
+.theme-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Button components */
+.theme-btn-primary {
+  background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  border: none;
+  transition: all var(--transition-normal);
+}
+
+.theme-btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-medium);
+}
+
+.theme-btn-secondary {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  transition: all var(--transition-normal);
+}
+
+.theme-btn-secondary:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+}
+
+/* Table components */
+.theme-table {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.theme-table th {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.theme-table td {
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.theme-table tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Modal components */
+.theme-modal {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-large);
+}
+
+.theme-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dark .theme-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Navigation components */
+.theme-nav-item {
+  color: var(--text-secondary);
+  transition: color var(--transition-normal);
+}
+
+.theme-nav-item:hover {
+  color: var(--accent-primary);
+}
+
+.theme-nav-item.active {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+/* Sidebar components */
+.theme-sidebar {
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-primary);
+}
+
+/* Header components */
+.theme-header {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-light);
+}
+
+/* Form components */
+.theme-form-group {
+  margin-bottom: 1rem;
+}
+
+.theme-form-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.theme-form-error {
+  color: #ef4444; /* red-500 */
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.theme-form-success {
+  color: #10b981; /* emerald-500 */
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Loading states */
+.theme-loading {
+  color: var(--text-tertiary);
+}
+
+.theme-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-tertiary) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Selection styling */
+::selection {
+  background-color: color-mix(in srgb, var(--accent-primary) 30%, transparent);
+  color: var(--text-primary);
+}
+
+/* Focus styles */
+.theme-focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: var(--transition-normal);
+  transition-timing-function: ease-in-out;
+}

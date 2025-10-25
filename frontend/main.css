@@ -1,1 +1,113 @@
 @import "tailwindcss";
+@import "./styles/theme.css";
+
+/* UNIVERSAL THEME ENFORCEMENT - Override ALL existing styles */
+/* This ensures ALL pages inherit theme colors without individual updates */
+
+html {
+  color-scheme: light;
+  transition: color-scheme 300ms;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Force theme on EVERYTHING - highest specificity overrides */
+body,
+#app,
+main,
+.min-h-screen,
+.bg-gray-50,
+.bg-gray-100,
+.bg-white {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 300ms ease, color 300ms ease !important;
+}
+
+/* Override common text colors universally */
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-600,
+.text-gray-500,
+p, span {
+  color: var(--text-secondary) !important;
+}
+
+/* Override common background colors universally */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.border-gray-200,
+.border-gray-300 {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+/* Card and container overrides */
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.rounded-lg,
+.border {
+  border-color: var(--border-primary) !important;
+  transition: all 300ms ease !important;
+}
+
+/* Input and form overrides */
+input,
+textarea,
+select,
+.border-gray-300 {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 20%, transparent) !important;
+}
+
+/* Button theme preservation */
+.bg-blue-600,
+.bg-blue-500 {
+  background-color: var(--accent-primary) !important;
+}
+
+.bg-blue-600:hover,
+.bg-blue-500:hover,
+.hover\:bg-blue-700:hover {
+  background-color: var(--accent-secondary) !important;
+}
+
+/* Success/Error states - keep their semantic colors but adjust contrast */
+.bg-green-50 { background-color: color-mix(in srgb, #10b981 10%, var(--bg-primary)) !important; }
+.bg-red-50 { background-color: color-mix(in srgb, #ef4444 10%, var(--bg-primary)) !important; }
+.text-green-600 { color: #10b981 !important; }
+.text-red-600 { color: #ef4444 !important; }
+
+/* Header and navigation overrides */
+.bg-white.shadow-sm,
+.border-b {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+/* Minimal theme utility classes for quick access */
+.theme-bg { background-color: var(--bg-primary) !important; }
+.theme-text { color: var(--text-primary) !important; }
+.theme-card {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
+}
