@@ -1,7 +1,7 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="min-h-screen bg-gray-50">
         <!-- Header Section -->
-        <div class="bg-gradient-to-r from-white to-blue-50 shadow-lg border-b border-blue-100">
+        <div class="bg-white shadow-lg border-b border-gray-200">
             <div class="max-w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <div
                     class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
@@ -50,7 +50,7 @@
                                     Project Tasks</h1>
                                 <p class="mt-1 text-gray-600 text-sm sm:text-base" v-if="project">
                                     Manage and track tasks for <span class="font-semibold text-blue-600">{{ project.name
-                                        }}</span>
+                                    }}</span>
                                 </p>
                             </div>
                         </div>
@@ -71,12 +71,13 @@
                         </button>
 
                         <button @click="openCreateModal()"
-                            class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="bg-blue-600 px-6 py-2.5 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
+                            style="color: white !important;">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4v16m8-8H4"></path>
                             </svg>
-                            Create Task
+                            <span style="color: white !important;">Create Task</span>
                         </button>
                     </div>
                 </div>
@@ -91,8 +92,7 @@
 
         <!-- Error State -->
         <div v-else-if="error" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div
-                class="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-2xl p-8 text-center shadow-lg">
+            <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center shadow-lg">
                 <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -102,7 +102,8 @@
                 <h3 class="text-xl font-bold text-red-900 mb-3">Error Loading Tasks</h3>
                 <p class="text-red-700 mb-6 max-w-md mx-auto">{{ error }}</p>
                 <button @click="fetchTasks"
-                    class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    class="bg-red-600 px-6 py-3 rounded-xl hover:bg-red-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                    style="color: white !important;">
                     Try Again
                 </button>
             </div>
@@ -112,7 +113,7 @@
         <div v-else class="max-w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <!-- Status Statistics -->
             <div
-                class="bg-gradient-to-br from-white to-indigo-50 rounded-2xl shadow-lg border border-indigo-100 p-4 sm:p-6 lg:p-8 mb-8 hover:shadow-xl transition-all duration-300">
+                class="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 mb-8 hover:shadow-xl transition-all duration-300">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
                     <div class="flex items-center mb-4 sm:mb-0">
                         <div
@@ -134,7 +135,7 @@
                 <div class="overflow-x-auto scrollbar-modern">
                     <div class="flex justify-between pb-2" style="min-width: max-content;">
                         <div v-for="status in taskStatuses" :key="status.id"
-                            class="text-center p-4 bg-white bg-opacity-70 rounded-xl border border-white shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 flex-1 mx-2 min-w-[120px] max-w-[200px]">
+                            class="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 flex-1 mx-2 min-w-[120px] max-w-[200px]">
                             <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm transition-all duration-300"
                                 :class="getStatusColor(status.id, 'bg')">
                                 <span class="text-base sm:text-lg font-bold" :class="getStatusColor(status.id, 'text')">
@@ -154,7 +155,7 @@
                     <div v-for="status in taskStatuses" :key="status.id" class="flex-shrink-0 w-80 sm:w-96">
                         <!-- Status Column Header -->
                         <div
-                            class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-200 mb-4 hover:shadow-xl transition-all duration-300">
+                            class="bg-white rounded-xl shadow-lg border border-gray-200 mb-4 hover:shadow-xl transition-all duration-300">
                             <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
@@ -179,7 +180,7 @@
                         </div>
 
                         <!-- Tasks in Status Column -->
-                        <div class="space-y-4 min-h-[400px] p-2 bg-gradient-to-b from-gray-50 to-white rounded-xl">
+                        <div class="space-y-4 min-h-[400px] p-2 bg-gray-50 rounded-xl">
                             <TaskCard v-for="task in getTasksInStatus(status.id)" :key="task.id" :task="task"
                                 :statuses="taskStatuses" @edit="openEditModal" @delete="deleteTask"
                                 @status-change="updateTaskStatus"
@@ -189,7 +190,7 @@
                             <div v-if="getTasksInStatus(status.id).length === 0"
                                 class="text-center py-12 text-gray-400">
                                 <div
-                                    class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                    class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
                                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -210,8 +211,7 @@
 
             <!-- Empty State - No Statuses -->
             <div v-if="!loading && taskStatuses.length === 0" class="text-center py-24">
-                <div
-                    class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <div class="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
                     <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -223,7 +223,8 @@
                     before you can start managing tasks</p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
                     <button @click="fetchTaskStatuses"
-                        class="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-6 py-3 rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                        class="bg-gray-600 px-6 py-3 rounded-xl hover:bg-gray-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                        style="color: white !important;">
                         Refresh Statuses
                     </button>
                 </div>

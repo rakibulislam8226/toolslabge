@@ -16,12 +16,13 @@
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load project</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
         <div class="space-x-3">
-          <button @click="fetchProject"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">
+          <button @click="fetchProject" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300"
+            style="color: white !important;">
             Try Again
           </button>
           <router-link to="/projects"
-            class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block">
+            class="bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block"
+            style="color: white !important;">
             Back to Projects
           </router-link>
         </div>
@@ -31,8 +32,8 @@
     <!-- Project Details Content -->
     <div v-else-if="project" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
       <!-- Header Section -->
-      <div
-        class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-100 mb-6 sm:mb-8 overflow-hidden">
+      <!-- Header Section -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 sm:mb-8 overflow-hidden">
         <div class="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-200">
           <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
             <div class="flex-1 lg:mr-6">
@@ -74,29 +75,32 @@
             <div
               class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
               <button @click="editProject"
-                class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="bg-blue-600 px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                style="color: white !important;">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                   </path>
                 </svg>
-                <span class="font-medium">Edit Project</span>
+                <span class="font-medium" style="color: white !important;">Edit Project</span>
               </button>
               <router-link :to="`/projects/${project.slug ? project.slug + '-' + project.id : project.id}/tasks`"
-                class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-4 py-2.5 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="bg-indigo-600 px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                style="color: white !important;">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
                   </path>
                 </svg>
-                <span class="font-medium">View Tasks</span>
+                <span class="font-medium" style="color: white !important;">View Tasks</span>
               </router-link>
             </div>
           </div>
         </div>
 
         <!-- Project Stats -->
-        <div class="px-4 sm:px-6 py-4 sm:py-6 bg-gradient-to-r from-gray-50 to-white">
+        <!-- Project Stats -->
+        <div class="px-4 sm:px-6 py-4 sm:py-6 bg-gray-50">
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <!-- Tasks -->
             <div
@@ -162,7 +166,7 @@
       <div class="grid lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
         <!-- Project Timeline -->
         <div
-          class="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg border border-blue-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
           <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
             <div
               class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
@@ -176,7 +180,7 @@
 
           <div class="space-y-4">
             <div
-              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-blue-100 shadow-sm">
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
               <span class="text-gray-600 font-medium mb-1 sm:mb-0">Start Date</span>
               <span class="font-semibold text-gray-900 text-sm sm:text-base">
                 {{ project.start_date ? formatDate(project.start_date) : 'Not set' }}
@@ -184,7 +188,7 @@
             </div>
 
             <div
-              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-blue-100 shadow-sm">
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
               <span class="text-gray-600 font-medium mb-1 sm:mb-0">End Date</span>
               <span class="font-semibold text-gray-900 text-sm sm:text-base">
                 {{ project.end_date ? formatDate(project.end_date) : 'Not set' }}
@@ -192,7 +196,7 @@
             </div>
 
             <!-- Progress Bar -->
-            <div class="mt-6 p-4 bg-white bg-opacity-70 rounded-xl border border-blue-100 shadow-sm">
+            <div class="mt-6 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
               <div class="flex justify-between text-sm font-medium text-gray-700 mb-3">
                 <span>Overall Progress</span>
                 <span class="text-blue-600 font-bold">{{ getStaticProgress(project) }}%</span>
@@ -208,7 +212,7 @@
 
         <!-- Project Information -->
         <div
-          class="bg-gradient-to-br from-white to-indigo-50 rounded-xl shadow-lg border border-indigo-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
           <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
             <div
               class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
@@ -222,7 +226,7 @@
 
           <div class="space-y-4">
             <div
-              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-indigo-100 shadow-sm">
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
               <span class="text-gray-600 font-medium mb-1 sm:mb-0">Project Manager</span>
               <span class="font-semibold text-gray-900 text-sm sm:text-base break-words">
                 <template v-if="project?.manager">
@@ -238,7 +242,7 @@
             </div>
 
             <div
-              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-indigo-100 shadow-sm">
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
               <span class="text-gray-600 font-medium mb-2 sm:mb-0">Status</span>
               <span :class="getStatusBadgeClass(project.status)"
                 class="px-3 py-1.5 text-sm font-semibold rounded-full shadow-sm self-start sm:self-center">
@@ -247,7 +251,7 @@
             </div>
 
             <div
-              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white bg-opacity-70 rounded-xl border border-indigo-100 shadow-sm">
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
               <span class="text-gray-600 font-medium mb-1 sm:mb-0">Created</span>
               <span class="font-semibold text-gray-900 text-sm sm:text-base">
                 {{ project.created_at ? formatDate(project.created_at) : 'Unknown' }}
@@ -261,7 +265,7 @@
       <div class="grid lg:grid-cols-2 gap-6 sm:gap-8">
         <!-- Recent Tasks -->
         <div
-          class="bg-gradient-to-br from-white to-green-50 rounded-xl shadow-lg border border-green-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
           <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-2 sm:space-y-0">
             <h2 class="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
               <div
@@ -290,7 +294,8 @@
             </div>
             <p class="text-gray-600 font-medium mb-4">Tasks will be displayed here</p>
             <button @click="viewAllTasks"
-              class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              class="bg-green-600 px-6 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              style="color: white !important;">
               View Tasks
             </button>
           </div>
@@ -298,7 +303,7 @@
 
         <!-- Project Members -->
         <div
-          class="bg-gradient-to-br from-white to-purple-50 rounded-xl shadow-lg border border-purple-100 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
+          class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
           <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-2 sm:space-y-0">
             <h2 class="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
               <div
@@ -325,7 +330,8 @@
             </div>
             <p class="text-gray-600 font-medium mb-4">Project members will be displayed here</p>
             <button @click="manageMembers"
-              class="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              class="bg-purple-600 px-6 py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              style="color: white !important;">
               Manage Members
             </button>
           </div>

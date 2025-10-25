@@ -1,25 +1,15 @@
 <template>
-  <div 
-    v-if="isOpen" 
-    class="fixed inset-0 z-50 overflow-y-auto"
-    @click.self="handleBackdropClick"
-  >
+  <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto" @click.self="handleBackdropClick">
     <!-- Backdrop with blur effect -->
     <div class="fixed inset-0 backdrop-blur-md bg-black/20 transition-all duration-300"></div>
-    
+
     <!-- Modal Content -->
     <div class="flex min-h-full items-center justify-center p-4">
-      <div 
-        class="relative bg-white rounded-xl shadow-xl max-w-md w-full transform transition-all duration-300"
-        :class="modalClass"
-        @click.stop
-      >
+      <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full transform transition-all duration-300"
+        :class="modalClass" @click.stop>
         <!-- Close Button -->
-        <button 
-          v-if="showCloseButton"
-          @click="close"
-          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 z-10"
-        >
+        <button v-if="showCloseButton" @click="close"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 z-10">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
@@ -60,8 +50,8 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: 'md', // sm, md, lg, xl
-    validator: (value) => ['sm', 'md', 'lg', 'xl'].includes(value)
+    default: 'md', // sm, md, lg, xl, xxl
+    validator: (value) => ['sm', 'md', 'lg', 'xl', 'xxl'].includes(value)
   },
   showCloseButton: {
     type: Boolean,
@@ -81,7 +71,8 @@ const modalClass = computed(() => {
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
-    xl: 'max-w-2xl'
+    xl: 'max-w-2xl',
+    xxl: 'max-w-4xl'
   }
   return sizeClasses[props.size]
 })
