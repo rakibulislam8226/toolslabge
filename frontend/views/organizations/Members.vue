@@ -14,14 +14,15 @@
                     </div>
                     <div class="flex-shrink-0">
                         <button @click="openInviteModal = true"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-200 ease-in-out">
-                            <svg class="-ml-1 mr-2 h-5 w-5 transition-transform duration-200" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                            class="bg-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-lg flex items-center transform hover:scale-105"
+                            style="color: white !important;">
+                            <svg class="-ml-1 mr-2 h-5 w-5 transition-transform duration-200" fill="none" stroke="white"
+                                viewBox="0 0 24 24" style="color: white !important;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
-                            <span class="hidden sm:inline">Invite Member</span>
-                            <span class="sm:hidden">Invite</span>
+                            <span class="hidden sm:inline" style="color: white !important;">Invite Member</span>
+                            <span class="sm:hidden" style="color: white !important;">Invite</span>
                         </button>
                     </div>
                 </div>
@@ -133,12 +134,14 @@
                             members to collaborate on
                             your projects and build amazing things together.</p>
                         <button @click="openInviteModal = true"
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm sm:text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg">
-                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm sm:text-base font-medium rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg"
+                            style="color: white !important;">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="white" viewBox="0 0 24 24"
+                                style="color: white !important;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
-                            Invite Your First Member
+                            <span style="color: white !important;">Invite Your First Member</span>
                         </button>
                     </div>
                 </div>
