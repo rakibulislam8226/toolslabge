@@ -2,12 +2,12 @@
     <div class="min-h-screen bg-gray-50">
         <!-- Header Section -->
         <div class="bg-white shadow-lg border-b border-gray-200">
-            <div class="max-w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div class="max-w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
                 <div
-                    class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
+                    class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-3 lg:space-y-0">
                     <div class="flex-1">
                         <!-- Breadcrumb -->
-                        <nav class="mb-4 sm:mb-6">
+                        <nav class="mb-2 sm:mb-3">
                             <ol class="flex items-center space-x-2 text-sm text-gray-500">
                                 <li>
                                     <router-link to="/projects"
@@ -37,29 +37,29 @@
                             </ol>
                         </nav>
 
-                        <div class="flex items-center mb-4">
+                        <div class="flex items-center mb-2">
                             <div
-                                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
                                     Project Tasks</h1>
-                                <p class="mt-1 text-gray-600 text-sm sm:text-base" v-if="project">
+                                <p class="mt-0.5 text-gray-600 text-sm" v-if="project">
                                     Manage and track tasks for <span class="font-semibold text-blue-600">{{ project.name
-                                        }}</span>
+                                    }}</span>
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     <div
-                        class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
+                        class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
                         <button @click="refreshTasks" :disabled="loading"
-                            class="bg-white text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-md border border-gray-200 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
+                            class="bg-white text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-md border border-gray-200 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
                             :class="{ 'opacity-50 cursor-not-allowed': loading }">
                             <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@
                         </button>
 
                         <button @click="openCreateModal()"
-                            class="bg-blue-600 px-6 py-2.5 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
+                            class="bg-blue-600 px-6 py-2 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
                             style="color: white !important;">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -110,40 +110,35 @@
         </div>
 
         <!-- Tasks Kanban Board -->
-        <div v-else class="max-w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div v-else class="max-w-full px-2 sm:px-4 lg:px-4 py-6 sm:py-8">
             <!-- Status Statistics -->
             <div
-                class="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 mb-8 hover:shadow-xl transition-all duration-300">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
-                    <div class="flex items-center mb-4 sm:mb-0">
+                class="bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 mb-4 hover:shadow-md transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
                         <div
-                            class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="w-4 h-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded flex items-center justify-center mr-2">
+                            <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                                 </path>
                             </svg>
                         </div>
-                        <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Tasks Overview</h2>
+                        <h2 class="text-sm font-semibold text-gray-900">Tasks Overview</h2>
                     </div>
-                    <div class="text-sm text-gray-600 font-medium">
-                        {{ tasks.length }} total tasks
-                    </div>
-                </div>
 
-                <!-- Horizontal scrollable status cards -->
-                <div class="overflow-x-auto scrollbar-modern">
-                    <div class="flex justify-between pb-2" style="min-width: max-content;">
+                    <!-- Status indicators on the right -->
+                    <div class="flex items-center space-x-3 overflow-x-auto">
                         <div v-for="status in taskStatuses" :key="status.id"
-                            class="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 flex-1 mx-2 min-w-[120px] max-w-[200px]">
-                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm transition-all duration-300"
+                            class="flex items-center space-x-1.5 px-2 py-1 rounded-md border transition-all duration-200 hover:shadow-sm flex-shrink-0"
+                            :class="getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'border')">
+                            <div class="w-5 h-5 rounded flex items-center justify-center"
                                 :class="getStatusColor(status.id, 'bg')">
-                                <span class="text-base sm:text-lg font-bold" :class="getStatusColor(status.id, 'text')">
+                                <span class="text-xs font-bold" :class="getStatusColor(status.id, 'text')">
                                     {{ getTasksInStatus(status.id).length }}
                                 </span>
                             </div>
-                            <p class="text-xs sm:text-sm font-semibold text-gray-900 truncate px-1">{{ status.name }}
-                            </p>
+                            <span class="text-xs font-medium text-gray-700 whitespace-nowrap">{{ status.name }}</span>
                         </div>
                     </div>
                 </div>
@@ -151,11 +146,12 @@
 
             <!-- Kanban Board -->
             <div class="overflow-x-auto scrollbar-modern">
-                <div class="flex space-x-6 pb-8" style="min-width: max-content;">
+                <div class="flex space-x-4 pb-8" style="min-width: max-content;">
                     <div v-for="status in taskStatuses" :key="status.id" class="flex-shrink-0 w-80 sm:w-96">
                         <!-- Status Column Header -->
                         <div
-                            class="bg-white rounded-xl shadow-lg border border-gray-200 mb-4 hover:shadow-xl transition-all duration-300">
+                            class="bg-white rounded-xl shadow-lg border border-gray-200 mb-4 hover:shadow-xl transition-all duration-300"
+                            :class="[`status-header-${status.id}`]">
                             <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
