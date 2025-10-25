@@ -7,11 +7,9 @@
           Team Member <span class="text-red-500">*</span>
         </label>
         <div class="relative">
-          <input id="user" v-model="userSearch" type="text" required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-            :class="{ 'border-red-500': errors.user }" placeholder="Search for an organization member..."
-            @focus="showUserDropdown = true" @input="handleUserSearch" />
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+          <BaseInput v-model="userSearch" placeholder="Search for an organization member..." required
+            :error="fieldErrors.user" @focus="showUserDropdown = true" @input="handleUserSearch" />
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <svg v-if="loadingUsers" class="w-4 h-4 animate-spin text-gray-400" fill="none" stroke="currentColor"
               viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
@@ -80,32 +78,17 @@
             </button>
           </div>
         </div>
-
-        <p v-if="errors.user" class="mt-1 text-sm text-red-600">
-          {{ errors.user[0] }}
-        </p>
       </div>
 
       <!-- Role Selection -->
       <div>
-        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
-          Project Role <span class="text-red-500">*</span>
-        </label>
-        <select id="role" v-model="form.role" required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.role }">
-          <option value="contributor">Contributor</option>
-          <option value="manager">Manager</option>
-          <option value="viewer">Viewer</option>
-        </select>
+        <BaseSelect v-model="form.role" label="Project Role" :options="roleOptions" required
+          :error="fieldErrors.role" />
         <p class="mt-1 text-xs text-gray-500">
           <span v-if="form.role === 'manager'">Can manage project settings, members, and all tasks</span>
           <span v-else-if="form.role === 'contributor'">Can create and edit tasks, collaborate on project</span>
           <span v-else-if="form.role === 'viewer'">Can view project details and tasks (read-only access)</span>
           <span v-else>Select a role to see permissions</span>
-        </p>
-        <p v-if="errors.role" class="mt-1 text-sm text-red-600">
-          {{ errors.role[0] }}
         </p>
       </div>
 
@@ -151,8 +134,7 @@
 import { ref, reactive, watch, computed, inject } from 'vue'
 import BaseModal from './BaseModal.vue'
 import axios from "@/plugins/axiosConfig.js"
-
-const $toast = inject('toast')
+import { BaseInput, BaseSelect } from '@/components/forms'
 
 // Debounce utility function
 function debounce(func, wait) {
@@ -179,20 +161,28 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'added'])
+const $toast = inject("toast")
+
+// Role options
+const roleOptions = [
+  { value: 'contributor', label: 'Contributor' },
+  { value: 'manager', label: 'Manager' },
+  { value: 'viewer', label: 'Viewer' }
+]
 
 // Form data
 const form = reactive({
-  user: null,
-  role: ''
+  user_id: null,
+  role: 'contributor'
 })
 
 // State
 const loading = ref(false)
-const errors = ref({})
+const fieldErrors = ref({})
 const generalError = ref('')
 
 // User search state
-const orgMembers = ref([])
+const organizationUsers = ref([])
 const loadingUsers = ref(false)
 const userSearch = ref('')
 const selectedUser = ref(null)
@@ -201,13 +191,15 @@ const showUserDropdown = ref(false)
 // Computed property for filtered users
 const filteredUsers = computed(() => {
   if (!userSearch.value.trim()) {
-    return orgMembers.value
+    return organizationUsers.value
   }
 
   const search = userSearch.value.toLowerCase()
-  return orgMembers.value.filter(member => {
-    const fullName = `${member.user.first_name} ${member.user.last_name}`.toLowerCase()
-    const email = member.user.email.toLowerCase()
+  return organizationUsers.value.filter(user => {
+    const fullName = user.user.first_name && user.user.last_name
+      ? `${user.user.first_name} ${user.user.last_name}`.toLowerCase()
+      : ''
+    const email = user.user.email.toLowerCase()
     return fullName.includes(search) || email.includes(search)
   })
 })
@@ -216,7 +208,7 @@ const filteredUsers = computed(() => {
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     resetForm()
-    fetchOrgMembers()
+    fetchOrganizationUsers()
   }
 })
 
@@ -239,54 +231,53 @@ watch(() => showUserDropdown.value, (isOpen) => {
 
 // Reset form to initial state
 const resetForm = () => {
-  form.user = null
+  form.user_id = null
   form.role = 'contributor'
   userSearch.value = ''
   selectedUser.value = null
   showUserDropdown.value = false
-  errors.value = {}
+  fieldErrors.value = {}
   generalError.value = ''
 }
 
-// Fetch organization members
-const fetchOrgMembers = async () => {
+// Fetch organization users
+const fetchOrganizationUsers = async () => {
   try {
     loadingUsers.value = true
     const response = await axios.get('organizations/members/')
-    orgMembers.value = response.data.data || []
+    organizationUsers.value = response.data.data || []
   } catch (err) {
-    console.error('Failed to fetch organization members:', err)
-    generalError.value = 'Failed to load organization members'
+    organizationUsers.value = []
   } finally {
     loadingUsers.value = false
   }
 }
 
-// Debounced member search
-const debouncedFetchMembers = debounce(fetchOrgMembers, 300)
+// Debounced user search
+const debouncedFetchUsers = debounce(fetchOrganizationUsers, 300)
 
 // Handle user search input
 const handleUserSearch = () => {
   showUserDropdown.value = true
-  if (orgMembers.value.length === 0 && !loadingUsers.value) {
-    debouncedFetchMembers()
+  if (organizationUsers.value.length === 0 && !loadingUsers.value) {
+    debouncedFetchUsers()
   }
 }
 
 // Select a user
-const selectUser = (member) => {
-  selectedUser.value = member
-  form.user = member.user.id
-  userSearch.value = member.user.first_name && member.user.last_name
-    ? `${member.user.first_name} ${member.user.last_name}`
-    : member.user.email
+const selectUser = (user) => {
+  selectedUser.value = user
+  form.user_id = user.user.id
+  userSearch.value = user.user.first_name && user.user.last_name
+    ? `${user.user.first_name} ${user.user.last_name}`
+    : user.user.email
   showUserDropdown.value = false
 }
 
 // Clear selected user
 const clearUser = () => {
   selectedUser.value = null
-  form.user = null
+  form.user_id = null
   userSearch.value = ''
   showUserDropdown.value = false
 }
@@ -296,62 +287,43 @@ const handleSubmit = async () => {
   if (loading.value) return
 
   loading.value = true
-  errors.value = {}
+  fieldErrors.value = {}
   generalError.value = ''
 
   try {
-    // Validate required fields
     if (!selectedUser.value) {
-      errors.value.user = ['Please select a user']
+      fieldErrors.value.user = 'Please select a team member'
       return
     }
 
-    if (!form.role) {
-      errors.value.role = ['Please select a role']
-      return
-    }
-
-    // Prepare form data
     const formData = {
-      user: form.user,
+      user_id: form.user_id,
       role: form.role
     }
 
     const response = await axios.post(`projects/${props.projectId}/members/`, formData)
+    const newMember = response.data.data || response.data
 
-    // Success - emit added event with new member data
-    emit('added', response.data.data || response.data)
-    $toast.success(response.data.message || 'Project member added successfully')
+    $toast?.success('Member added successfully')
+    emit('added', newMember)
     handleClose()
-
   } catch (err) {
-    console.error('Failed to add project member:', err)
+    const responseData = err.response?.data
 
-    if (err.response?.status === 400 && err.response?.data) {
-      // Handle validation errors
-      const responseData = err.response.data
+    if (responseData?.message) {
+      $toast?.error(responseData.message)
+      generalError.value = responseData.message
+    }
 
-      if (responseData.data?.errors && Array.isArray(responseData.data.errors)) {
-        const errorObj = {}
-        responseData.data.errors.forEach(errorItem => {
-          Object.keys(errorItem).forEach(field => {
-            errorObj[field] = [errorItem[field]]
-          })
-        })
-        errors.value = errorObj
-      } else if (responseData.errors) {
-        errors.value = responseData.errors
-      } else if (responseData.message) {
-        generalError.value = responseData.message
-      } else {
-        generalError.value = 'Validation failed. Please check your input.'
-      }
-    } else if (err.response?.status === 401) {
-      generalError.value = 'You are not authorized to add project members'
-    } else if (err.response?.data?.message) {
-      generalError.value = err.response.data.message
-    } else {
-      generalError.value = 'Failed to add project member. Please try again.'
+    if (responseData?.data?.errors && Array.isArray(responseData.data.errors)) {
+      responseData.data.errors.forEach(errorItem => {
+        Object.assign(fieldErrors.value, errorItem)
+      })
+    } else if (responseData?.errors) {
+      Object.assign(fieldErrors.value, responseData.errors)
+    } else if (!responseData?.message) {
+      generalError.value = 'Failed to add member. Please try again.'
+      $toast?.error('Failed to add member')
     }
   } finally {
     loading.value = false
@@ -365,19 +337,3 @@ const handleClose = () => {
   }
 }
 </script>
-
-<style scoped>
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

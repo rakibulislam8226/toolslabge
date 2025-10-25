@@ -83,59 +83,26 @@
       <div class="bg-white rounded-lg shadow-sm border">
         <form @submit.prevent="updateProject" class="p-6 space-y-6">
           <!-- Project Name -->
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-              Project Name *
-            </label>
-            <input type="text" id="name" v-model="form.name" placeholder="Enter project name"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required />
-          </div>
+          <BaseInput v-model="form.name" label="Project Name" placeholder="Enter project name" required
+            :error="fieldErrors.name" />
 
           <!-- Project Description -->
-          <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea id="description" v-model="form.description" rows="4" placeholder="Enter project description"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-          </div>
+          <BaseTextarea v-model="form.description" label="Description" placeholder="Enter project description" :rows="4"
+            :error="fieldErrors.description" />
 
           <!-- Date Fields -->
           <div class="grid md:grid-cols-2 gap-6">
             <!-- Start Date -->
-            <div>
-              <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
-                Start Date
-              </label>
-              <flatpickr id="start_date" v-model="form.start_date" :config="datePickerConfig"
-                placeholder="Select start date"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
+            <BaseDatePicker v-model="form.start_date" label="Start Date" placeholder="Select start date"
+              :enable-time="false" date-format="Y-m-d" alt-format="F j, Y" :error="fieldErrors.start_date" />
 
             <!-- End Date -->
-            <div>
-              <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
-                End Date
-              </label>
-              <flatpickr id="end_date" v-model="form.end_date" :config="datePickerConfig" placeholder="Select end date"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            </div>
+            <BaseDatePicker v-model="form.end_date" label="End Date" placeholder="Select end date" :enable-time="false"
+              date-format="Y-m-d" alt-format="F j, Y" :error="fieldErrors.end_date" />
           </div>
 
           <!-- Status -->
-          <div>
-            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <select id="status" v-model="form.status"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="on_hold">On Hold</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
+          <BaseSelect v-model="form.status" label="Status" :options="statusOptions" :error="fieldErrors.status" />
 
           <!-- Form Actions -->
           <div class="flex items-center justify-between pt-6 border-t border-gray-200">
@@ -179,19 +146,6 @@
             </div>
           </div>
         </form>
-
-        <!-- Success/Error Messages -->
-        <div v-if="successMessage" class="p-6 pt-0">
-          <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p class="text-green-600 font-medium">{{ successMessage }}</p>
-          </div>
-        </div>
-
-        <div v-if="updateError" class="p-6 pt-0">
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p class="text-red-600 font-medium">{{ updateError }}</p>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -245,25 +199,19 @@ import { ref, reactive, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
 import { extractIdFromSlug } from "@/utils/slugUtils.js"
-import flatpickr from 'vue-flatpickr-component'
-import 'flatpickr/dist/flatpickr.css'
+import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker } from '@/components/forms'
 
 const router = useRouter()
 const route = useRoute()
-const $toast = inject("toast");
+const $toast = inject("toast")
 
-// Components
-const components = {
-  flatpickr
-}
-
-// Flatpickr configuration
-const datePickerConfig = {
-  dateFormat: 'Y-m-d',
-  allowInput: true,
-  altInput: true,
-  altFormat: 'F j, Y'
-}
+// Status options
+const statusOptions = [
+  { value: 'active', label: 'Active' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'on_hold', label: 'On Hold' },
+  { value: 'cancelled', label: 'Cancelled' }
+]
 
 // Reactive data
 const project = ref(null)
@@ -271,8 +219,7 @@ const loading = ref(true)
 const updating = ref(false)
 const deleting = ref(false)
 const error = ref('')
-const updateError = ref('')
-const successMessage = ref('')
+const fieldErrors = ref({})
 const showDeleteModal = ref(false)
 
 // Form data
@@ -331,16 +278,14 @@ const fetchProject = async () => {
 const updateProject = async () => {
   try {
     updating.value = true
-    updateError.value = ''
-    successMessage.value = ''
+    fieldErrors.value = {}
 
     const id = projectId.value
     if (!id) {
-      updateError.value = 'Cannot update - invalid project ID'
+      $toast?.error('Cannot update - invalid project ID')
       return
     }
 
-    // Prepare data for PATCH request
     const updateData = {
       name: form.name,
       description: form.description,
@@ -350,25 +295,28 @@ const updateProject = async () => {
     }
 
     const response = await axios.patch(`projects/${id}/`, updateData)
-
-    // Update local project data
     const updatedProject = response.data.data || response.data
+
     if (updatedProject) {
       project.value = updatedProject
-      $toast.success(response.data.message || 'Project updated successfully');
-      router.push(`/projects/${updatedProject.slug ? `${updatedProject.slug}-${updatedProject.id}` : updatedProject.id}`);
+      $toast?.success('Project updated successfully')
+      router.push(`/projects/${updatedProject.slug ? `${updatedProject.slug}-${updatedProject.id}` : updatedProject.id}`)
+    }
+  } catch (err) {
+    const responseData = err.response?.data
+
+    if (responseData?.message) {
+      $toast?.error(responseData.message)
     }
 
-  } catch (err) {
-    console.error('Failed to update project:', err)
-    if (err.response?.data?.detail) {
-      updateError.value = err.response.data.detail
-    } else if (err.response?.data) {
-      // Handle field-specific errors
-      const errors = Object.values(err.response.data).flat()
-      updateError.value = errors.join(', ')
-    } else {
-      updateError.value = 'Failed to update project. Please try again.'
+    if (responseData?.data?.errors && Array.isArray(responseData.data.errors)) {
+      responseData.data.errors.forEach(errorItem => {
+        Object.assign(fieldErrors.value, errorItem)
+      })
+    } else if (responseData?.errors) {
+      Object.assign(fieldErrors.value, responseData.errors)
+    } else if (!responseData?.message) {
+      $toast?.error('Failed to update project')
     }
   } finally {
     updating.value = false
@@ -382,23 +330,20 @@ const deleteProject = async () => {
 
     const id = projectId.value
     if (!id) {
-      updateError.value = 'Cannot delete - invalid project ID'
+      $toast?.error('Cannot delete - invalid project ID')
       return
     }
 
     await axios.delete(`projects/${id}/`)
-
-    // Redirect to projects list after successful deletion
+    $toast?.success('Project deleted successfully')
     router.push('/projects')
-
   } catch (err) {
-    console.error('Failed to delete project:', err)
     showDeleteModal.value = false
 
     if (err.response?.data?.detail) {
-      updateError.value = err.response.data.detail
+      $toast?.error(err.response.data.detail)
     } else {
-      updateError.value = 'Failed to delete project. Please try again.'
+      $toast?.error('Failed to delete project')
     }
   } finally {
     deleting.value = false

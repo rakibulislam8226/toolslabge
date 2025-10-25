@@ -2,57 +2,20 @@
   <BaseModal :is-open="isOpen" title="Create New Project" size="xxl" @close="handleClose">
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Project Name -->
-      <div>
-        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-          Project Name <span class="text-red-500">*</span>
-        </label>
-        <input id="name" v-model="form.name" type="text" required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.name }" placeholder="Enter project name" />
-        <p v-if="errors.name" class="mt-1 text-sm text-red-600">
-          {{ errors.name[0] }}
-        </p>
-      </div>
+      <BaseInput v-model="form.name" label="Project Name" placeholder="Enter project name" required
+        :error="fieldErrors.name" />
 
       <!-- Project Description -->
-      <div>
-        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-          Description
-        </label>
-        <textarea id="description" v-model="form.description" rows="4"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.description }" placeholder="Describe your project (optional)"></textarea>
-        <p v-if="errors.description" class="mt-1 text-sm text-red-600">
-          {{ errors.description[0] }}
-        </p>
-      </div>
+      <BaseTextarea v-model="form.description" label="Description" placeholder="Describe your project (optional)"
+        :rows="4" :error="fieldErrors.description" />
 
       <!-- Project Dates -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
-            Start Date
-          </label>
-          <flatpickr id="start_date" v-model="form.start_date" :config="datePickerConfig"
-            placeholder="Select start date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            :class="{ 'border-red-500': errors.start_date }" />
-          <p v-if="errors.start_date" class="mt-1 text-sm text-red-600">
-            {{ errors.start_date[0] }}
-          </p>
-        </div>
+        <BaseDatePicker v-model="form.start_date" label="Start Date" placeholder="Select start date"
+          :enable-time="false" date-format="Y-m-d" alt-format="F j, Y" :error="fieldErrors.start_date" />
 
-        <div>
-          <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
-            End Date
-          </label>
-          <flatpickr id="end_date" v-model="form.end_date" :config="datePickerConfig" placeholder="Select end date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            :class="{ 'border-red-500': errors.end_date }" />
-          <p v-if="errors.end_date" class="mt-1 text-sm text-red-600">
-            {{ errors.end_date[0] }}
-          </p>
-        </div>
+        <BaseDatePicker v-model="form.end_date" label="End Date" placeholder="Select end date" :enable-time="false"
+          date-format="Y-m-d" alt-format="F j, Y" :error="fieldErrors.end_date" />
       </div>
 
       <!-- Project Manager -->
@@ -61,11 +24,9 @@
           Project Manager
         </label>
         <div class="relative">
-          <input id="manager" v-model="managerSearch" type="text"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-            :class="{ 'border-red-500': errors.manager_id }" placeholder="Search for a team member..."
+          <BaseInput v-model="managerSearch" placeholder="Search for a team member..." :error="fieldErrors.manager_id"
             @focus="showManagerDropdown = true" @input="handleManagerSearch" />
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <svg v-if="loadingMembers" class="w-4 h-4 animate-spin text-gray-400" fill="none" stroke="currentColor"
               viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
@@ -128,29 +89,10 @@
             </button>
           </div>
         </div>
-
-        <p v-if="errors.manager_id" class="mt-1 text-sm text-red-600">
-          {{ errors.manager_id[0] }}
-        </p>
       </div>
 
       <!-- Project Status -->
-      <div>
-        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
-          Status
-        </label>
-        <select id="status" v-model="form.status"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.status }">
-          <option value="active">Active</option>
-          <option value="on_hold">On Hold</option>
-          <option value="completed">Completed</option>
-          <option value="archived">Archived</option>
-        </select>
-        <p v-if="errors.status" class="mt-1 text-sm text-red-600">
-          {{ errors.status[0] }}
-        </p>
-      </div>
+      <BaseSelect v-model="form.status" label="Status" :options="statusOptions" :error="fieldErrors.status" />
 
       <!-- Error Message -->
       <div v-if="generalError" class="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -191,11 +133,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue'
+import { ref, reactive, watch, computed, inject } from 'vue'
 import BaseModal from './BaseModal.vue'
 import axios from "@/plugins/axiosConfig.js"
-import flatpickr from 'vue-flatpickr-component'
-import 'flatpickr/dist/flatpickr.css'
+import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker } from '@/components/forms'
 
 // Debounce utility function
 function debounce(func, wait) {
@@ -210,14 +151,6 @@ function debounce(func, wait) {
   }
 }
 
-// Flatpickr configuration
-const datePickerConfig = {
-  dateFormat: 'Y-m-d',
-  allowInput: true,
-  altInput: true,
-  altFormat: 'F j, Y'
-}
-
 const props = defineProps({
   isOpen: {
     type: Boolean,
@@ -226,6 +159,15 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'created'])
+const $toast = inject("toast")
+
+// Status options
+const statusOptions = [
+  { value: 'active', label: 'Active' },
+  { value: 'on_hold', label: 'On Hold' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'archived', label: 'Archived' }
+]
 
 // Form data
 const form = reactive({
@@ -239,9 +181,8 @@ const form = reactive({
 
 // State
 const loading = ref(false)
-const errors = ref({})
+const fieldErrors = ref({})
 const generalError = ref('')
-const userOrganizations = ref([])
 
 // Manager search state
 const members = ref([])
@@ -268,7 +209,6 @@ const filteredMembers = computed(() => {
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     resetForm()
-    fetchOrganizations()
     fetchMembers()
   }
 })
@@ -302,28 +242,8 @@ const resetForm = () => {
   managerSearch.value = ''
   selectedManager.value = null
   showManagerDropdown.value = false
-  errors.value = {}
+  fieldErrors.value = {}
   generalError.value = ''
-}
-
-// Fetch user's organizations and auto-select
-const fetchOrganizations = async () => {
-  try {
-    const response = await axios.get('users/my-info/')
-    const userInfo = response.data.data || response.data
-    const organizations = userInfo.organizations || []
-
-    // Transform and store organizations data
-    userOrganizations.value = organizations.map(org => ({
-      id: org.organization_id,
-      name: org.organization_name,
-      slug: org.organization_slug
-    }))
-
-  } catch (err) {
-    console.error('Failed to fetch organizations:', err)
-    generalError.value = 'Failed to load organization information'
-  }
 }
 
 // Fetch organization members
@@ -333,7 +253,7 @@ const fetchMembers = async () => {
     const response = await axios.get('organizations/members/')
     members.value = response.data.data || []
   } catch (err) {
-    console.error('Failed to fetch members:', err)
+    members.value = []
   } finally {
     loadingMembers.value = false
   }
@@ -371,11 +291,10 @@ const handleSubmit = async () => {
   if (loading.value) return
 
   loading.value = true
-  errors.value = {}
+  fieldErrors.value = {}
   generalError.value = ''
 
   try {
-    // Prepare form data
     const formData = {
       name: form.name.trim(),
       description: form.description.trim() || null,
@@ -393,41 +312,28 @@ const handleSubmit = async () => {
     })
 
     const response = await axios.post('projects/', formData)
+    const newProject = response.data.data || response.data
 
-    // Success - emit created event with new project data
-    emit('created', response.data.data || response.data)
+    $toast?.success('Project created successfully')
+    emit('created', newProject)
     handleClose()
-
   } catch (err) {
-    console.error('Failed to create project:', err)
+    const responseData = err.response?.data
 
-    if (err.response?.status === 400 && err.response?.data) {
-      // Handle validation errors based on your API response structure
-      const responseData = err.response.data
+    if (responseData?.message) {
+      $toast?.error(responseData.message)
+      generalError.value = responseData.message
+    }
 
-      if (responseData.data?.errors && Array.isArray(responseData.data.errors)) {
-        // Handle the specific API response structure with errors array
-        const errorObj = {}
-        responseData.data.errors.forEach(errorItem => {
-          Object.keys(errorItem).forEach(field => {
-            errorObj[field] = [errorItem[field]]
-          })
-        })
-        errors.value = errorObj
-      } else if (responseData.errors) {
-        // Handle direct errors object
-        errors.value = responseData.errors
-      } else if (responseData.message) {
-        generalError.value = responseData.message
-      } else {
-        generalError.value = 'Validation failed. Please check your input.'
-      }
-    } else if (err.response?.status === 401) {
-      generalError.value = 'You are not authorized to create projects'
-    } else if (err.response?.data?.message) {
-      generalError.value = err.response.data.message
-    } else {
+    if (responseData?.data?.errors && Array.isArray(responseData.data.errors)) {
+      responseData.data.errors.forEach(errorItem => {
+        Object.assign(fieldErrors.value, errorItem)
+      })
+    } else if (responseData?.errors) {
+      Object.assign(fieldErrors.value, responseData.errors)
+    } else if (!responseData?.message) {
       generalError.value = 'Failed to create project. Please try again.'
+      $toast?.error('Failed to create project')
     }
   } finally {
     loading.value = false
@@ -438,14 +344,6 @@ const handleSubmit = async () => {
 const handleClose = () => {
   if (!loading.value) {
     emit('close')
-  }
-}
-</script>
-
-<script>
-export default {
-  components: {
-    flatpickr
   }
 }
 </script>
@@ -463,59 +361,5 @@ export default {
   to {
     transform: rotate(360deg);
   }
-}
-
-/* Flatpickr overrides to ensure text visibility */
-:deep(.flatpickr-calendar) {
-  background: white !important;
-  color: #374151 !important;
-}
-
-:deep(.flatpickr-day) {
-  color: #374151 !important;
-  background: transparent !important;
-}
-
-:deep(.flatpickr-day:hover) {
-  background: #f3f4f6 !important;
-  color: #111827 !important;
-}
-
-:deep(.flatpickr-day.selected) {
-  background: #3b82f6 !important;
-  color: white !important;
-}
-
-:deep(.flatpickr-day.today) {
-  border-color: #3b82f6 !important;
-  color: #3b82f6 !important;
-}
-
-:deep(.flatpickr-months .flatpickr-month) {
-  color: #374151 !important;
-}
-
-:deep(.flatpickr-current-month select) {
-  color: #374151 !important;
-  background: white !important;
-}
-
-:deep(.flatpickr-weekdays) {
-  background: #f9fafb !important;
-}
-
-:deep(.flatpickr-weekday) {
-  color: #6b7280 !important;
-  background: transparent !important;
-}
-
-:deep(.flatpickr-prev-month),
-:deep(.flatpickr-next-month) {
-  color: #374151 !important;
-}
-
-:deep(.flatpickr-prev-month:hover),
-:deep(.flatpickr-next-month:hover) {
-  color: #111827 !important;
 }
 </style>

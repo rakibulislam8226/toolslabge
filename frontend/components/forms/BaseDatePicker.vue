@@ -174,9 +174,22 @@ const inputClasses = computed(() => {
 // Event handlers
 const handleInput = (event) => {
     let value = Array.isArray(event) && event.length > 0 ? event[0] : event
+
     if (value instanceof Date) {
-        value = value.toISOString()
+        // Format date to YYYY-MM-DD for backend compatibility
+        const year = value.getFullYear()
+        const month = String(value.getMonth() + 1).padStart(2, '0')
+        const day = String(value.getDate()).padStart(2, '0')
+
+        if (props.enableTime) {
+            // If time is enabled, include time in ISO format
+            value = value.toISOString()
+        } else {
+            // If only date, format as YYYY-MM-DD
+            value = `${year}-${month}-${day}`
+        }
     }
+
     emit('update:modelValue', value)
     emit('input', value)
 }
