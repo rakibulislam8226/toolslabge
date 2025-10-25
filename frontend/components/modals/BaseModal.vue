@@ -5,7 +5,7 @@
 
     <!-- Modal Content -->
     <div class="flex min-h-full items-center justify-center p-4">
-      <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full transform transition-all duration-300"
+      <div class="relative bg-white rounded-2xl shadow-xl w-full transform transition-all duration-300"
         :class="modalClass" @click.stop>
         <!-- Close Button -->
         <button v-if="showCloseButton" @click="close"
@@ -28,7 +28,7 @@
         </div>
 
         <!-- Modal Footer -->
-        <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+        <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
           <slot name="footer"></slot>
         </div>
       </div>

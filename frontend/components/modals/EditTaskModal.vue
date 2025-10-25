@@ -1,205 +1,183 @@
 <template>
-    <div v-if="isOpen" class="fixed inset-0 overflow-y-auto z-50">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay with blur -->
-            <div class="fixed inset-0 backdrop-blur-md bg-black/20 transition-all duration-300" @click="closeModal">
-            </div>
-
-            <!-- Modal panel -->
-            <div
-                class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                <!-- Header -->
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Edit Task - </h3>
-                        <button @click="closeModal"
-                            class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div v-if="loading" class="flex items-center justify-center py-8">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        <span class="ml-2 text-gray-600">Loading task details...</span>
-                    </div>
-
-                    <!-- Form -->
-                    <form v-else @submit.prevent="updateTask" class="space-y-4">
-                        <!-- Title -->
-                        <div>
-                            <label for="edit-title" class="block text-sm font-medium text-gray-700 mb-1">
-                                Title <span class="text-red-500">*</span>
-                            </label>
-                            <input id="edit-title" v-model="form.title" type="text" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Enter task title" />
-                        </div>
-
-                        <!-- Description -->
-                        <div>
-                            <label for="edit-description" class="block text-sm font-medium text-gray-700 mb-1">
-                                Description
-                            </label>
-                            <textarea id="edit-description" v-model="form.description" rows="3"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Enter task description"></textarea>
-                        </div>
-
-                        <!-- Status and Priority Row -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Status -->
-                            <div>
-                                <label for="edit-status" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Status
-                                </label>
-                                <select id="edit-status" v-model="form.status_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option value="">Select status</option>
-                                    <option v-for="status in statuses" :key="status.id" :value="status.id">
-                                        {{ status.name }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Priority -->
-                            <div>
-                                <label for="edit-priority" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Priority
-                                </label>
-                                <select id="edit-priority" v-model="form.priority"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Scheduling Section -->
-                        <!-- Scheduling Section -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Scheduled Start -->
-                            <div>
-                                <label for="edit-scheduled-start" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Scheduled Start
-                                </label>
-                                <flat-pickr id="edit-scheduled-start" v-model="form.scheduled_start"
-                                    :config="flatpickrConfig" placeholder="Select start date & time"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                            </div>
-
-                            <!-- Target Completion -->
-                            <div>
-                                <label for="edit-target-completion"
-                                    class="block text-sm font-medium text-gray-700 mb-1">
-                                    Target Completion
-                                </label>
-                                <flat-pickr id="edit-target-completion" v-model="form.target_completion"
-                                    :config="flatpickrConfig" placeholder="Select completion date & time"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                            </div>
-                        </div>
-
-                        <!-- Estimated Hours -->
-                        <div>
-                            <label for="edit-estimated_hours" class="block text-sm font-medium text-gray-700 mb-1">
-                                Estimated Hours
-                            </label>
-                            <input id="edit-estimated_hours" v-model.number="form.estimated_hours" type="number"
-                                step="0.5" min="0" max="999"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="e.g., 4.5" />
-                        </div>
-
-                        <!-- Team Assignment -->
-                        <div>
-                            <label for="edit-assigned-members" class="block text-sm font-medium text-gray-700 mb-1">
-                                Team Assignment
-                            </label>
-
-                            <!-- Search Input -->
-                            <div class="mb-2">
-                                <input type="text" placeholder="Search team members..."
-                                    @input="debouncedMemberSearch($event.target.value)"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                            </div>
-
-                            <!-- Selected Members Display -->
-                            <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-gray-700 rounded-lg">
-                                <div class="text-xs font-medium text-blue-700 mb-1">Assigned Team Members:</div>
-                                <div class="flex flex-wrap gap-1">
-                                    <span v-for="memberId in form.assigned_members" :key="memberId"
-                                        class="inline-flex items-center px-2 py-1 text-xs text-blue-800 rounded-full">
-                                        {{ getSelectedMemberName(memberId) }}
-                                        <button @click="removeMember(memberId)"
-                                            class="ml-1 text-blue-600 hover:text-blue-800">
-                                            ×
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Members List -->
-                            <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-2">
-                                <div v-if="projectMembers.length === 0 && !memberSearchQuery"
-                                    class="text-sm text-gray-500 text-center py-2">
-                                    No project members available
-                                </div>
-                                <div v-else-if="projectMembers.length === 0 && memberSearchQuery"
-                                    class="text-sm text-gray-500 text-center py-2">
-                                    No members found matching "{{ memberSearchQuery }}"
-                                </div>
-                                <label v-for="member in projectMembers" :key="member.id"
-                                    class="flex items-center space-x-2 hover:bg-gray-500 p-1 rounded cursor-pointer">
-                                    <input type="checkbox" :value="member.user" v-model="form.assigned_members"
-                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                    <div class="flex items-center space-x-2 flex-1 min-w-0">
-                                        <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                                            <span class="text-xs font-medium text-gray-600">
-                                                {{ getInitials(member) }}
-                                            </span>
-                                        </div>
-                                        <span class="text-sm font-medium text-gray-900 truncate">
-                                            {{ member.user_name || member.user_email }}
-                                        </span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Error message -->
-                        <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-3">
-                            <p class="text-sm text-red-600">{{ error }}</p>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Footer -->
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button @click="updateTask" :disabled="updating || !form.title.trim()"
-                        class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        <svg v-if="updating" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                            </circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
-                        </svg>
-                        {{ updating ? 'Updating...' : 'Update Task' }}
-                    </button>
-                    <button @click="closeModal" :disabled="updating" type="button"
-                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        Cancel
-                    </button>
-                </div>
-            </div>
+    <BaseModal :is-open="isOpen" title="Edit Task" size="xxl" @close="closeModal">
+        <!-- Loading State -->
+        <div v-if="loading" class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span class="ml-2 text-gray-600">Loading task details...</span>
         </div>
-    </div>
+
+        <!-- Form -->
+        <form v-else @submit.prevent="updateTask" class="space-y-4">
+            <!-- Title -->
+            <div>
+                <label for="edit-title" class="block text-sm font-medium text-gray-700 mb-1">
+                    Title <span class="text-red-500">*</span>
+                </label>
+                <input id="edit-title" v-model="form.title" type="text" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter task title" />
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="edit-description" class="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                </label>
+                <textarea id="edit-description" v-model="form.description" rows="3"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter task description"></textarea>
+            </div>
+
+            <!-- Status and Priority Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Status -->
+                <div>
+                    <label for="edit-status" class="block text-sm font-medium text-gray-700 mb-1">
+                        Status
+                    </label>
+                    <select id="edit-status" v-model="form.status_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select status</option>
+                        <option v-for="status in statuses" :key="status.id" :value="status.id">
+                            {{ status.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Priority -->
+                <div>
+                    <label for="edit-priority" class="block text-sm font-medium text-gray-700 mb-1">
+                        Priority
+                    </label>
+                    <select id="edit-priority" v-model="form.priority"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Scheduling Section -->
+            <!-- Scheduling Section -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Scheduled Start -->
+                <div>
+                    <label for="edit-scheduled-start" class="block text-sm font-medium text-gray-700 mb-1">
+                        Scheduled Start
+                    </label>
+                    <flat-pickr id="edit-scheduled-start" v-model="form.scheduled_start" :config="flatpickrConfig"
+                        placeholder="Select start date & time"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+
+                <!-- Target Completion -->
+                <div>
+                    <label for="edit-target-completion" class="block text-sm font-medium text-gray-700 mb-1">
+                        Target Completion
+                    </label>
+                    <flat-pickr id="edit-target-completion" v-model="form.target_completion" :config="flatpickrConfig"
+                        placeholder="Select completion date & time"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+            </div>
+
+            <!-- Estimated Hours -->
+            <div>
+                <label for="edit-estimated_hours" class="block text-sm font-medium text-gray-700 mb-1">
+                    Estimated Hours
+                </label>
+                <input id="edit-estimated_hours" v-model.number="form.estimated_hours" type="number" step="0.5" min="0"
+                    max="999"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g., 4.5" />
+            </div>
+
+            <!-- Team Assignment -->
+            <div>
+                <label for="edit-assigned-members" class="block text-sm font-medium text-gray-700 mb-1">
+                    Team Assignment
+                </label>
+
+                <!-- Search Input -->
+                <div class="mb-2">
+                    <input type="text" placeholder="Search team members..."
+                        @input="debouncedMemberSearch($event.target.value)"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+
+                <!-- Selected Members Display -->
+                <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-gray-50 dark:bg-blue-900/20 rounded-lg">
+                    <div class="text-xs font-medium text-gray-600 dark:text-blue-300 mb-1">Assigned Team Members:</div>
+                    <div class="flex flex-wrap gap-1">
+                        <span v-for="memberId in form.assigned_members" :key="memberId"
+                            class="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-blue-800 text-gray-700 dark:text-blue-200 rounded-full">
+                            {{ getSelectedMemberName(memberId) }}
+                            <button @click="removeMember(memberId)"
+                                class="ml-1 text-gray-500 dark:text-blue-400 hover:text-gray-700 dark:hover:text-blue-200">
+                                ×
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Members List -->
+                <div
+                    class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-2 bg-gray-50 dark:bg-gray-800">
+                    <div v-if="projectMembers.length === 0 && !memberSearchQuery"
+                        class="text-sm text-gray-400 dark:text-gray-400 text-center py-2">
+                        No project members available
+                    </div>
+                    <div v-else-if="projectMembers.length === 0 && memberSearchQuery"
+                        class="text-sm text-gray-400 dark:text-gray-400 text-center py-2">
+                        No members found matching "{{ memberSearchQuery }}"
+                    </div>
+                    <label v-for="member in projectMembers" :key="member.id"
+                        class="flex items-center space-x-2 hover:bg-blue-50 hover:border-blue-200 border border-transparent dark:hover:bg-gray-700 dark:hover:border-gray-600 p-1 rounded cursor-pointer transition-all duration-200">
+                        <input type="checkbox" :value="member.user" v-model="form.assigned_members"
+                            class="rounded border-gray-200 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700" />
+                        <div class="flex items-center space-x-2 flex-1 min-w-0">
+                            <div
+                                class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-300">
+                                    {{ getInitials(member) }}
+                                </span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-100 truncate">
+                                {{ member.user_name || member.user_email }}
+                            </span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Error message -->
+            <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p class="text-sm text-red-600">{{ error }}</p>
+            </div>
+        </form>
+
+        <template #footer>
+            <div class="flex space-x-3 justify-end">
+                <button @click="closeModal" :disabled="updating" type="button"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Cancel
+                </button>
+                <button @click="updateTask" :disabled="updating || !form.title.trim()"
+                    class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg v-if="updating" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    {{ updating ? 'Updating...' : 'Update Task' }}
+                </button>
+            </div>
+        </template>
+    </BaseModal>
 </template>
 
 <script setup>
@@ -207,6 +185,7 @@ import { ref, reactive, watch, computed, onMounted, nextTick } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
 import flatPickr from 'vue-flatpickr-component'
 import 'flatpickr/dist/flatpickr.css'
+import BaseModal from './BaseModal.vue'
 
 // Props
 const props = defineProps({
