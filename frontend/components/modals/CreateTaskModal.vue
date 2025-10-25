@@ -3,89 +3,40 @@
         <!-- Form -->
         <form @submit.prevent="createTask" class="space-y-4">
             <!-- Title -->
-            <div>
-                <label for="title" class="block text-sm font-medium text-gray-700 mb-1">
-                    Title <span class="text-red-500">*</span>
-                </label>
-                <input id="title" v-model="form.title" type="text" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter task title" />
-            </div>
+            <BaseInput v-model="form.title" label="Title" placeholder="Enter task title" required
+                :error="fieldErrors.title" />
 
             <!-- Description -->
-            <div>
-                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                </label>
-                <textarea id="description" v-model="form.description" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter task description"></textarea>
-            </div>
+            <BaseTextarea v-model="form.description" label="Description" placeholder="Enter task description" :rows="3"
+                :error="fieldErrors.description" />
 
             <!-- Status and Priority Row -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Status -->
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">
-                        Status
-                    </label>
-                    <select id="status" v-model="form.status_id"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">Select status</option>
-                        <option v-for="status in statuses" :key="status.id" :value="status.id">
-                            {{ status.name }}
-                        </option>
-                    </select>
-                </div>
+                <BaseSelect v-model="form.status_id" label="Status" placeholder="Select status" :options="statuses"
+                    option-value="id" option-label="name" :error="fieldErrors.status_id" />
 
                 <!-- Priority -->
-                <div>
-                    <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">
-                        Priority
-                    </label>
-                    <select id="priority" v-model="form.priority"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
+                <BaseSelect v-model="form.priority" label="Priority" :options="priorityOptions"
+                    :error="fieldErrors.priority" />
             </div>
 
             <!-- Scheduling Section -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Scheduled Start -->
-                <div>
-                    <label for="create-scheduled-start" class="block text-sm font-medium text-gray-700 mb-1">
-                        Scheduled Start
-                    </label>
-                    <flat-pickr id="create-scheduled-start" v-model="form.scheduled_start" :config="flatpickrConfig"
-                        placeholder="Select start date & time"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                </div>
+                <BaseDatePicker v-model="form.scheduled_start" label="Scheduled Start"
+                    placeholder="Select start date & time" :error="fieldErrors.start_date" />
 
                 <!-- Target Completion -->
-                <div>
-                    <label for="create-target-completion" class="block text-sm font-medium text-gray-700 mb-1">
-                        Target Completion
-                    </label>
-                    <flat-pickr id="create-target-completion" v-model="form.target_completion" :config="flatpickrConfig"
-                        placeholder="Select completion date & time"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                </div>
-            </div> <!-- Estimated Hours -->
-            <div>
-                <label for="estimated_hours" class="block text-sm font-medium text-gray-700 mb-1">
-                    Estimated Hours
-                </label>
-                <input id="estimated_hours" v-model.number="form.estimated_hours" type="number" step="0.5" min="0"
-                    max="999"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., 4.5" />
+                <BaseDatePicker v-model="form.target_completion" label="Target Completion"
+                    placeholder="Select completion date & time" :error="fieldErrors.due_date" />
             </div>
 
+            <!-- Estimated Hours -->
+            <BaseInput v-model="form.estimated_hours" label="Estimated Hours" type="number" placeholder="e.g., 4.5"
+                step="0.5" min="0" max="999" :error="fieldErrors.estimated_hours" />
+
             <!-- Assign Members -->
-            <!-- Member Assignment -->
             <div>
                 <label for="create-assigned-members" class="block text-sm font-medium text-gray-700 mb-1">
                     Member Assignment
@@ -93,9 +44,8 @@
 
                 <!-- Search Input -->
                 <div class="mb-2">
-                    <input type="text" placeholder="Search team members..."
-                        @input="debouncedMemberSearch($event.target.value)"
-                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    <BaseInput placeholder="Search team members..." @input="debouncedMemberSearch($event.target.value)"
+                        size="sm" />
                 </div>
 
                 <!-- Selected Members Display -->
@@ -172,11 +122,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed, onMounted, nextTick } from 'vue'
+import { ref, reactive, watch, nextTick, inject, onMounted } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
-import flatPickr from 'vue-flatpickr-component'
-import 'flatpickr/dist/flatpickr.css'
 import BaseModal from './BaseModal.vue'
+import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker } from '@/components/forms'
 
 // Props
 const props = defineProps({
@@ -201,22 +150,19 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['close', 'created'])
 
-// Flatpickr configuration
-const flatpickrConfig = {
-    enableTime: true,
-    dateFormat: 'Y-m-d H:i',
-    altInput: true,
-    altFormat: 'F j, Y \\a\\t H:i',
-    time_24hr: false,
-    allowInput: true,
-    clickOpens: true,
-    defaultDate: null,
-    minuteIncrement: 30
-}
+const $toast = inject("toast");
+
+// Priority options
+const priorityOptions = [
+    { value: 'low', label: 'Low' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' }
+]
 
 // Reactive data
 const creating = ref(false)
 const error = ref('')
+const fieldErrors = ref({})
 const projectMembers = ref([])
 const memberSearchQuery = ref('')
 const searchTimeout = ref(null)
@@ -232,30 +178,12 @@ const form = reactive({
     assigned_members: []
 })
 
-// Computed properties
-const filteredProjectMembers = computed(() => {
-    if (!memberSearchQuery.value) {
-        return projectMembers.value
-    }
-
-    const query = memberSearchQuery.value.toLowerCase()
-    return projectMembers.value.filter(member => {
-        const fullName = `${member.user.first_name || ''} ${member.user.last_name || ''}`.toLowerCase()
-        const email = member.user.email.toLowerCase()
-        const role = member.role.toLowerCase()
-
-        return fullName.includes(query) || email.includes(query) || role.includes(query)
-    })
-})
-
-// Watch for initial status changes
 watch(() => props.initialStatusId, (newValue) => {
     if (newValue) {
         form.status_id = newValue
     }
 })
 
-// Watch for dialog open/close to reset form and manage body scroll
 watch(() => props.isOpen, (isOpen) => {
     nextTick(() => {
         if (isOpen) {
@@ -279,6 +207,7 @@ const resetForm = () => {
     form.estimated_hours = null
     form.assigned_members = []
     error.value = ''
+    fieldErrors.value = {}
     memberSearchQuery.value = ''
 }
 
@@ -301,7 +230,7 @@ const closeModal = () => {
 }
 
 const fetchProjectMembers = async (searchQuery = '') => {
-    if (!props.projectId) return
+    if (!props.projectId || props.projectId === 'null') return
 
     try {
         let url = `projects/${props.projectId}/members/`
@@ -312,57 +241,45 @@ const fetchProjectMembers = async (searchQuery = '') => {
         const response = await axios.get(url)
         projectMembers.value = response.data.data || response.data || []
     } catch (err) {
-        console.error('Failed to fetch project members:', err)
         projectMembers.value = []
     }
 }
 
 const createTask = async () => {
     if (!form.title.trim()) return
-    if (!props.projectId) {
-        error.value = 'Project ID is required'
+
+    if (!props.projectId || props.projectId === 'null' || props.projectId === null) {
+        error.value = 'Invalid project ID - cannot create task'
         return
     }
 
     try {
         creating.value = true
         error.value = ''
+        fieldErrors.value = {}
 
-        // Prepare payload
         const payload = {
+            project_id: parseInt(props.projectId),
             title: form.title.trim(),
             description: form.description.trim() || null,
             priority: form.priority,
             members: form.assigned_members
         }
 
-        // Add optional fields
         if (form.status_id) {
             payload.status_id = parseInt(form.status_id)
         }
 
         if (form.scheduled_start) {
-            // Handle date conversion properly
-            let startDate
-            if (typeof form.scheduled_start === 'string') {
-                startDate = new Date(form.scheduled_start)
-            } else if (form.scheduled_start instanceof Date) {
-                startDate = form.scheduled_start
-            }
-            if (startDate && !isNaN(startDate.getTime())) {
+            const startDate = new Date(form.scheduled_start)
+            if (!isNaN(startDate.getTime())) {
                 payload.start_date = startDate.toISOString()
             }
         }
 
         if (form.target_completion) {
-            // Handle date conversion properly
-            let endDate
-            if (typeof form.target_completion === 'string') {
-                endDate = new Date(form.target_completion)
-            } else if (form.target_completion instanceof Date) {
-                endDate = form.target_completion
-            }
-            if (endDate && !isNaN(endDate.getTime())) {
+            const endDate = new Date(form.target_completion)
+            if (!isNaN(endDate.getTime())) {
                 payload.due_date = endDate.toISOString()
             }
         }
@@ -373,26 +290,23 @@ const createTask = async () => {
 
         const response = await axios.post(`projects/${props.projectId}/tasks/`, payload)
         const newTask = response.data.data || response.data
+        $toast.success(response.data.message || 'Task created successfully')
 
         emit('created', newTask)
     } catch (err) {
-        console.error('Failed to create task:', err)
+        const responseData = err.response?.data
 
-        if (err.response?.data?.detail) {
-            error.value = err.response.data.detail
-        } else if (err.response?.data) {
-            // Handle field-specific errors
-            const errors = []
-            Object.entries(err.response.data).forEach(([field, messages]) => {
-                if (Array.isArray(messages)) {
-                    errors.push(`${field}: ${messages.join(', ')}`)
-                } else {
-                    errors.push(`${field}: ${messages}`)
-                }
+        if (responseData?.message) {
+            $toast.error(responseData.message)
+        }
+
+        if (responseData?.data?.errors && Array.isArray(responseData.data.errors)) {
+            responseData.data.errors.forEach(errorItem => {
+                Object.assign(fieldErrors.value, errorItem)
             })
-            error.value = errors.join('\n')
-        } else {
+        } else if (!responseData?.message) {
             error.value = 'Failed to create task. Please try again.'
+            $toast.error('Failed to create task')
         }
     } finally {
         creating.value = false
@@ -400,27 +314,18 @@ const createTask = async () => {
 }
 
 const getInitials = (member) => {
-    if (member.user_name) {
-        const nameParts = member.user_name.trim().split(' ')
-        if (nameParts.length >= 2) {
-            return `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`.toUpperCase()
-        } else {
-            return nameParts[0].charAt(0).toUpperCase()
-        }
-    } else if (member.user_email) {
-        return member.user_email.charAt(0).toUpperCase()
-    }
-    return '?'
+    const name = member.user_name || member.user_email
+    if (!name) return '?'
+
+    const parts = name.trim().split(' ')
+    return parts.length > 1
+        ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+        : parts[0][0].toUpperCase()
 }
 
 const getSelectedMemberName = (memberId) => {
     const member = projectMembers.value.find(m => m.user === memberId)
-    if (member) {
-        return member.user_name ?
-            member.user_name.trim() :
-            member.user_email || 'Unknown'
-    }
-    return 'Unknown'
+    return member?.user_name?.trim() || member?.user_email || 'Unknown'
 }
 
 const removeMember = (memberId) => {
@@ -430,31 +335,6 @@ const removeMember = (memberId) => {
     }
 }
 
-const getAvatarColor = (user) => {
-    const colors = [
-        'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
-        'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-cyan-500'
-    ]
-    const index = (user.id || user.email.length) % colors.length
-    return colors[index]
-}
-
-const formatRole = (role) => {
-    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()
-}
-
-const getRoleBadgeClass = (role) => {
-    const roleClasses = {
-        'manager': 'bg-purple-100 text-purple-800',
-        'developer': 'bg-blue-100 text-blue-800',
-        'designer': 'bg-pink-100 text-pink-800',
-        'tester': 'bg-green-100 text-green-800',
-        'member': 'bg-gray-100 text-gray-800'
-    }
-    return roleClasses[role.toLowerCase()] || 'bg-gray-100 text-gray-800'
-}
-
-// Initialize on mount
 onMounted(() => {
     if (props.isOpen) {
         fetchProjectMembers()

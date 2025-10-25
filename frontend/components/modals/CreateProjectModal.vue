@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :is-open="isOpen" title="Create New Project" size="lg" @close="handleClose">
+  <BaseModal :is-open="isOpen" title="Create New Project" size="xxl" @close="handleClose">
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Project Name -->
       <div>

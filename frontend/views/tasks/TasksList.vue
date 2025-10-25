@@ -50,7 +50,7 @@
                                     Project Tasks</h1>
                                 <p class="mt-1 text-gray-600 text-sm sm:text-base" v-if="project">
                                     Manage and track tasks for <span class="font-semibold text-blue-600">{{ project.name
-                                    }}</span>
+                                        }}</span>
                                 </p>
                             </div>
                         </div>
@@ -232,9 +232,8 @@
         </div>
 
         <!-- Create Task Modal -->
-        <CreateTaskModal :is-open="showCreateModal" :project-id="String(projectId)"
-            :initial-status-id="selectedStatusId" :statuses="taskStatuses" @close="closeCreateModal"
-            @created="onTaskCreated" />
+        <CreateTaskModal :is-open="showCreateModal" :project-id="projectId" :initial-status-id="selectedStatusId"
+            :statuses="taskStatuses" @close="closeCreateModal" @created="onTaskCreated" />
 
         <!-- Edit Task Modal -->
         <EditTaskModal :is-open="showEditModal" :task="selectedTask" :statuses="taskStatuses" @close="closeEditModal"
@@ -274,7 +273,16 @@ const projectSlug = computed(() => route.params.slug)
 // Extract project ID from slug for API calls
 const projectId = computed(() => {
     const slug = projectSlug.value
-    return extractIdFromSlug(slug)
+    const id = extractIdFromSlug(slug)
+    console.log('TasksList: extracting project ID from slug:', slug, '-> ID:', id)
+
+    // If we can't extract from slug but have project data, use that
+    if (!id && project.value?.id) {
+        console.log('TasksList: using project ID from fetched project data:', project.value.id)
+        return project.value.id
+    }
+
+    return id
 })
 
 // Status color mapping based on status names
@@ -337,17 +345,37 @@ const getStatusColor = (statusId, type) => {
 // Fetch project details
 const fetchProject = async () => {
     try {
-        const id = projectId.value
-        if (!id) {
-            error.value = 'Invalid project URL - could not extract project ID'
-            return
+        const slug = projectSlug.value
+        const extractedId = extractIdFromSlug(slug)
+
+        console.log('fetchProject: slug =', slug, 'extractedId =', extractedId)
+
+        let response
+        if (extractedId) {
+            // If we have an ID from the slug, fetch by ID
+            console.log('fetchProject: fetching by ID:', extractedId)
+            response = await axios.get(`projects/${extractedId}/`)
+        } else {
+            // If no ID in slug, try to find project by slug in the list
+            console.log('fetchProject: searching for project by slug:', slug)
+            const projectsResponse = await axios.get('projects/')
+            const projects = projectsResponse.data.data || projectsResponse.data || []
+            const foundProject = projects.find(p => p.slug === slug)
+
+            if (!foundProject) {
+                throw new Error('Project not found by slug')
+            }
+
+            console.log('fetchProject: found project by slug:', foundProject)
+            // Now fetch the full project details
+            response = await axios.get(`projects/${foundProject.id}/`)
         }
 
-        const response = await axios.get(`projects/${id}/`)
         project.value = response.data.data
+        console.log('fetchProject: fetched project:', project.value)
     } catch (err) {
         console.error('Failed to fetch project:', err)
-        if (err.response?.status === 404) {
+        if (err.response?.status === 404 || err.message === 'Project not found by slug') {
             error.value = 'Project not found'
         } else {
             error.value = 'Failed to load project details'
@@ -373,13 +401,17 @@ const fetchTasks = async () => {
         error.value = ''
 
         const id = projectId.value
+        console.log('fetchTasks: using project ID:', id)
+
         if (!id) {
-            error.value = 'Invalid project URL - could not extract project ID'
+            console.warn('fetchTasks: no project ID available yet')
+            error.value = 'Project not loaded yet - cannot fetch tasks'
             return
         }
 
         const response = await axios.get(`projects/${id}/tasks/`)
         tasks.value = response.data.data || response.data || []
+        console.log('fetchTasks: loaded', tasks.value.length, 'tasks')
     } catch (err) {
         console.error('Failed to fetch tasks:', err)
         if (err.response?.status === 404) {
@@ -397,12 +429,21 @@ const fetchTasks = async () => {
 // Initialize data
 const initializeData = async () => {
     loading.value = true
-    await Promise.all([
-        fetchProject(),
-        fetchTaskStatuses(),
-        fetchTasks()
-    ])
-    loading.value = false
+
+    try {
+        // First fetch project to get the project ID
+        await fetchProject()
+
+        // Then fetch tasks and statuses in parallel
+        await Promise.all([
+            fetchTaskStatuses(),
+            fetchTasks()
+        ])
+    } catch (err) {
+        console.error('Failed to initialize data:', err)
+    } finally {
+        loading.value = false
+    }
 }
 
 // Refresh tasks
@@ -418,6 +459,15 @@ const goToProject = () => {
 
 // Modal handlers
 const openCreateModal = (statusId = null) => {
+    const currentProjectId = projectId.value
+    console.log('openCreateModal: project ID =', currentProjectId)
+
+    if (!currentProjectId) {
+        console.error('openCreateModal: No project ID available. Project data:', project.value)
+        $toast?.error('Project not loaded yet. Please wait and try again.')
+        return
+    }
+
     selectedStatusId.value = statusId
     showCreateModal.value = true
 }

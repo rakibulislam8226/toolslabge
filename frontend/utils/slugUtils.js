@@ -1,6 +1,6 @@
 /**
  * Extract project ID from slug (assuming slug format includes ID at the end)
- * @param {string} slug - The slug containing the ID (e.g., "ems-project-3")
+ * @param {string} slug - The slug containing the ID (e.g., "ems-project-3" or "vip-1")
  * @returns {number|null} - Extracted project ID or null if not found
  */
 export function extractIdFromSlug(slug) {
