@@ -50,7 +50,7 @@
                                     Project Tasks</h1>
                                 <p class="mt-0.5 text-gray-600 text-sm" v-if="project">
                                     Manage and track tasks for <span class="font-semibold text-blue-600">{{ project.name
-                                    }}</span>
+                                        }}</span>
                                 </p>
                             </div>
                         </div>
@@ -148,16 +148,14 @@
             <div class="overflow-x-auto scrollbar-modern">
                 <div class="flex space-x-4 pb-8" style="min-width: max-content;">
                     <div v-for="status in taskStatuses" :key="status.id" class="flex-shrink-0 w-80 sm:w-96">
-                        <!-- Status Column Header -->
+                        <!-- Sticky Header -->
                         <div
-                            class="bg-white rounded-xl shadow-lg border border-gray-200 mb-4 hover:shadow-xl transition-all duration-300"
-                            :class="[`status-header-${status.id}`]">
+                            class="bg-white rounded-t-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 sticky top-0 z-20">
                             <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
                                         <div class="w-4 h-4 rounded-full mr-3 shadow-sm"
-                                            :class="getStatusColor(status.id, 'bg')">
-                                        </div>
+                                            :class="getStatusColor(status.id, 'bg')"></div>
                                         <h3 class="font-bold text-gray-900 text-lg">{{ status.name }}</h3>
                                         <span class="ml-3 px-3 py-1 text-xs font-semibold rounded-full shadow-sm"
                                             :class="getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'text')">
@@ -168,15 +166,16 @@
                                         class="text-gray-400 hover:text-blue-600 transition-all duration-300 p-2 rounded-lg hover:bg-blue-50">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4"></path>
+                                                d="M12 4v16m8-8H4" />
                                         </svg>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Tasks in Status Column -->
-                        <div class="space-y-4 min-h-[400px] p-2 bg-gray-50 rounded-xl">
+                        <!-- Independent Scrollable Tasks -->
+                        <div
+                            class="space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 bg-gray-50 rounded-b-xl status-column">
                             <TaskCard v-for="task in getTasksInStatus(status.id)" :key="task.id" :task="task"
                                 :statuses="taskStatuses" @edit="openEditModal" @delete="deleteTask"
                                 @status-change="updateTaskStatus"
@@ -190,8 +189,7 @@
                                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                        </path>
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
                                 <p class="text-sm font-medium text-gray-500">No tasks in this status</p>
@@ -204,6 +202,7 @@
                     </div>
                 </div>
             </div>
+
 
             <!-- Empty State - No Statuses -->
             <div v-if="!loading && taskStatuses.length === 0" class="text-center py-24">
@@ -486,7 +485,6 @@ const closeEditModal = () => {
 // Task operations
 const onTaskCreated = (newTask) => {
     tasks.value.unshift(newTask)
-    $toast?.success('Task created successfully')
     closeCreateModal()
 }
 
@@ -780,4 +778,16 @@ button:focus,
 .shadow-strong {
     box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.16);
 }
+
+.status-column::-webkit-scrollbar {
+  width: 8px;
+}
+.status-column::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.3);
+  border-radius: 8px;
+}
+.status-column::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.5);
+}
+
 </style>
