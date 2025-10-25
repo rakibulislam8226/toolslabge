@@ -16,12 +16,13 @@
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load project</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
         <div class="space-x-3">
-          <button @click="fetchProject"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">
+          <button @click="fetchProject" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300"
+            style="color: white !important;">
             Try Again
           </button>
           <router-link to="/projects"
-            class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block">
+            class="bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block"
+            style="color: white !important;">
             Back to Projects
           </router-link>
         </div>
@@ -31,51 +32,52 @@
     <!-- Edit Form -->
     <div v-else-if="project" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-      <!-- Header -->
-      <div class="mb-8">
-        <!-- Breadcrumb -->
-        <nav class="mb-4">
-          <ol class="flex items-center space-x-2 text-sm text-gray-500">
-            <li>
-              <router-link to="/projects" class="hover:text-blue-600 transition duration-300">
-                Projects
-              </router-link>
-            </li>
-            <li>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </li>
-            <li>
-              <router-link :to="`/projects/${project.slug ? `${project.slug}-${project.id}` : project.id}`"
-                class="hover:text-blue-600 transition duration-300">
-                {{ project.name }}
-              </router-link>
-            </li>
-            <li>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </li>
-            <li class="text-gray-900 font-medium">Edit</li>
-          </ol>
-        </nav>
+        <!-- Header -->
+        <div class="mb-8">
+          <!-- Breadcrumb -->
+          <nav class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-500">
+              <li>
+                <router-link to="/projects" class="hover:text-blue-600 transition duration-300">
+                  Projects
+                </router-link>
+              </li>
+              <li>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </li>
+              <li>
+                <router-link :to="`/projects/${project.slug ? `${project.slug}-${project.id}` : project.id}`"
+                  class="hover:text-blue-600 transition duration-300">
+                  {{ project.name }}
+                </router-link>
+              </li>
+              <li>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </li>
+              <li class="text-gray-900 font-medium">Edit</li>
+            </ol>
+          </nav>
 
-        <h1 class="text-3xl font-bold text-gray-900">Edit Project</h1>
-        <p class="mt-2 text-gray-600">Update your project information</p>
+          <h1 class="text-3xl font-bold text-gray-900">Edit Project</h1>
+          <p class="mt-2 text-gray-600">Update your project information</p>
+        </div>
+        <div>
+          <router-link :to="`/projects/${project.slug ? `${project.slug}-${project.id}` : project.id}/members`"
+            class="bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300 flex items-center"
+            style="color: white !important;">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656 0-1.28-.195-1.835M7 20v-2a3 3 0 015.356-1.857M7 20h10M12 12a5 5 0 100-10 5 5 0 000 10zm-7 8a7 7 0 0114 0v1H5v-1z">
+              </path>
+            </svg>
+            <span style="color: white !important;">️ Manage Users</span>
+          </router-link>
+        </div>
       </div>
-      <div>
-        <router-link :to="`/projects/${project.slug ? `${project.slug}-${project.id}` : project.id}/members`"
-          class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300 flex items-center">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656 0-1.28-.195-1.835M7 20v-2a3 3 0 015.356-1.857M7 20h10M12 12a5 5 0 100-10 5 5 0 000 10zm-7 8a7 7 0 0114 0v1H5v-1z">
-            </path>
-          </svg>
-          ️ Manage Users
-        </router-link>
-      </div>
-    </div>
 
       <!-- Form -->
       <div class="bg-white rounded-lg shadow-sm border">
@@ -106,7 +108,8 @@
               <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
                 Start Date
               </label>
-              <input type="date" id="start_date" v-model="form.start_date"
+              <flatpickr id="start_date" v-model="form.start_date" :config="datePickerConfig"
+                placeholder="Select start date"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             </div>
 
@@ -115,7 +118,7 @@
               <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
                 End Date
               </label>
-              <input type="date" id="end_date" v-model="form.end_date"
+              <flatpickr id="end_date" v-model="form.end_date" :config="datePickerConfig" placeholder="Select end date"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             </div>
           </div>
@@ -143,18 +146,20 @@
 
             <div class="flex space-x-3">
               <button type="button" @click="showDeleteModal = true"
-                class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300 flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300 flex items-center"
+                style="color: white !important;">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                   </path>
                 </svg>
-                Delete Project
+                <span style="color: white !important;">Delete Project</span>
               </button>
 
               <button type="submit" :disabled="updating"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center">
-                <span v-if="updating" class="flex items-center">
+                class="bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                style="color: white !important;">
+                <span v-if="updating" class="flex items-center" style="color: white !important;">
                   <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -162,13 +167,13 @@
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                     </path>
                   </svg>
-                  Updating...
+                  <span style="color: white !important;">Updating...</span>
                 </span>
-                <span v-else class="flex items-center">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span v-else class="flex items-center" style="color: white !important;">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  Update Project
+                  <span style="color: white !important;">Update Project</span>
                 </span>
               </button>
             </div>
@@ -215,8 +220,9 @@
             Cancel
           </button>
           <button @click="deleteProject" :disabled="deleting"
-            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 disabled:opacity-50 flex items-center">
-            <span v-if="deleting" class="flex items-center">
+            class="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition duration-300 disabled:opacity-50 flex items-center"
+            style="color: white !important;">
+            <span v-if="deleting" class="flex items-center" style="color: white !important;">
               <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -224,9 +230,9 @@
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                 </path>
               </svg>
-              Deleting...
+              <span style="color: white !important;">Deleting...</span>
             </span>
-            <span v-else>Delete Project</span>
+            <span v-else style="color: white !important;">Delete Project</span>
           </button>
         </div>
       </div>
@@ -239,10 +245,25 @@ import { ref, reactive, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
 import { extractIdFromSlug } from "@/utils/slugUtils.js"
+import flatpickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 
 const router = useRouter()
 const route = useRoute()
 const $toast = inject("toast");
+
+// Components
+const components = {
+  flatpickr
+}
+
+// Flatpickr configuration
+const datePickerConfig = {
+  dateFormat: 'Y-m-d',
+  allowInput: true,
+  altInput: true,
+  altFormat: 'F j, Y'
+}
 
 // Reactive data
 const project = ref(null)
@@ -388,6 +409,14 @@ const deleteProject = async () => {
 onMounted(() => {
   fetchProject()
 })
+</script>
+
+<script>
+export default {
+  components: {
+    flatpickr
+  }
+}
 </script>
 
 <style scoped>

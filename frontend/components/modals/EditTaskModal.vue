@@ -129,11 +129,11 @@
                             </div>
 
                             <!-- Selected Members Display -->
-                            <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-blue-50 rounded-lg">
+                            <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-gray-700 rounded-lg">
                                 <div class="text-xs font-medium text-blue-700 mb-1">Assigned Team Members:</div>
                                 <div class="flex flex-wrap gap-1">
                                     <span v-for="memberId in form.assigned_members" :key="memberId"
-                                        class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                                        class="inline-flex items-center px-2 py-1 text-xs text-blue-800 rounded-full">
                                         {{ getSelectedMemberName(memberId) }}
                                         <button @click="removeMember(memberId)"
                                             class="ml-1 text-blue-600 hover:text-blue-800">
@@ -154,7 +154,7 @@
                                     No members found matching "{{ memberSearchQuery }}"
                                 </div>
                                 <label v-for="member in projectMembers" :key="member.id"
-                                    class="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded cursor-pointer">
+                                    class="flex items-center space-x-2 hover:bg-gray-500 p-1 rounded cursor-pointer">
                                     <input type="checkbox" :value="member.user" v-model="form.assigned_members"
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                                     <div class="flex items-center space-x-2 flex-1 min-w-0">

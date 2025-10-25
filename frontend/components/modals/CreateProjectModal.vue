@@ -1,25 +1,14 @@
 <template>
-  <BaseModal
-    :is-open="isOpen"
-    title="Create New Project"
-    size="lg"
-    @close="handleClose"
-  >
+  <BaseModal :is-open="isOpen" title="Create New Project" size="lg" @close="handleClose">
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Project Name -->
       <div>
         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
           Project Name <span class="text-red-500">*</span>
         </label>
-        <input
-          id="name"
-          v-model="form.name"
-          type="text"
-          required
+        <input id="name" v-model="form.name" type="text" required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.name }"
-          placeholder="Enter project name"
-        />
+          :class="{ 'border-red-500': errors.name }" placeholder="Enter project name" />
         <p v-if="errors.name" class="mt-1 text-sm text-red-600">
           {{ errors.name[0] }}
         </p>
@@ -30,14 +19,9 @@
         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
           Description
         </label>
-        <textarea
-          id="description"
-          v-model="form.description"
-          rows="4"
+        <textarea id="description" v-model="form.description" rows="4"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.description }"
-          placeholder="Describe your project (optional)"
-        ></textarea>
+          :class="{ 'border-red-500': errors.description }" placeholder="Describe your project (optional)"></textarea>
         <p v-if="errors.description" class="mt-1 text-sm text-red-600">
           {{ errors.description[0] }}
         </p>
@@ -49,13 +33,10 @@
           <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
             Start Date
           </label>
-          <input
-            id="start_date"
-            v-model="form.start_date"
-            type="date"
+          <flatpickr id="start_date" v-model="form.start_date" :config="datePickerConfig"
+            placeholder="Select start date"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            :class="{ 'border-red-500': errors.start_date }"
-          />
+            :class="{ 'border-red-500': errors.start_date }" />
           <p v-if="errors.start_date" class="mt-1 text-sm text-red-600">
             {{ errors.start_date[0] }}
           </p>
@@ -65,14 +46,9 @@
           <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
             End Date
           </label>
-          <input
-            id="end_date"
-            v-model="form.end_date"
-            type="date"
+          <flatpickr id="end_date" v-model="form.end_date" :config="datePickerConfig" placeholder="Select end date"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            :class="{ 'border-red-500': errors.end_date }"
-            :min="form.start_date"
-          />
+            :class="{ 'border-red-500': errors.end_date }" />
           <p v-if="errors.end_date" class="mt-1 text-sm text-red-600">
             {{ errors.end_date[0] }}
           </p>
@@ -85,36 +61,34 @@
           Project Manager
         </label>
         <div class="relative">
-          <input
-            id="manager"
-            v-model="managerSearch"
-            type="text"
+          <input id="manager" v-model="managerSearch" type="text"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-            :class="{ 'border-red-500': errors.manager_id }"
-            placeholder="Search for a team member..."
-            @focus="showManagerDropdown = true"
-            @input="handleManagerSearch"
-          />
+            :class="{ 'border-red-500': errors.manager_id }" placeholder="Search for a team member..."
+            @focus="showManagerDropdown = true" @input="handleManagerSearch" />
           <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-            <svg v-if="loadingMembers" class="w-4 h-4 animate-spin text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="loadingMembers" class="w-4 h-4 animate-spin text-gray-400" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-              <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+              <path fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                class="opacity-75"></path>
             </svg>
             <svg v-else class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
           </div>
-          
+
           <!-- Manager Dropdown -->
-          <div 
-            v-if="showManagerDropdown && (filteredMembers.length > 0 || managerSearch.length > 0)"
-            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-          >
+          <div v-if="showManagerDropdown && (filteredMembers.length > 0 || managerSearch.length > 0)"
+            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             <div v-if="loadingMembers" class="p-3 text-center text-gray-500">
               <div class="flex items-center justify-center">
                 <svg class="w-4 h-4 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                  <path fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    class="opacity-75"></path>
                 </svg>
                 Loading members...
               </div>
@@ -123,13 +97,8 @@
               No members found
             </div>
             <div v-else>
-              <button
-                v-for="member in filteredMembers"
-                :key="member.id"
-                type="button"
-                @click="selectManager(member)"
-                class="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none flex items-center"
-              >
+              <button v-for="member in filteredMembers" :key="member.id" type="button" @click="selectManager(member)"
+                class="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none flex items-center">
                 <div class="flex-1">
                   <div class="font-medium text-gray-900">
                     {{ member.user.first_name }} {{ member.user.last_name }}
@@ -141,7 +110,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Selected Manager Display -->
         <div v-if="selectedManager" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
           <div class="flex items-center justify-between">
@@ -152,18 +121,14 @@
               <div class="text-sm text-blue-700">{{ selectedManager.user.email }}</div>
               <div class="text-xs text-blue-600 capitalize">{{ selectedManager.role }}</div>
             </div>
-            <button
-              type="button"
-              @click="clearManager"
-              class="text-blue-600 hover:text-blue-800"
-            >
+            <button type="button" @click="clearManager" class="text-blue-600 hover:text-blue-800">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
         </div>
-        
+
         <p v-if="errors.manager_id" class="mt-1 text-sm text-red-600">
           {{ errors.manager_id[0] }}
         </p>
@@ -174,12 +139,9 @@
         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
           Status
         </label>
-        <select
-          id="status"
-          v-model="form.status"
+        <select id="status" v-model="form.status"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          :class="{ 'border-red-500': errors.status }"
-        >
+          :class="{ 'border-red-500': errors.status }">
           <option value="active">Active</option>
           <option value="on_hold">On Hold</option>
           <option value="completed">Completed</option>
@@ -194,7 +156,8 @@
       <div v-if="generalError" class="bg-red-50 border border-red-200 rounded-lg p-4">
         <div class="flex">
           <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <div>
             <h3 class="text-sm font-medium text-red-800">Error creating project</h3>
@@ -206,23 +169,19 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <button
-          type="button"
-          @click="handleClose"
+        <button type="button" @click="handleClose"
           class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          :disabled="loading"
-        >
+          :disabled="loading">
           Cancel
         </button>
-        <button
-          type="submit"
-          @click="handleSubmit"
+        <button type="submit" @click="handleSubmit"
           class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          :disabled="loading"
-        >
+          :disabled="loading">
           <svg v-if="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-            <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+            <path fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              class="opacity-75"></path>
           </svg>
           {{ loading ? 'Creating...' : 'Create Project' }}
         </button>
@@ -235,6 +194,8 @@
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import BaseModal from './BaseModal.vue'
 import axios from "@/plugins/axiosConfig.js"
+import flatpickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 
 // Debounce utility function
 function debounce(func, wait) {
@@ -247,6 +208,14 @@ function debounce(func, wait) {
     clearTimeout(timeout)
     timeout = setTimeout(later, wait)
   }
+}
+
+// Flatpickr configuration
+const datePickerConfig = {
+  dateFormat: 'Y-m-d',
+  allowInput: true,
+  altInput: true,
+  altFormat: 'F j, Y'
 }
 
 const props = defineProps({
@@ -286,7 +255,7 @@ const filteredMembers = computed(() => {
   if (!managerSearch.value.trim()) {
     return members.value
   }
-  
+
   const search = managerSearch.value.toLowerCase()
   return members.value.filter(member => {
     const fullName = `${member.user.first_name} ${member.user.last_name}`.toLowerCase()
@@ -315,7 +284,7 @@ watch(() => showManagerDropdown.value, (isOpen) => {
         document.removeEventListener('click', handleClickOutside)
       }
     }
-    
+
     setTimeout(() => {
       document.addEventListener('click', handleClickOutside)
     }, 100)
@@ -343,14 +312,14 @@ const fetchOrganizations = async () => {
     const response = await axios.get('users/my-info/')
     const userInfo = response.data.data || response.data
     const organizations = userInfo.organizations || []
-    
+
     // Transform and store organizations data
     userOrganizations.value = organizations.map(org => ({
       id: org.organization_id,
       name: org.organization_name,
       slug: org.organization_slug
     }))
-    
+
   } catch (err) {
     console.error('Failed to fetch organizations:', err)
     generalError.value = 'Failed to load organization information'
@@ -424,18 +393,18 @@ const handleSubmit = async () => {
     })
 
     const response = await axios.post('projects/', formData)
-    
+
     // Success - emit created event with new project data
     emit('created', response.data.data || response.data)
     handleClose()
-    
+
   } catch (err) {
     console.error('Failed to create project:', err)
-    
+
     if (err.response?.status === 400 && err.response?.data) {
       // Handle validation errors based on your API response structure
       const responseData = err.response.data
-      
+
       if (responseData.data?.errors && Array.isArray(responseData.data.errors)) {
         // Handle the specific API response structure with errors array
         const errorObj = {}
@@ -473,6 +442,14 @@ const handleClose = () => {
 }
 </script>
 
+<script>
+export default {
+  components: {
+    flatpickr
+  }
+}
+</script>
+
 <style scoped>
 .animate-spin {
   animation: spin 1s linear infinite;
@@ -482,8 +459,63 @@ const handleClose = () => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Flatpickr overrides to ensure text visibility */
+:deep(.flatpickr-calendar) {
+  background: white !important;
+  color: #374151 !important;
+}
+
+:deep(.flatpickr-day) {
+  color: #374151 !important;
+  background: transparent !important;
+}
+
+:deep(.flatpickr-day:hover) {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+:deep(.flatpickr-day.selected) {
+  background: #3b82f6 !important;
+  color: white !important;
+}
+
+:deep(.flatpickr-day.today) {
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+}
+
+:deep(.flatpickr-months .flatpickr-month) {
+  color: #374151 !important;
+}
+
+:deep(.flatpickr-current-month select) {
+  color: #374151 !important;
+  background: white !important;
+}
+
+:deep(.flatpickr-weekdays) {
+  background: #f9fafb !important;
+}
+
+:deep(.flatpickr-weekday) {
+  color: #6b7280 !important;
+  background: transparent !important;
+}
+
+:deep(.flatpickr-prev-month),
+:deep(.flatpickr-next-month) {
+  color: #374151 !important;
+}
+
+:deep(.flatpickr-prev-month:hover),
+:deep(.flatpickr-next-month:hover) {
+  color: #111827 !important;
 }
 </style>
