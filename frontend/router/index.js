@@ -15,61 +15,79 @@ const routes = [
     path: "/register",
     name: "auth.register",
     component: () => import("@/views/auth/Register.vue"),
-    meta: { requiresGuest: true }
+    meta: { requiresGuest: true },
   },
   {
     path: "/login",
     name: "auth.login",
     component: () => import("@/views/auth/Login.vue"),
-    meta: { requiresGuest: true }
+    meta: { requiresGuest: true },
   },
   {
     path: "/dashboard",
     name: "dashboard.index",
     component: () => import("@/views/dashboard/Dashboard.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/projects",
     name: "projects.index",
     component: () => import("@/views/projects/ProjectsList.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/projects/:slug",
     name: "projects.details",
     component: () => import("@/views/projects/ProjectDetails.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/projects/:slug/members",
     name: "projects.members",
     component: () => import("@/views/projects/ProjectMembers.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/projects/:slug/edit",
     name: "projects.edit",
     component: () => import("@/views/projects/ProjectEdit.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/projects/:slug/tasks",
     name: "projects.tasks",
+    component: () => import("@/views/projects/ProjectTasksList.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/projects/:slug/tasks/:id",
+    name: "projects.tasks.detail",
+    component: () => import("@/views/tasks/TaskDetail.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/tasks",
+    name: "tasks.index",
     component: () => import("@/views/tasks/TasksList.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/tasks/:id",
+    name: "tasks.detail",
+    component: () => import("@/views/tasks/TaskDetail.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/organizations",
     name: "organizations.index",
     component: () => import("@/views/organizations/Organizations.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/organizations/members",
     name: "organizations.members.index",
     component: () => import("@/views/organizations/Members.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/:pathMatch(.*)*",
@@ -85,17 +103,17 @@ const router = createRouter({
 
 // Route guards
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('access')
-  
+  const isAuthenticated = !!localStorage.getItem("access");
+
   if (to.meta.requiresAuth && !isAuthenticated) {
     // Redirect to home if trying to access protected route without auth
-    next({ name: 'home.index' })
+    next({ name: "home.index" });
   } else if (to.meta.requiresGuest && isAuthenticated) {
     // Redirect to dashboard if trying to access guest-only route while authenticated
-    next({ name: 'dashboard.index' })
+    next({ name: "dashboard.index" });
   } else {
-    next()
+    next();
   }
-})
+});
 
 export default router;

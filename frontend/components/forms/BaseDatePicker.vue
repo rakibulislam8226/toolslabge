@@ -7,8 +7,9 @@
         </label>
 
         <!-- Flatpickr Input -->
-        <flat-pickr :id="inputId" :value="modelValue" :config="flatpickrConfig" :placeholder="placeholder"
-            :class="inputClasses" v-bind="$attrs" @on-change="handleInput" @blur="handleBlur" @focus="handleFocus" />
+        <flat-pickr :id="inputId" :model-value="computedValue || null" :config="flatpickrConfig"
+            :placeholder="placeholder" :class="inputClasses" v-bind="$attrs" @update:model-value="handleInput"
+            @blur="handleBlur" @focus="handleFocus" />
 
         <!-- Error Message -->
         <p v-if="error" class="text-sm text-red-600">
@@ -35,7 +36,7 @@ defineOptions({
 const props = defineProps({
     modelValue: {
         type: [String, Date],
-        default: ''
+        default: null
     },
     label: {
         type: String,
@@ -104,6 +105,15 @@ const emit = defineEmits(['update:modelValue', 'blur', 'focus', 'input', 'change
 
 const attrs = useAttrs()
 
+// Computed properties
+const computedValue = computed(() => {
+    // Convert empty string to null for FlatPickr
+    if (props.modelValue === '' || props.modelValue === undefined) {
+        return null
+    }
+    return props.modelValue
+})
+
 // Generate unique ID for input
 const inputId = computed(() => {
     return attrs.id || `datepicker-${Math.random().toString(36).substr(2, 9)}`
@@ -120,7 +130,13 @@ const flatpickrConfig = computed(() => {
         allowInput: true,
         clickOpens: true,
         defaultDate: null,
-        minuteIncrement: props.minuteIncrement
+        minuteIncrement: props.minuteIncrement,
+        // Ensure empty value handling
+        onReady: function (selectedDates, dateStr, instance) {
+            if (!dateStr || dateStr === '') {
+                instance.clear();
+            }
+        }
     }
 
     return {
@@ -188,6 +204,9 @@ const handleInput = (event) => {
             // If only date, format as YYYY-MM-DD
             value = `${year}-${month}-${day}`
         }
+    } else if (value === '' || value === undefined) {
+        // Convert empty values to null
+        value = null
     }
 
     emit('update:modelValue', value)
