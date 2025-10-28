@@ -85,8 +85,8 @@ const props = defineProps({
     type: Object,
     default: null
   },
-  projectId: {
-    type: [String, Number],
+  projectSlug: {
+    type: String,
     required: true
   }
 })
@@ -143,13 +143,13 @@ const handleSubmit = async () => {
   if (loading.value || !props.member) return
 
   loading.value = true
-  errors.value = {}
+  fieldErrors.value = {}
   generalError.value = ''
 
   try {
     // Validate required fields
     if (!form.role) {
-      errors.value.role = ['Please select a role']
+      fieldErrors.value.role = ['Please select a role']
       return
     }
 
@@ -163,7 +163,7 @@ const handleSubmit = async () => {
       role: form.role
     }
 
-    const response = await axios.patch(`projects/${props.projectId}/members/${props.member.id}/`, formData)
+    const response = await axios.patch(`projects/${props.projectSlug}/members/${props.member.id}/`, formData)
 
     // Success - emit updated event with member data
     const updatedMember = response.data.data || response.data
@@ -186,9 +186,9 @@ const handleSubmit = async () => {
             errorObj[field] = [errorItem[field]]
           })
         })
-        errors.value = errorObj
+        fieldErrors.value = errorObj
       } else if (responseData.errors) {
-        errors.value = responseData.errors
+        fieldErrors.value = responseData.errors
       } else if (responseData.message) {
         generalError.value = responseData.message
       } else {

@@ -137,6 +137,10 @@ const props = defineProps({
         type: [String, Number],
         required: true
     },
+    projectSlug: {
+        type: String,
+        required: true
+    },
     initialStatusId: {
         type: [String, Number],
         default: null
@@ -230,10 +234,10 @@ const closeModal = () => {
 }
 
 const fetchProjectMembers = async (searchQuery = '') => {
-    if (!props.projectId || props.projectId === 'null') return
+    if (!props.projectSlug) return
 
     try {
-        let url = `projects/${props.projectId}/members/`
+        let url = `projects/${props.projectSlug}/members/`
         if (searchQuery.trim()) {
             url += `?search=${encodeURIComponent(searchQuery.trim())}`
         }

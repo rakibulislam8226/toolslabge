@@ -1,9 +1,9 @@
 <template>
-  <BaseModal :is-open="isOpen" title="Add Project Member" size="lg" @close="handleClose">
+  <BaseModal :is-open="isOpen" title="Add Project Member" size="xl" @close="handleClose">
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- User Selection -->
       <div>
-        <label for="user" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="user" class="block text-base font-medium text-gray-700 mb-3">
           Team Member <span class="text-red-500">*</span>
         </label>
         <div class="relative">
@@ -25,8 +25,8 @@
 
           <!-- User Dropdown -->
           <div v-if="showUserDropdown && (filteredUsers.length > 0 || userSearch.length > 0)"
-            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-            <div v-if="loadingUsers" class="p-3 text-center text-gray-500">
+            class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div v-if="loadingUsers" class="p-3 text-center text-gray-500 dark:text-gray-400">
               <div class="flex items-center justify-center">
                 <svg class="w-4 h-4 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
@@ -37,21 +37,22 @@
                 Loading members...
               </div>
             </div>
-            <div v-else-if="filteredUsers.length === 0" class="p-3 text-center text-gray-500">
+            <div v-else-if="filteredUsers.length === 0" class="p-3 text-center text-gray-500 dark:text-gray-400">
               No members found
             </div>
             <div v-else>
               <button v-for="user in filteredUsers" :key="user.id" type="button" @click="selectUser(user)"
-                class="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none flex items-center">
+                class="w-full px-3 py-2 text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-l-4 hover:border-blue-500 dark:hover:border-blue-400 focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:border-l-4 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none flex items-center cursor-pointer transition-all duration-200 ease-in-out">
                 <div class="flex-1">
-                  <div class="font-medium text-gray-900">
+                  <div
+                    class="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-200 text-base">
                     <span v-if="user.user.first_name && user.user.last_name">
                       {{ user.user.first_name }} {{ user.user.last_name }}
                     </span>
                     <span v-else>{{ user.user.email }}</span>
                   </div>
-                  <div class="text-sm text-gray-500">{{ user.user.email }}</div>
-                  <div class="text-xs text-blue-600 capitalize">{{ user.role }} in organization</div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.user.email }}</div>
+                  <div class="text-sm text-blue-600 dark:text-blue-400 capitalize">{{ user.role }} in organization</div>
                 </div>
               </button>
             </div>
@@ -59,19 +60,22 @@
         </div>
 
         <!-- Selected User Display -->
-        <div v-if="selectedUser" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+        <div v-if="selectedUser"
+          class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
           <div class="flex items-center justify-between">
             <div>
-              <div class="font-medium text-blue-900">
+              <div class="font-medium text-blue-900 dark:text-blue-300 text-base">
                 <span v-if="selectedUser.user.first_name && selectedUser.user.last_name">
                   {{ selectedUser.user.first_name }} {{ selectedUser.user.last_name }}
                 </span>
                 <span v-else>{{ selectedUser.user.email }}</span>
               </div>
-              <div class="text-sm text-blue-700">{{ selectedUser.user.email }}</div>
-              <div class="text-xs text-blue-600 capitalize">{{ selectedUser.role }} in organization</div>
+              <div class="text-sm text-blue-700 dark:text-blue-400">{{ selectedUser.user.email }}</div>
+              <div class="text-sm text-blue-600 dark:text-blue-400 capitalize">{{ selectedUser.role }} in organization
+              </div>
             </div>
-            <button type="button" @click="clearUser" class="text-blue-600 hover:text-blue-800">
+            <button type="button" @click="clearUser"
+              class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-200">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -84,7 +88,7 @@
       <div>
         <BaseSelect v-model="form.role" label="Project Role" :options="roleOptions" required
           :error="fieldErrors.role" />
-        <p class="mt-1 text-xs text-gray-500">
+        <p class="mt-2 text-sm text-gray-500">
           <span v-if="form.role === 'manager'">Can manage project settings, members, and all tasks</span>
           <span v-else-if="form.role === 'contributor'">Can create and edit tasks, collaborate on project</span>
           <span v-else-if="form.role === 'viewer'">Can view project details and tasks (read-only access)</span>
@@ -92,32 +96,19 @@
         </p>
       </div>
 
-      <!-- Error Message -->
-      <div v-if="generalError" class="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div class="flex">
-          <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <div>
-            <h3 class="text-sm font-medium text-red-800">Error adding member</h3>
-            <div class="mt-1 text-sm text-red-700">{{ generalError }}</div>
-          </div>
-        </div>
-      </div>
     </form>
 
     <template #footer>
       <div class="flex justify-end space-x-3">
         <button type="button" @click="handleClose"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="px-5 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           :disabled="loading">
           Cancel
         </button>
         <button type="submit" @click="handleSubmit"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          class="px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           :disabled="loading || !selectedUser || !form.role">
-          <svg v-if="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="loading" class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
             <path fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
@@ -154,8 +145,8 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  projectId: {
-    type: [String, Number],
+  projectSlug: {
+    type: String,
     required: true
   }
 })
@@ -179,7 +170,6 @@ const form = reactive({
 // State
 const loading = ref(false)
 const fieldErrors = ref({})
-const generalError = ref('')
 
 // User search state
 const organizationUsers = ref([])
@@ -237,7 +227,6 @@ const resetForm = () => {
   selectedUser.value = null
   showUserDropdown.value = false
   fieldErrors.value = {}
-  generalError.value = ''
 }
 
 // Fetch organization users
@@ -266,8 +255,10 @@ const handleUserSearch = () => {
 
 // Select a user
 const selectUser = (user) => {
+  console.log('Selecting user:', user)
   selectedUser.value = user
   form.user_id = user.user.id
+  console.log('Set form.user_id to:', form.user_id)
   userSearch.value = user.user.first_name && user.user.last_name
     ? `${user.user.first_name} ${user.user.last_name}`
     : user.user.email
@@ -288,7 +279,6 @@ const handleSubmit = async () => {
 
   loading.value = true
   fieldErrors.value = {}
-  generalError.value = ''
 
   try {
     if (!selectedUser.value) {
@@ -296,12 +286,21 @@ const handleSubmit = async () => {
       return
     }
 
+    if (!form.user_id) {
+      fieldErrors.value.user = 'User ID is missing'
+      console.error('form.user_id is null or undefined:', form.user_id)
+      return
+    }
+
     const formData = {
-      user_id: form.user_id,
+      user: form.user_id,
       role: form.role
     }
 
-    const response = await axios.post(`projects/${props.projectId}/members/`, formData)
+    console.log('Sending formData:', formData)
+    console.log('Selected user:', selectedUser.value)
+
+    const response = await axios.post(`projects/${props.projectSlug}/members/`, formData)
     const newMember = response.data.data || response.data
 
     $toast?.success('Member added successfully')
@@ -312,7 +311,6 @@ const handleSubmit = async () => {
 
     if (responseData?.message) {
       $toast?.error(responseData.message)
-      generalError.value = responseData.message
     }
 
     if (responseData?.data?.errors && Array.isArray(responseData.data.errors)) {
@@ -322,7 +320,6 @@ const handleSubmit = async () => {
     } else if (responseData?.errors) {
       Object.assign(fieldErrors.value, responseData.errors)
     } else if (!responseData?.message) {
-      generalError.value = 'Failed to add member. Please try again.'
       $toast?.error('Failed to add member')
     }
   } finally {

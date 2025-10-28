@@ -48,8 +48,7 @@
                 </svg>
               </li>
               <li>
-                <router-link :to="`/projects/${project.slug ? `${project.slug}-${project.id}` : project.id}`"
-                  class="hover:text-blue-600 transition duration-300">
+                <router-link :to="`/projects/${project.slug}`" class="hover:text-blue-600 transition duration-300">
                   {{ project.name }}
                 </router-link>
               </li>
@@ -66,7 +65,7 @@
           <p class="mt-2 text-gray-600">Update your project information</p>
         </div>
         <div>
-          <router-link :to="`/projects/${project.slug ? `${project.slug}-${project.id}` : project.id}/members`"
+          <router-link :to="`/projects/${project.slug}/members`"
             class="bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300 flex items-center"
             style="color: white !important;">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -106,7 +105,7 @@
 
           <!-- Form Actions -->
           <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-            <router-link :to="`/projects/${project.slug ? `${project.slug}-${project.id}` : project.id}`"
+            <router-link :to="`/projects/${project.slug}`"
               class="text-gray-600 hover:text-gray-800 font-medium transition duration-300">
               Cancel
             </router-link>
@@ -198,7 +197,6 @@
 import { ref, reactive, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
-import { extractIdFromSlug } from "@/utils/slugUtils.js"
 import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker } from '@/components/forms'
 
 const router = useRouter()
@@ -231,11 +229,8 @@ const form = reactive({
   status: 'active'
 })
 
-// Get project ID from route slug
-const projectId = computed(() => {
-  const slug = route.params.slug
-  return extractIdFromSlug(slug)
-})
+// Get project slug from route
+const projectSlug = computed(() => route.params.slug)
 
 // Fetch project details from API
 const fetchProject = async () => {
@@ -243,13 +238,13 @@ const fetchProject = async () => {
     loading.value = true
     error.value = ''
 
-    const id = projectId.value
-    if (!id) {
-      error.value = 'Invalid project URL - could not extract project ID'
+    const slug = projectSlug.value
+    if (!slug) {
+      error.value = 'Invalid project URL - missing slug'
       return
     }
 
-    const response = await axios.get(`projects/${id}/`)
+    const response = await axios.get(`projects/${slug}/`)
     const projectData = response.data.data || response.data || null
     project.value = projectData
 
@@ -280,27 +275,20 @@ const updateProject = async () => {
     updating.value = true
     fieldErrors.value = {}
 
-    const id = projectId.value
-    if (!id) {
-      $toast?.error('Cannot update - invalid project ID')
+    const slug = projectSlug.value
+    if (!slug) {
+      $toast?.error('Cannot update - invalid project slug')
       return
     }
 
-    const updateData = {
-      name: form.name,
-      description: form.description,
-      start_date: form.start_date || null,
-      end_date: form.end_date || null,
-      status: form.status
-    }
-
-    const response = await axios.patch(`projects/${id}/`, updateData)
+    const updateData = { ...form }
+    const response = await axios.patch(`projects/${slug}/`, updateData)
     const updatedProject = response.data.data || response.data
 
     if (updatedProject) {
       project.value = updatedProject
       $toast?.success('Project updated successfully')
-      router.push(`/projects/${updatedProject.slug ? `${updatedProject.slug}-${updatedProject.id}` : updatedProject.id}`)
+      router.push(`/projects/${updatedProject.slug}`)
     }
   } catch (err) {
     const responseData = err.response?.data
@@ -328,13 +316,13 @@ const deleteProject = async () => {
   try {
     deleting.value = true
 
-    const id = projectId.value
-    if (!id) {
-      $toast?.error('Cannot delete - invalid project ID')
+    const slug = projectSlug.value
+    if (!slug) {
+      $toast?.error('Cannot delete - invalid project slug')
       return
     }
 
-    await axios.delete(`projects/${id}/`)
+    await axios.delete(`projects/${slug}/`)
     $toast?.success('Project deleted successfully')
     router.push('/projects')
   } catch (err) {

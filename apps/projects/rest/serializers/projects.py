@@ -40,7 +40,10 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
     def validate(self, data):
         request = self.context["request"]
         user = request.user
-        project_id = self.context.get("project_id")
+        project_slug = self.context.get("project_slug")
+        # project_id = self.context.get("project_id")
+        project = Project.objects.get(slug=project_slug)
+        project_id = project.id
 
         # Only validate user membership during creation, not updates
         if not self.instance:  # This is a create operation
@@ -84,8 +87,8 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get("request")
         user = request.user
-        project = self.context.get("project_id")
-        project = Project.objects.get(id=project)
+        project_slug = self.context.get("project_slug")
+        project = Project.objects.get(slug=project_slug)
 
         project_member = ProjectMember.objects.create(
             created_by=user,

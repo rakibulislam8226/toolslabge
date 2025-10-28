@@ -84,7 +84,7 @@
                 </svg>
                 <span class="font-medium" style="color: white !important;">Edit Project</span>
               </button>
-              <router-link :to="`/projects/${project.slug ? project.slug + '-' + project.id : project.id}/tasks`"
+              <router-link :to="`/projects/${project.slug}/tasks`"
                 class="bg-indigo-600 px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 style="color: white !important;">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -345,7 +345,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
-import { extractIdFromSlug } from "@/utils/slugUtils.js"
 
 const router = useRouter()
 const route = useRoute()
@@ -358,42 +357,24 @@ const error = ref('')
 // Get project slug from route
 const projectSlug = computed(() => route.params.slug)
 
-// Extract project ID from slug for API calls
-const projectId = computed(() => {
-  const slug = projectSlug.value
-  return extractIdFromSlug(slug)
-})
-
 // Fetch project details from API
 const fetchProject = async () => {
   try {
     loading.value = true
     error.value = ''
 
-    // Extract ID from slug for API call
-    const id = projectId.value
-    if (!id) {
-      error.value = 'Invalid project URL - could not extract project ID'
+    const slug = projectSlug.value
+    if (!slug) {
+      error.value = 'Invalid project URL - missing slug'
       return
     }
 
-    // API call uses ID (projects/3/) but URL shows slug (projects/ems-project-3)
-    const response = await axios.get(`projects/${id}/`)
+    // API call uses backend slug directly: projects/{slug}/
+    const response = await axios.get(`projects/${slug}/`)
 
     // Handle your API response structure
     const projectData = response.data.data || response.data || null
     project.value = projectData
-
-    // Optional: Validate that the slug in URL matches the slug from API
-    if (projectData && projectData.slug) {
-      const expectedSlug = `${projectData.slug}-${projectData.id}`
-      const currentSlug = projectSlug.value
-
-      // If the slug doesn't match, redirect to correct slug
-      if (expectedSlug !== currentSlug) {
-        router.replace(`/projects/${expectedSlug}`)
-      }
-    }
 
   } catch (err) {
     console.error('Failed to fetch project:', err)
@@ -493,20 +474,20 @@ const getDaysLabel = () => {
 
 // Action functions
 const editProject = () => {
-  // Navigate to edit project page using slug-id format
-  const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
+  // Navigate to edit project page using backend slug
+  const slug = project.value.slug
   router.push(`/projects/${slug}/edit`)
 }
 
 const viewAllTasks = () => {
   // Navigate to tasks page for this project
-  const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
+  const slug = project.value.slug
   router.push(`/projects/${slug}/tasks`)
 }
 
 const manageMembers = () => {
   // Navigate to project members management page
-  const slug = project.value.slug ? `${project.value.slug}-${project.value.id}` : project.value.id
+  const slug = project.value.slug
   router.push({ name: 'projects.members', params: { slug } })
 }
 

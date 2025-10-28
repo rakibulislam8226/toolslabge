@@ -146,6 +146,10 @@ const props = defineProps({
     statuses: {
         type: Array,
         default: () => []
+    },
+    projectSlug: {
+        type: String,
+        required: true
     }
 })
 
@@ -260,10 +264,10 @@ const closeModal = () => {
 }
 
 const fetchProjectMembers = async (searchQuery = '') => {
-    if (!projectId.value) return
+    if (!props.projectSlug) return
 
     try {
-        let url = `projects/${projectId.value}/members/`
+        let url = `projects/${props.projectSlug}/members/`
         if (searchQuery.trim()) {
             url += `?search=${encodeURIComponent(searchQuery.trim())}`
         }

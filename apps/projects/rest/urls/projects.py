@@ -9,14 +9,15 @@ from ..views.projects import (
 
 urlpatterns = [
     path("", ProjectListCreateView.as_view(), name="project-list-create"),
-    path("<int:pk>/", ProjectDetailView.as_view(), name="project-detail"),
+    # path("<int:pk>/", ProjectDetailView.as_view(), name="project-detail"),
+    path("<slug:slug>/", ProjectDetailView.as_view(), name="project-detail"),
     path(
-        "<int:project_id>/members/",
+        "<slug:slug>/members/",
         ProjectMemberListCreateView.as_view(),
         name="project-member-list-create",
     ),
     path(
-        "<int:project_id>/members/<int:id>/",
+        "<slug:slug>/members/<int:id>/",
         ProjectMemberDetailView.as_view(),
         name="project-member-detail",
     ),

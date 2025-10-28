@@ -9,22 +9,20 @@
     <!-- Error State -->
     <div v-else-if="error" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <div class="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 text-center">
-        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
         <h3 class="text-base sm:text-lg font-semibold text-red-800 mb-2">Failed to load project members</h3>
         <p class="text-sm sm:text-base text-red-600 mb-4">{{ error }}</p>
         <div class="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3">
-          <button
-            @click="fetchMembers"
-            class="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300 text-sm sm:text-base"
-          >
+          <button @click="fetchMembers"
+            class="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 text-sm sm:text-base cursor-pointer">
             Try Again
           </button>
-          <button
-            @click="goBack"
-            class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 text-sm sm:text-base"
-          >
+          <button @click="goBack"
+            class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 text-sm sm:text-base cursor-pointer">
             Back to Project
           </button>
         </div>
@@ -52,7 +50,8 @@
                     </svg>
                   </li>
                   <li>
-                    <button @click="goBack" class="hover:text-blue-600 transition duration-300 truncate max-w-[120px] sm:max-w-none">
+                    <button @click="goBack"
+                      class="hover:text-blue-600 transition duration-300 truncate max-w-[120px] sm:max-w-none cursor-pointer focus:outline-none focus:text-blue-600">
                       {{ projectName }}
                     </button>
                   </li>
@@ -78,15 +77,13 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-end lg:ml-6">
-              <button
-                @click="showAddMemberModal = true"
-                class="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center text-sm sm:text-base"
-              >
-                <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                <span class="hidden sm:inline">Add Member</span>
-                <span class="sm:hidden">Add</span>
+              <button @click="showAddMemberModal = true"
+              class="bg-blue-600 text-white font-bold px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md">
+              <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span class="hidden sm:inline">Add Member</span>
+              <span class="sm:hidden">Add</span>
               </button>
             </div>
           </div>
@@ -96,9 +93,11 @@
         <div class="px-4 sm:px-6 py-4 sm:py-6">
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div class="text-center">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <div
+                class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
                 </svg>
               </div>
               <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ members.length }}</p>
@@ -106,9 +105,11 @@
             </div>
 
             <div class="text-center">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <div
+                class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.25-4.5v16.5h-16.5V7.5"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m5.25-4.5v16.5h-16.5V7.5"></path>
                 </svg>
               </div>
               <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ getManagersCount() }}</p>
@@ -116,9 +117,12 @@
             </div>
 
             <div class="text-center">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              <div
+                class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
               </div>
               <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ getContributorsCount() }}</p>
@@ -126,10 +130,15 @@
             </div>
 
             <div class="text-center">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              <div
+                class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                  </path>
                 </svg>
               </div>
               <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ getViewersCount() }}</p>
@@ -146,15 +155,16 @@
         </div>
 
         <div v-if="members.length === 0" class="text-center py-8 sm:py-12 px-4">
-          <svg class="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
+          <svg class="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
           </svg>
           <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No members yet</h3>
-          <p class="text-sm sm:text-base text-gray-600 mb-6 max-w-sm mx-auto">Add team members to start collaborating on this project</p>
-          <button
-            @click="showAddMemberModal = true"
-            class="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 inline-flex items-center text-sm sm:text-base"
-          >
+          <p class="text-sm sm:text-base text-gray-600 mb-6 max-w-sm mx-auto">Add team members to start collaborating on
+            this project</p>
+          <button @click="showAddMemberModal = true"
+            class="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 inline-flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md">
             <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -163,15 +173,13 @@
         </div>
 
         <div v-else class="divide-y divide-gray-200">
-          <div
-            v-for="member in members"
-            :key="member.id"
-            class="px-4 sm:px-6 py-4 hover:bg-gray-50 transition duration-300"
-          >
+          <div v-for="member in members" :key="member.id"
+            class="px-4 sm:px-6 py-4 hover:bg-gray-50 transition duration-300">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
               <div class="flex items-center min-w-0 flex-1">
                 <!-- Avatar -->
-                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3 flex-shrink-0">
+                <div
+                  class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3 flex-shrink-0">
                   {{ getInitials(member.user) }}
                 </div>
 
@@ -192,30 +200,27 @@
 
               <!-- Role and Actions -->
               <div class="flex items-center justify-between sm:justify-end space-x-3 flex-shrink-0">
-                <span 
-                  :class="getRoleBadgeClass(member.role)"
-                  class="px-2 py-1 text-xs font-medium rounded-full"
-                >
+                <span :class="getRoleBadgeClass(member.role)" class="px-2 py-1 text-xs font-medium rounded-full">
                   {{ formatRole(member.role) }}
                 </span>
 
                 <div class="flex items-center space-x-1">
-                  <button
-                    @click="editMember(member)"
-                    class="text-blue-600 hover:text-blue-800 p-1 rounded"
-                    title="Edit role"
-                  >
+                  <button @click="editMember(member)"
+                    class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded-lg cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    title="Edit role">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                      </path>
                     </svg>
                   </button>
-                  <button
-                    @click="removeMember(member)"
-                    class="text-red-600 hover:text-red-800 p-1 rounded"
-                    title="Remove member"
-                  >
+                  <button @click="removeMember(member)"
+                    class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    title="Remove member">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                      </path>
                     </svg>
                   </button>
                 </div>
@@ -227,33 +232,18 @@
     </div>
 
     <!-- Add Member Modal -->
-    <AddProjectMemberModal
-      :is-open="showAddMemberModal"
-      :project-id="projectId"
-      @close="closeAddMemberModal"
-      @added="onMemberAdded"
-    />
+    <AddProjectMemberModal :is-open="showAddMemberModal" :project-slug="projectSlug" @close="closeAddMemberModal"
+      @added="onMemberAdded" />
 
     <!-- Edit Member Modal -->
-    <EditProjectMemberModal
-      v-if="editingMember"
-      :is-open="showEditMemberModal"
-      :member="editingMember"
-      :project-id="projectId"
-      @close="showEditMemberModal = false"
-      @updated="handleMemberUpdated"
-    />
+    <EditProjectMemberModal v-if="editingMember" :is-open="showEditMemberModal" :member="editingMember"
+      :project-slug="projectSlug" @close="showEditMemberModal = false" @updated="handleMemberUpdated" />
 
     <!-- Remove Member Confirmation Modal -->
-    <ConfirmModal
-      :is-open="showRemoveModal"
-      title="Remove Member"
+    <ConfirmModal :is-open="showRemoveModal" title="Remove Member"
       :message="`Are you sure you want to remove ${removingMember?.user_name ? removingMember.user_name : removingMember?.user_email} from this project?`"
-      confirm-text="Remove"
-      confirm-class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
-      @confirm="confirmRemoveMember"
-      @cancel="showRemoveModal = false"
-    />
+      confirm-text="Remove" confirm-class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+      @confirm="confirmRemoveMember" @cancel="showRemoveModal = false" />
   </div>
 </template>
 
@@ -261,7 +251,6 @@
 import { ref, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
-import { extractIdFromSlug } from "@/utils/slugUtils.js"
 import AddProjectMemberModal from '@/components/modals/AddProjectMemberModal.vue'
 import EditProjectMemberModal from '@/components/modals/EditProjectMemberModal.vue'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
@@ -280,34 +269,48 @@ const $toast = inject('toast')
 // Get project slug from route
 const projectSlug = computed(() => route.params.slug)
 
-// Extract project ID from slug for API calls
-const projectId = computed(() => {
-  const slug = projectSlug.value
-  return extractIdFromSlug(slug)
-})
+// Store project data
+const project = ref(null)
+
+// Fetch project details for project name
+const fetchProject = async () => {
+  try {
+    const slug = projectSlug.value
+    if (!slug) {
+      throw new Error('Missing project slug')
+    }
+
+    const response = await axios.get(`projects/${slug}/`)
+    const projectData = response.data.data || response.data
+    project.value = projectData
+    projectName.value = projectData.name || 'Unknown Project'
+  } catch (err) {
+    console.error('Failed to fetch project:', err)
+    throw err
+  }
+}
 
 // Fetch project members from API
 const fetchMembers = async () => {
   try {
     loading.value = true
     error.value = ''
-    
-    const id = projectId.value
-    if (!id) {
-      error.value = 'Invalid project URL - could not extract project ID'
+
+    const slug = projectSlug.value
+    if (!slug) {
+      error.value = 'Missing project slug'
       return
     }
-    
-    const response = await axios.get(`projects/${id}/members/`)
+
+    // Fetch members using slug directly
+    const response = await axios.get(`projects/${slug}/members/`)
     members.value = response.data.data || response.data || []
 
-    // Also fetch project name for breadcrumb
+    // Also fetch project details for the project name
     try {
-      const projectResponse = await axios.get(`projects/${id}/`)
-      const projectData = projectResponse.data.data || projectResponse.data
-      projectName.value = projectData.name || 'Unknown Project'
+      await fetchProject()
     } catch (err) {
-      console.error('Failed to fetch project name:', err)
+      console.error('Failed to fetch project details:', err)
       projectName.value = 'Project'
     }
 
@@ -344,7 +347,7 @@ const formatRole = (role) => {
 
 const getRoleBadgeClass = (role) => {
   const roleLower = (role || 'contributor').toLowerCase()
-  
+
   switch (roleLower) {
     case 'manager':
       return 'bg-purple-100 text-purple-800'
@@ -360,10 +363,10 @@ const getRoleBadgeClass = (role) => {
 const formatDate = (dateString) => {
   if (!dateString) return ''
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
   })
 }
 
@@ -405,7 +408,7 @@ const removeMember = (member) => {
   removingMember.value = member
   showRemoveModal.value = true
   console.log("test");
-  
+
 }
 
 // Additional modal states for edit and remove
@@ -427,11 +430,12 @@ const handleMemberUpdated = (updatedMember) => {
 // Confirm member removal
 const confirmRemoveMember = async () => {
   if (!removingMember.value) return
-  
+
   try {
-    await axios.delete(`projects/${projectId.value}/members/${removingMember.value.id}/`)
+    const slug = projectSlug.value
+    await axios.delete(`projects/${slug}/members/${removingMember.value.id}/`)
     members.value = members.value.filter(m => m.id !== removingMember.value.id)
-    
+
     showRemoveModal.value = false
     removingMember.value = null
     $toast.success('Member removed successfully')
@@ -456,6 +460,7 @@ onMounted(() => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

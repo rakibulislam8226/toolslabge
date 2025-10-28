@@ -28,13 +28,13 @@ class ProjectListCreateView(generics.ListCreateAPIView):
 class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProjectDetailSerializer
     permission_classes = [IsOrgOwnerAdminOrManager]
+    lookup_field = "slug"
 
     def get_queryset(self):
         user = self.request.user
-        # Fetch all projects under organizations where user has membership
         return (
             Project.objects.select_related("organization")
-            .filter(organization__memberships__user=user)
+            .filter(organization=user.organization_memberships.first().organization)
             .distinct()
         )
 
@@ -45,11 +45,12 @@ class ProjectMemberListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        project_id = self.kwargs.get("project_id")
+        # project_id = self.kwargs.get("project_id")
+        project_slug = self.kwargs.get("slug")
         search = self.request.query_params.get("search", "")
         qs = ProjectMember.objects.select_related("project", "user").filter(
             project__organization=user.organization_memberships.first().organization,
-            project__id=project_id,
+            project__slug=project_slug,
         )
         if search:
             qs = qs.filter(
@@ -61,7 +62,7 @@ class ProjectMemberListCreateView(generics.ListCreateAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["project_id"] = self.kwargs.get("project_id")
+        context["project_slug"] = self.kwargs.get("slug")
         return context
 
 
@@ -70,15 +71,16 @@ class ProjectMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOrgOwnerAdminOrManager]
     lookup_field = "id"
 
+
     def get_queryset(self):
         user = self.request.user
-        project_id = self.kwargs.get("project_id")
+        project_slug = self.kwargs.get("slug")
         return ProjectMember.objects.select_related("project", "user").filter(
             project__organization=user.organization_memberships.first().organization,
-            project__id=project_id,
+            project__slug=project_slug,
         )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["project_id"] = self.kwargs.get("project_id")
+        context["project_slug"] = self.kwargs.get("slug")
         return context

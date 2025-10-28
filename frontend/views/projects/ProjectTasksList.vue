@@ -227,12 +227,13 @@
         </div>
 
         <!-- Create Task Modal -->
-        <CreateTaskModal :is-open="showCreateModal" :project-id="projectId" :initial-status-id="selectedStatusId"
-            :statuses="taskStatuses" @close="closeCreateModal" @created="onTaskCreated" />
+        <CreateTaskModal :is-open="showCreateModal" :project-id="projectId" :project-slug="projectSlug"
+            :initial-status-id="selectedStatusId" :statuses="taskStatuses" @close="closeCreateModal"
+            @created="onTaskCreated" />
 
         <!-- Edit Task Modal -->
-        <EditTaskModal :is-open="showEditModal" :task="selectedTask" :statuses="taskStatuses" @close="closeEditModal"
-            @updated="onTaskUpdated" />
+        <EditTaskModal :is-open="showEditModal" :task="selectedTask" :project-slug="projectSlug"
+            :statuses="taskStatuses" @close="closeEditModal" @updated="onTaskUpdated" />
     </div>
 </template>
 
@@ -240,7 +241,6 @@
 import { ref, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
-import { extractIdFromSlug } from "@/utils/slugUtils.js"
 import TaskCard from '@/components/tasks/TaskCard.vue'
 import CreateTaskModal from '@/components/modals/CreateTaskModal.vue'
 import EditTaskModal from '@/components/modals/EditTaskModal.vue'
@@ -265,19 +265,13 @@ const selectedStatusId = ref(null)
 // Get project slug from route
 const projectSlug = computed(() => route.params.slug)
 
-// Extract project ID from slug for API calls
+// Get project ID from project data for nested API calls
 const projectId = computed(() => {
-    const slug = projectSlug.value
-    const id = extractIdFromSlug(slug)
-    console.log('TasksList: extracting project ID from slug:', slug, '-> ID:', id)
-
-    // If we can't extract from slug but have project data, use that
-    if (!id && project.value?.id) {
+    if (project.value?.id) {
         console.log('TasksList: using project ID from fetched project data:', project.value.id)
         return project.value.id
     }
-
-    return id
+    return null
 })
 
 // Status color mapping based on status names
@@ -341,36 +335,22 @@ const getStatusColor = (statusId, type) => {
 const fetchProject = async () => {
     try {
         const slug = projectSlug.value
-        const extractedId = extractIdFromSlug(slug)
 
-        console.log('fetchProject: slug =', slug, 'extractedId =', extractedId)
+        console.log('fetchProject: slug =', slug)
 
-        let response
-        if (extractedId) {
-            // If we have an ID from the slug, fetch by ID
-            console.log('fetchProject: fetching by ID:', extractedId)
-            response = await axios.get(`projects/${extractedId}/`)
-        } else {
-            // If no ID in slug, try to find project by slug in the list
-            console.log('fetchProject: searching for project by slug:', slug)
-            const projectsResponse = await axios.get('projects/')
-            const projects = projectsResponse.data.data || projectsResponse.data || []
-            const foundProject = projects.find(p => p.slug === slug)
-
-            if (!foundProject) {
-                throw new Error('Project not found by slug')
-            }
-
-            console.log('fetchProject: found project by slug:', foundProject)
-            // Now fetch the full project details
-            response = await axios.get(`projects/${foundProject.id}/`)
+        if (!slug) {
+            throw new Error('Missing project slug')
         }
+
+        // Use backend slug directly
+        console.log('fetchProject: fetching by slug:', slug)
+        const response = await axios.get(`projects/${slug}/`)
 
         project.value = response.data.data
         console.log('fetchProject: fetched project:', project.value)
     } catch (err) {
         console.error('Failed to fetch project:', err)
-        if (err.response?.status === 404 || err.message === 'Project not found by slug') {
+        if (err.response?.status === 404) {
             error.value = 'Project not found'
         } else {
             error.value = 'Failed to load project details'
@@ -448,8 +428,10 @@ const refreshTasks = () => {
 
 // Navigate back to project
 const goToProject = () => {
-    const slug = project.value?.slug ? `${project.value.slug}-${project.value.id}` : projectId.value
-    router.push(`/projects/${slug}`)
+    const slug = project.value?.slug
+    if (slug) {
+        router.push(`/projects/${slug}`)
+    }
 }
 
 // Modal handlers
@@ -780,14 +762,15 @@ button:focus,
 }
 
 .status-column::-webkit-scrollbar {
-  width: 8px;
-}
-.status-column::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 116, 139, 0.3);
-  border-radius: 8px;
-}
-.status-column::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(100, 116, 139, 0.5);
+    width: 8px;
 }
 
+.status-column::-webkit-scrollbar-thumb {
+    background-color: rgba(100, 116, 139, 0.3);
+    border-radius: 8px;
+}
+
+.status-column::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(100, 116, 139, 0.5);
+}
 </style>

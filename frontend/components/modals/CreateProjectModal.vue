@@ -94,19 +94,6 @@
       <!-- Project Status -->
       <BaseSelect v-model="form.status" label="Status" :options="statusOptions" :error="fieldErrors.status" />
 
-      <!-- Error Message -->
-      <div v-if="generalError" class="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div class="flex">
-          <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <div>
-            <h3 class="text-sm font-medium text-red-800">Error creating project</h3>
-            <div class="mt-1 text-sm text-red-700">{{ generalError }}</div>
-          </div>
-        </div>
-      </div>
     </form>
 
     <template #footer>
@@ -182,7 +169,6 @@ const form = reactive({
 // State
 const loading = ref(false)
 const fieldErrors = ref({})
-const generalError = ref('')
 
 // Manager search state
 const members = ref([])
@@ -243,7 +229,6 @@ const resetForm = () => {
   selectedManager.value = null
   showManagerDropdown.value = false
   fieldErrors.value = {}
-  generalError.value = ''
 }
 
 // Fetch organization members
@@ -292,7 +277,6 @@ const handleSubmit = async () => {
 
   loading.value = true
   fieldErrors.value = {}
-  generalError.value = ''
 
   try {
     const formData = {
@@ -320,11 +304,6 @@ const handleSubmit = async () => {
   } catch (err) {
     const responseData = err.response?.data
 
-    if (responseData?.message) {
-      $toast?.error(responseData.message)
-      generalError.value = responseData.message
-    }
-
     if (responseData?.data?.errors && Array.isArray(responseData.data.errors)) {
       responseData.data.errors.forEach(errorItem => {
         Object.assign(fieldErrors.value, errorItem)
@@ -332,7 +311,6 @@ const handleSubmit = async () => {
     } else if (responseData?.errors) {
       Object.assign(fieldErrors.value, responseData.errors)
     } else if (!responseData?.message) {
-      generalError.value = 'Failed to create project. Please try again.'
       $toast?.error('Failed to create project')
     }
   } finally {
