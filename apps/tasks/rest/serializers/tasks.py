@@ -31,6 +31,7 @@ class MyTaskListCreateSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "slug",
             "description",
             "start_date",
             "due_date",

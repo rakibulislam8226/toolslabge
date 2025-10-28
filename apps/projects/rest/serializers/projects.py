@@ -109,13 +109,14 @@ class ProjectListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "slug",
             "description",
             "start_date",
             "end_date",
             "status",
             "manager_id",
         ]
-        read_only_fields = ["status"]
+        read_only_fields = ["status", "slug"]
 
     def validate(self, data):
         request = self.context["request"]
@@ -216,6 +217,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "slug",
             "organization",
             "manager",
             "members",

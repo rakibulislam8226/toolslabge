@@ -193,6 +193,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             "id",
             "project",
             "title",
+            "slug",
             "description",
             "start_date",
             "due_date",
