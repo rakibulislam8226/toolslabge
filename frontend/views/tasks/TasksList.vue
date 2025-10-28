@@ -14,32 +14,36 @@
                     <!-- Filters and Actions -->
                     <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-3">
                         <!-- Priority Filter -->
-                        <select v-model="selectedPriority" @change="fetchTasks"
-                            class="rounded-lg border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">All Priorities</option>
-                            <option value="high">High Priority</option>
-                            <option value="medium">Medium Priority</option>
-                            <option value="low">Low Priority</option>
-                        </select>
-
-                        <!-- Status Filter -->
-                        <select v-model="selectedStatus" @change="fetchTasks"
-                            class="rounded-lg border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">All Statuses</option>
-                            <option v-for="status in taskStatuses" :key="status.id" :value="status.id">
-                                {{ status.name }}
-                            </option>
-                        </select>
+                        <div class="relative">
+                            <select v-model="selectedPriority" @change="handlePriorityChange"
+                                class="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 min-w-[130px]">
+                                <option value="" class="text-gray-500">All Priorities</option>
+                                <option value="high" class="text-red-600 font-medium">High</option>
+                                <option value="medium" class="text-yellow-600 font-medium">Medium</option>
+                                <option value="low" class="text-green-600 font-medium">Low</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
 
                         <!-- Refresh Button -->
                         <button @click="refreshTasks" :disabled="loading"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200 text-sm font-medium">
-                            <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed transition-colors duration-200">
+                            <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                     stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor"
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            <svg v-else class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                                 </path>
                             </svg>
                             {{ loading ? 'Loading...' : 'Refresh' }}
@@ -85,7 +89,7 @@
                 </svg>
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
                 <p class="mt-1 text-sm text-gray-500">
-                    {{ hasFilters ? 'Try adjusting your filters to see more tasks.' : 'Get started by creating your first task.' }}
+                    {{ hasFilters ? 'Try adjusting your filters to see more tasks.' : 'Create a task.' }}
                 </p>
             </div>
 
@@ -129,12 +133,11 @@ export default {
         const meta = ref(null)
         const currentPage = ref(1)
         const selectedPriority = ref('')
-        const selectedStatus = ref('')
         const taskStatuses = ref([])
 
         // Computed properties
         const totalTasks = computed(() => meta.value?.total || 0)
-        const hasFilters = computed(() => selectedPriority.value || selectedStatus.value)
+        const hasFilters = computed(() => selectedPriority.value)
 
         // Methods
         const fetchTasks = async (page = 1) => {
@@ -145,8 +148,7 @@ export default {
 
             const params = {
                 page,
-                ...(selectedPriority.value && { priority: selectedPriority.value }),
-                ...(selectedStatus.value && { status: selectedStatus.value })
+                ...(selectedPriority.value && { priority: selectedPriority.value })
             }
 
             const result = await fetchTasksAPI(params)
@@ -169,7 +171,11 @@ export default {
 
         const refreshTasks = () => {
             selectedPriority.value = ''
-            selectedStatus.value = ''
+            currentPage.value = 1
+            fetchTasks(1)
+        }
+
+        const handlePriorityChange = () => {
             currentPage.value = 1
             fetchTasks(1)
         }
@@ -243,12 +249,12 @@ export default {
             error,
             currentPage,
             selectedPriority,
-            selectedStatus,
             taskStatuses,
             totalTasks,
             hasFilters,
             fetchTasks,
             refreshTasks,
+            handlePriorityChange,
             handlePageChange,
             handleStatusChange,
             handleTaskEdit,
