@@ -300,7 +300,6 @@ const handleSubmit = async () => {
 
     $toast?.success('Project created successfully')
     emit('created', newProject)
-    handleClose()
   } catch (err) {
     const responseData = err.response?.data
 

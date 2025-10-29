@@ -152,7 +152,8 @@
     </div>
 
     <!-- Create Project Modal -->
-    <CreateProjectModal :is-open="showCreateModal" @close="closeCreateModal" @created="onProjectCreated" />
+    <CreateProjectModal :is-open="showCreateModal" @close="closeCreateModal"
+      @created="(e) => { closeCreateModal(); onProjectCreated(e) }" />
   </div>
 </template>
 
@@ -182,7 +183,7 @@ const fetchProjects = async (page = 1) => {
       params: { page }
     })
 
-    // Handle your API response structure
+    // Handle API response structure
     const projectsData = response.data.data || []
     const meta = response.data.meta || {}
 
@@ -192,7 +193,7 @@ const fetchProjects = async (page = 1) => {
       projects.value.push(...projectsData)
     }
 
-    // Handle pagination based on your API meta structure
+    // Handle pagination based on API meta structure
     hasMore.value = meta.has_next || false
     currentPage.value = meta.current_page || page
 
@@ -275,25 +276,16 @@ const closeCreateModal = () => {
 }
 
 const onProjectCreated = (newProject) => {
-  // Navigate to the newly created project's details page
   const slug = newProject.slug
   router.push(`/projects/${slug}`)
-
-  // Show success message (you can use your notification system)
-  console.log('Project created successfully:', newProject.name)
-
-  // You can add a toast notification here if you have one
-  // For example: showNotification('Project created successfully!', 'success')
 }
 
 const viewProject = (project) => {
-  // Navigate to project detail page using backend slug
   const slug = project.slug
   router.push(`/projects/${slug}`)
 }
 
 const editProject = (project) => {
-  // Navigate to edit project page using backend slug
   const slug = project.slug
   router.push(`/projects/${slug}/edit`)
 }
