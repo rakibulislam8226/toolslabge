@@ -112,7 +112,7 @@
 
             <div class="flex space-x-3">
               <button type="button" @click="showDeleteModal = true"
-                class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300 flex items-center"
+                class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300 flex items-center cursor-pointer"
                 style="color: white !important;">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -123,7 +123,7 @@
               </button>
 
               <button type="submit" :disabled="updating"
-                class="bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                class="bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center cursor-pointer"
                 style="color: white !important;">
                 <span v-if="updating" class="flex items-center" style="color: white !important;">
                   <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"

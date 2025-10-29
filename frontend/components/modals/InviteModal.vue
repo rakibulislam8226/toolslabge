@@ -71,7 +71,7 @@
     <template #footer>
       <div class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-2">
         <button @click="$emit('close')"
-          class="px-4 py-2 rounded-lg border border-gray-300 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-gray-100 active:scale-[.98] transition">
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-gray-100 active:scale-[.98] transition cursor-pointer">
           Cancel
         </button>
         <button @click="send" :disabled="loading || !isValid"
