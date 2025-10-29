@@ -1,5 +1,10 @@
 <template>
     <button :type="type" :class="buttonClasses" :disabled="disabled || loading" @click="handleClick">
+        <!-- Prepend Slot -->
+        <span v-if="$slots.prepend">
+            <slot name="prepend"></slot>
+        </span>
+
         <!-- Loading Spinner -->
         <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4"
             :class="{ 'h-3 w-3': size === 'sm', 'h-5 w-5': size === 'lg' }" fill="none" viewBox="0 0 24 24">
@@ -17,6 +22,11 @@
         <!-- Button Content -->
         <span v-if="!loading || loadingText">
             <slot>{{ loading && loadingText ? loadingText : label }}</slot>
+        </span>
+
+        <!-- Append Slot -->
+        <span v-if="$slots.append">
+            <slot name="append"></slot>
         </span>
     </button>
 </template>

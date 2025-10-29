@@ -265,7 +265,8 @@ export default {
     name: 'TaskDetail',
     components: {
         EditTaskModal,
-        ConfirmModal
+        ConfirmModal,
+        Button
     },
     setup() {
         const route = useRoute()
@@ -323,13 +324,6 @@ export default {
             if (queryProjectId) {
                 projectId.value = queryProjectId
             }
-
-            console.log('Fetching task with context:', {
-                taskId: route.params.id,
-                projectSlug,
-                queryProjectId,
-                contextProjectId
-            })
 
             // Extract project ID from task data if available in route or context
             const result = await fetchTaskById(route.params.id, contextProjectId)
@@ -468,8 +462,6 @@ export default {
 
         // Lifecycle
         onMounted(() => {
-            // fetchTask() is already called by the watcher above
-
             // Add keyboard shortcut for going back
             const handleKeyPress = (e) => {
                 if (e.key === 'Escape') {

@@ -149,7 +149,7 @@ const props = defineProps({
     },
     projectSlug: {
         type: String,
-        required: true
+        default: ''
     }
 })
 

@@ -135,7 +135,7 @@ const props = defineProps({
     },
     projectId: {
         type: [String, Number],
-        required: true
+        default: null
     },
     projectSlug: {
         type: String,
