@@ -151,9 +151,11 @@
           </div>
         </router-link>
 
-        <div :class="[
-          isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-gray-200',
-          'rounded-lg shadow p-6 transition-all duration-300'
+        <router-link to="/tasks" :class="[
+          isDark
+            ? 'bg-slate-800 border border-slate-700 hover:shadow-lg hover:bg-slate-700 hover:border-emerald-400'
+            : 'bg-white border border-gray-200 hover:shadow-lg hover:bg-green-50 hover:border-green-300',
+          'rounded-lg shadow p-6 transition-all duration-300 block'
         ]">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -163,7 +165,8 @@
               ]">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                  </path>
                 </svg>
               </div>
             </div>
@@ -178,9 +181,9 @@
               ]">0</p>
             </div>
           </div>
-        </div>
+        </router-link>
 
-        <router-link to="/organization" :class="[
+        <router-link to="/organizations" :class="[
           isDark
             ? 'bg-slate-800 border border-slate-700 hover:shadow-lg hover:bg-slate-700 hover:border-violet-400'
             : 'bg-white border border-gray-200 hover:shadow-lg hover:bg-purple-50 hover:border-purple-300',

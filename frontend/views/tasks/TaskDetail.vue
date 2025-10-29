@@ -19,9 +19,7 @@
                     <div>
                         <h3 class="text-sm font-medium text-red-800">Error loading task</h3>
                         <p class="text-sm text-red-700 mt-1">{{ error }}</p>
-                        <button @click="fetchTask" class="mt-2 text-sm text-red-600 hover:text-red-500 underline">
-                            Try again
-                        </button>
+                        <Button variant="ghost" size="sm" label="Try again" @click="fetchTask" />
                     </div>
                 </div>
             </div>
@@ -203,7 +201,7 @@
                             <div class="shrink-0">
                                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                                     <span class="text-white text-sm font-semibold">{{ task.project.name.charAt(0)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div>
@@ -261,6 +259,7 @@ import axios from '@/plugins/axiosConfig.js'
 import { useTasks } from '@/composables/useTasks.js'
 import EditTaskModal from '@/components/modals/EditTaskModal.vue'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
+import Button from '@/components/Button.vue'
 
 export default {
     name: 'TaskDetail',

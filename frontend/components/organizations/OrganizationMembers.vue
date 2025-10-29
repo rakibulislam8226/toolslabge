@@ -190,12 +190,14 @@
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-semibold text-gray-900">Invite Member</h3>
-                        <button @click="showInviteModal = false" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
+                        <Button variant="ghost" size="sm" @click="showInviteModal = false">
+                            <template #icon>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </template>
+                        </Button>
                     </div>
 
                     <form @submit.prevent="inviteMember">
@@ -217,14 +219,9 @@
                         </div>
 
                         <div class="flex justify-end space-x-3 mt-6">
-                            <button type="button" @click="showInviteModal = false"
-                                class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300">
-                                Cancel
-                            </button>
-                            <button type="submit" :disabled="inviting"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50">
-                                {{ inviting ? 'Inviting...' : 'Send Invitation' }}
-                            </button>
+                            <Button variant="secondary" size="md" label="Cancel" @click="showInviteModal = false" />
+                            <Button type="submit" variant="primary" size="md" :loading="inviting"
+                                loadingText="Inviting..." label="Send Invitation" />
                         </div>
                     </form>
                 </div>
@@ -235,6 +232,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
+import Button from '@/components/Button.vue'
 import axiosInstance from '@/plugins/axiosConfig.js'
 
 // Reactive data

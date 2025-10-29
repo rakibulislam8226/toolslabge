@@ -8,12 +8,12 @@
             <h1 class="text-3xl font-bold text-gray-900">Projects</h1>
             <p class="mt-2 text-gray-600">Manage and track all your organization's projects</p>
           </div>
-          <Button :label="'Create Project'" @click="createNewProject"
-            :buttonClass="'bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-lg flex items-center'">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Create Project
+          <Button variant="primary" size="lg" label="Create Project" @click="createNewProject">
+            <template #icon>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+            </template>
           </Button>
         </div>
       </div>
@@ -35,8 +35,7 @@
         </svg>
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load projects</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
-        <Button :label="'Try Again'" @click="fetchProjects"
-          :buttonClass="'bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300'" />
+        <Button variant="danger" size="md" label="Try Again" @click="fetchProjects" />
       </div>
 
       <!-- Empty State -->
@@ -48,12 +47,12 @@
         </svg>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No projects yet</h3>
         <p class="text-gray-600 mb-6">Get started by creating your first project</p>
-        <Button :label="'Create Your First Project'" @click="createNewProject"
-          :buttonClass="'bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-lg inline-flex items-center'">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Create Your First Project
+        <Button variant="primary" size="lg" label="Create Your First Project" @click="createNewProject">
+          <template #icon>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </template>
         </Button>
       </div>
 
@@ -128,16 +127,15 @@
             </div>
           </div> <!-- Project Actions -->
           <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-            <Button :label="'Edit'" @click.stop="editProject(project)" />
-            <Button :label="'View Details'" @click.stop="viewProject(project)" />
+            <Button variant="secondary" size="sm" label="Edit" @click.stop="editProject(project)" />
+            <Button variant="outline" size="sm" label="View Details" @click.stop="viewProject(project)" />
           </div>
         </div>
       </div>
 
       <!-- Load More Button (if pagination exists) -->
       <div v-if="hasMore && !loading" class="text-center mt-8">
-        <Button :label="'Load More Projects'" @click="loadMore"
-          :buttonClass="'bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition duration-300'" />
+        <Button variant="secondary" size="lg" label="Load More Projects" @click="loadMore" />
       </div>
     </div>
 

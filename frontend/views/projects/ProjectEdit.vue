@@ -16,10 +16,7 @@
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load project</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
         <div class="space-x-3">
-          <button @click="fetchProject" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300"
-            style="color: white !important;">
-            Try Again
-          </button>
+          <Button variant="danger" size="md" label="Try Again" @click="fetchProject" />
           <router-link to="/projects"
             class="bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block"
             style="color: white !important;">
@@ -122,26 +119,14 @@
                 <span style="color: white !important;">Delete Project</span>
               </button>
 
-              <button type="submit" :disabled="updating"
-                class="bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center cursor-pointer"
-                style="color: white !important;">
-                <span v-if="updating" class="flex items-center" style="color: white !important;">
-                  <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                  </svg>
-                  <span style="color: white !important;">Updating...</span>
-                </span>
-                <span v-else class="flex items-center" style="color: white !important;">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
+              <Button type="submit" variant="primary" size="md" :loading="updating" loadingText="Updating..."
+                label="Update Project">
+                <template #icon>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  <span style="color: white !important;">Update Project</span>
-                </span>
-              </button>
+                </template>
+              </Button>
             </div>
           </div>
         </form>
@@ -196,6 +181,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import Button from '@/components/Button.vue'
 import axios from "@/plugins/axiosConfig.js"
 import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker } from '@/components/forms'
 

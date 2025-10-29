@@ -16,10 +16,7 @@
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load project</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
         <div class="space-x-3">
-          <button @click="fetchProject" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300"
-            style="color: white !important;">
-            Try Again
-          </button>
+          <Button variant="danger" size="md" label="Try Again" @click="fetchProject" />
           <router-link to="/projects"
             class="bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block"
             style="color: white !important;">
@@ -75,7 +72,7 @@
             <div
               class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
               <button @click="editProject"
-                class="bg-blue-600 px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                class="bg-blue-600 px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
                 style="color: white !important;">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -293,11 +290,11 @@
               </svg>
             </div>
             <p class="text-gray-600 font-medium mb-4">Tasks will be displayed here</p>
-            <button @click="viewAllTasks"
+            <Button @click="viewAllTasks"
               class="bg-green-600 px-6 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               style="color: white !important;">
               View Tasks
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -329,7 +326,7 @@
               </svg>
             </div>
             <p class="text-gray-600 font-medium mb-4">Project members will be displayed here</p>
-            <button @click="manageMembers"
+            <Button @click="manageMembers"
               class="bg-purple-600 px-6 py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               style="color: white !important;">
               Manage Members
@@ -345,6 +342,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
+import Button from '@/components/Button.vue'
 
 const router = useRouter()
 const route = useRoute()

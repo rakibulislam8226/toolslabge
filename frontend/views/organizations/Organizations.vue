@@ -13,15 +13,14 @@
             </p>
           </div>
           <div class="shrink-0" v-if="currentView === 'overview'">
-            <button @click="showCreateModal = true"
-              class="bg-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-lg flex items-center transform hover:scale-105"
-              style="color: white !important;">
-              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="white" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
-                </path>
-              </svg>
-              <span style="color: white !important;">Create Organization</span>
-            </button>
+            <Button variant="primary" size="lg" label="Create Organization" @click="showCreateModal = true">
+              <template #icon>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                  </path>
+                </svg>
+              </template>
+            </Button>
           </div>
         </div>
       </div>
@@ -105,10 +104,7 @@
                   </svg>
                   <h3 class="text-lg font-medium text-gray-900 mb-2">No organizations found</h3>
                   <p class="text-gray-500 mb-4">Get started by creating your first organization.</p>
-                  <button @click="showCreateModal = true"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
-                    Create Organization
-                  </button>
+                  <Button variant="primary" size="md" label="Create Organization" @click="showCreateModal = true" />
                 </div>
               </div>
             </div>
@@ -143,11 +139,13 @@
         <div class="p-6">
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-xl font-semibold text-gray-900">Create Organization</h3>
-            <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
+            <Button variant="ghost" size="sm" @click="showCreateModal = false">
+              <template #icon>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </template>
+            </Button>
           </div>
 
           <form @submit.prevent="createOrganization">
@@ -167,14 +165,9 @@
             </div>
 
             <div class="flex justify-end space-x-3 mt-6">
-              <button type="button" @click="showCreateModal = false"
-                class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300">
-                Cancel
-              </button>
-              <button type="submit" :disabled="creating"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50">
-                {{ creating ? 'Creating...' : 'Create' }}
-              </button>
+              <Button variant="secondary" size="md" label="Cancel" @click="showCreateModal = false" />
+              <Button type="submit" variant="primary" size="md" :loading="creating" loadingText="Creating..."
+                label="Create" />
             </div>
           </form>
         </div>
@@ -191,6 +184,7 @@ import OrganizationTasks from '@/components/organizations/OrganizationTasks.vue'
 import OrganizationMembers from '@/components/organizations/OrganizationMembers.vue'
 import OrganizationSettings from '@/components/organizations/OrganizationSettings.vue'
 import OrganizationAnalytics from '@/components/organizations/OrganizationAnalytics.vue'
+import Button from '@/components/Button.vue'
 
 const router = useRouter()
 
