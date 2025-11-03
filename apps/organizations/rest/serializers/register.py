@@ -17,10 +17,19 @@ class OrganizationRegistrationSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     organization_name = serializers.CharField(max_length=255)
 
+    def validate(self, attrs):
+        email = attrs.get("email")
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError(
+                {"email": "A user with this email already exists."}
+            )
+        return attrs
+
     @transaction.atomic
     def create(self, validated_data):
         org_name = validated_data.pop("organization_name")
-        user = User.objects.create_user(**validated_data)
+        print(validated_data)
+        user = User.objects.create(**validated_data)
         org = Organization.objects.create(name=org_name, created_by=user)
         OrganizationMember.objects.create(
             user=user,
