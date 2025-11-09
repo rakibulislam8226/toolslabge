@@ -15,7 +15,10 @@ from ...models import Organization
 # FIXME:Permissions check exact organizationuser with org_id
 class SendInvitationView(generics.CreateAPIView):
     serializer_class = SendInvitationSerializer
-    permission_classes = [IsOrgOwnerAdminOrManager]
+    # permission_classes = [IsOrgOwnerAdminOrManager]
+
+    def get_queryset(self):
+        return Organization.objects.none()
 
     def get_organization(self):
         org_id = self.kwargs.get("org_id")

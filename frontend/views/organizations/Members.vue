@@ -12,7 +12,7 @@
                             Manage your organization's members and invite new ones.
                         </p>
                     </div>
-                    <div class="flex-shrink-0">
+                    <div v-if="hasPermission('organizations.add_organizationinvitation')" class="flex-shrink-0">
                         <button @click="openInviteModal = true"
                             class="bg-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-lg flex items-center transform hover:scale-105"
                             style="color: white !important;">
@@ -208,9 +208,10 @@ import { useAuth } from '@/composables/useAuth.js'
 import axios from '@/plugins/axiosConfig.js'
 import InviteModal from '@/components/modals/InviteModal.vue'
 import Pagination from "@/components/Pagination.vue";
+import { usePermissions } from '@/composables/usePermissions.js'
 
 
-
+const { hasPermission } = usePermissions()
 const { fetchUserProfile } = useAuth()
 const loading = ref(true)
 const members = ref([])

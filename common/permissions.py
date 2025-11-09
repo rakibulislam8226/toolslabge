@@ -12,3 +12,20 @@ class IsUserOwnerPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
 
         return obj.user == request.user
+
+
+class IsCreatorOrHasModelPermission(permissions.BasePermission):
+    """
+    Object-level permission:
+    - Allows creator to edit/delete their own object
+    - Otherwise falls back to DjangoModelPermissions (handled globally)
+    """
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+
+        # Creator can always edit or delete their own object
+        if request.method in ["PUT", "PATCH", "DELETE"] and obj.created_by == user:
+            return True
+
+        return False

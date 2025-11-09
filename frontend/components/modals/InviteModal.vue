@@ -136,15 +136,13 @@ const send = async () => {
 
   try {
     const orgId = user.value?.organizations?.[0]?.organization_id
-    await axios.post(`organizations/${orgId}/invite/`, form.value)
-
-    message.value = 'Invitation sent!'
+    const response = await axios.post(`organizations/${orgId}/invite/`, form.value)
+    message.value = response.data.message || 'Invitation sent successfully'
     isError.value = false
     emit('invited', form.value)
     $toast.success('Invitation sent successfully')
   } catch (error) {
-    message.value = 'Failed to send invitation'
-    $toast.error('Failed to send invitation')
+    message.value = error.response.data.message || 'Failed to send invitation'
     isError.value = true
   } finally {
     loading.value = false

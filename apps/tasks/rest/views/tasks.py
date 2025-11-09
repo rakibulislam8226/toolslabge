@@ -1,14 +1,14 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 
+from common.permissions import IsCreatorOrHasModelPermission
 
-from ...models import Task, TaskMember
 from ..serializers.tasks import MyTaskListCreateSerializer
+from ...models import Task
 
 
 class MyTaskListCreateView(generics.ListCreateAPIView):
     serializer_class = MyTaskListCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCreatorOrHasModelPermission]
 
     def get_queryset(self):
         qs = (
@@ -18,7 +18,6 @@ class MyTaskListCreateView(generics.ListCreateAPIView):
         )
         status = self.request.query_params.get("status")
         priority = self.request.query_params.get("priority")
-        print("Status filter:", status)
 
         if status:
             qs = qs.filter(status__name=status)
