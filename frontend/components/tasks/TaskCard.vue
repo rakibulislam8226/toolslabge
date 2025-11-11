@@ -80,7 +80,9 @@
                     </svg>
                     <span>Start: {{ task.start_date ? formatDate(task.start_date) : '-' }}</span>
                 </div>
-                <div class="flex items-center" :class="{ 'text-red-500': isOverdue }">
+                <!-- FIXME: temporary fix but it will come from backend later -->
+                <div class="flex items-center"
+                    :class="{ 'text-red-500': isOverdue && (task.status?.slug.toLowerCase() === 'to-do' || task.status?.slug.toLowerCase() === 'in-progress') }">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
