@@ -186,6 +186,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
     assigned_members = serializers.SerializerMethodField(read_only=True)
+    deadline_extensions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Task
@@ -203,6 +204,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             "status",
             "members",
             "assigned_members",
+            "deadline_extensions",
             "created_by",
             "created_at",
             "updated_at",
@@ -243,6 +245,20 @@ class TaskDetailSerializer(serializers.ModelSerializer):
         task_members = obj.task_members.select_related("member__user")
         users = [tm.member.user for tm in task_members]
         return UserSlimSerializer(users, many=True).data
+
+    def get_deadline_extensions(self, obj):
+        extensions = obj.deadline_extensions.all()
+        return [
+            {
+                "id": ext.id,
+                "previous_due_date": ext.previous_due_date,
+                "new_due_date": ext.new_due_date,
+                "reason": ext.reason,
+                "created_at": ext.created_at,
+                "created_by": ext.created_by.email if ext.created_by else None,
+            }
+            for ext in extensions
+        ]
 
     def validate(self, data):
         user = self.context["request"].user

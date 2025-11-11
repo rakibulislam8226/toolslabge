@@ -89,6 +89,16 @@
                         </path>
                     </svg>
                     <span>Due: {{ task.due_date ? formatDate(task.due_date) : '-' }}</span>
+                    <!-- Extension indicator -->
+                    <span v-if="hasDeadlineExtensions"
+                        class="ml-1 inline-flex items-center px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full"
+                        :title="`Extended ${task.deadline_extensions?.length || 0} time(s)`">
+                        <svg class="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ task.deadline_extensions?.length || 0 }}
+                    </span>
                 </div>
             </div>
 
@@ -180,6 +190,10 @@ const showDropdown = ref(false)
 const isOverdue = computed(() => {
     if (!props.task.due_date) return false
     return new Date(props.task.due_date) < new Date()
+})
+
+const hasDeadlineExtensions = computed(() => {
+    return props.task.deadline_extensions && props.task.deadline_extensions.length > 0
 })
 
 // Methods
