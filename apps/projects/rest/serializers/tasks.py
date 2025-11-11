@@ -4,7 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from apps.projects.models import Project, ProjectMember
-from apps.tasks.models import Task, TaskMember, TaskStatus
+from apps.tasks.models import Task, TaskMember, TaskStatus, TaskDeadlineExtension
 from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
 
 User = get_user_model()
@@ -300,6 +300,59 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             )
 
         # Update allowed fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
+
+
+class TaskDeadlineExtensionListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskDeadlineExtension
+        fields = [
+            "id",
+            "task",
+            "previous_due_date",
+            "new_due_date",
+            "reason",
+            "created_at",
+            "created_by",
+        ]
+        read_only_fields = [
+            "id",
+            "previous_due_date",
+            "created_at",
+            "created_by",
+        ]
+
+    def validate_new_due_date(self, value):
+        task = self.context["task"]
+        if task.due_date and value <= task.due_date:
+            raise serializers.ValidationError(
+                "New due date must be after current due date."
+            )
+        return value
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        task = self.context["task"]
+
+        extension = TaskDeadlineExtension.objects.create(
+            task=task,
+            previous_due_date=task.due_date,
+            new_due_date=validated_data["new_due_date"],
+            reason=validated_data.get("reason", ""),
+            created_by=user,
+        )
+
+        return extension
+
+    def update(self, instance, validated_data):
+        # Prevent updating previous_due_date and created_by
+        validated_data.pop("previous_due_date", None)
+        validated_data.pop("created_by", None)
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()

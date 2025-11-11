@@ -58,6 +58,21 @@ class Task(TimeStampedModel):
         return self.title
 
 
+class TaskDeadlineExtension(TimeStampedModel):
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE, related_name="deadline_extensions"
+    )
+    previous_due_date = models.DateTimeField()
+    new_due_date = models.DateTimeField()
+    reason = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Extension of Task {self.task.id} to {self.new_due_date}"
+
+
 class TaskMember(TimeStampedModel):
     task = models.ForeignKey(
         Task, on_delete=models.CASCADE, related_name="task_members"

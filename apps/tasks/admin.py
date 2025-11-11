@@ -7,6 +7,7 @@ from .models import (
     TaskAttachment,
     TaskActivity,
     TaskMember,
+    TaskDeadlineExtension,
 )
 
 
@@ -23,6 +24,13 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ("title", "project", "status", "due_date", "priority")
     search_fields = ("title", "description")
     list_filter = ("status", "priority", "due_date")
+    ordering = ("-created_at",)
+
+
+@admin.register(TaskDeadlineExtension)
+class TaskDeadlineExtensionAdmin(admin.ModelAdmin):
+    list_display = ("task", "previous_due_date", "new_due_date", "created_at")
+    search_fields = ("task__title",)
     ordering = ("-created_at",)
 
 

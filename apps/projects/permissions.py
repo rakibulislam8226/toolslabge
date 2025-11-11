@@ -32,6 +32,26 @@ class IsProjectMemberOrManager(permissions.BasePermission):
         return obj.task_members.filter(member__user=user).exists()
 
 
+class IsProjectManager(permissions.BasePermission):
+    """Only project managers can perform certain actions."""
+
+    def has_permission(self, request, view):
+        task_id = view.kwargs.get("task_id")
+        if not task_id:
+            return False
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            return False
+
+        user = request.user
+        return ProjectMember.objects.filter(
+            user=user,
+            project=task.project,
+            role=ProjectMemberRoleChoices.MANAGER,
+        ).exists()
+
+
 class IsProjectMemberForComments(permissions.BasePermission):
     """
     Only project members can view or create comments.
