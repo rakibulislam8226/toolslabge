@@ -13,8 +13,8 @@
                 :error=" fieldErrors.title " />
 
             <!-- Description -->
-            <BaseTextarea v-model=" form.description " label="Description" placeholder="Enter task description" :rows=" 3 "
-                :error=" fieldErrors.description " />
+            <BaseTextarea v-model=" form.description " label="Description" placeholder="Enter task description"
+                :rows=" 3 " :error=" fieldErrors.description " />
 
             <!-- Status and Priority Row -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -235,15 +235,9 @@
 
             <!-- Team Assignment -->
             <div>
-                <label for="edit-assigned-members" class="block text-sm font-medium text-gray-700 mb-1">
-                    Team Assignment
-                </label>
-
-                <!-- Search Input -->
-                <!-- Search Input -->
                 <div class="mb-2">
-                    <BaseInput placeholder="Search team members..." @input="debouncedMemberSearch($event.target.value)"
-                        size="sm" />
+                    <BaseInput label="Team Assignment" placeholder="Search team members..."
+                        @input="debouncedMemberSearch($event.target.value)" size="sm" />
                 </div> <!-- Selected Members Display -->
                 <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-gray-50 dark:bg-blue-900/20 rounded-lg">
                     <div class="text-xs font-medium text-gray-600 dark:text-blue-300 mb-1">Assigned Team Members:</div>
@@ -531,10 +525,21 @@ const closeModal = () => {
 }
 
 const fetchProjectMembers = async (searchQuery = '') => {
-    if (!props.projectSlug) return
+    // Try to get project identifier from props or task data
+    let projectIdentifier = props.projectSlug
+
+    if (!projectIdentifier && props.task?.project) {
+        // If no projectSlug prop but we have task project data, use project ID
+        projectIdentifier = props.task.project.id || props.task.project.slug
+    }
+
+    if (!projectIdentifier) {
+        console.warn('No project identifier available for fetching members')
+        return
+    }
 
     try {
-        let url = `projects/${props.projectSlug}/members/`
+        let url = `projects/${projectIdentifier}/members/`
         if (searchQuery.trim()) {
             url += `?search=${encodeURIComponent(searchQuery.trim())}`
         }
@@ -542,6 +547,7 @@ const fetchProjectMembers = async (searchQuery = '') => {
         const response = await axios.get(url)
         projectMembers.value = response.data.data || response.data || []
     } catch (err) {
+        console.error('Failed to fetch project members:', err)
         projectMembers.value = []
     }
 }

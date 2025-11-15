@@ -63,7 +63,11 @@ class MyTaskListCreateSerializer(serializers.ModelSerializer):
         return fields
 
     def get_project(self, obj):
-        return {"id": obj.project.id, "name": obj.project.name}
+        return {
+            "id": obj.project.id,
+            "name": obj.project.name,
+            "slug": obj.project.slug,
+        }
 
     def get_status(self, obj):
         if not obj.status:

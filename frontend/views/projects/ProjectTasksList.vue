@@ -50,7 +50,7 @@
                                     Project Tasks</h1>
                                 <p class="mt-0.5 text-gray-600 text-sm" v-if="project">
                                     Manage and track tasks for <span class="font-semibold text-blue-600">{{ project.name
-                                        }}</span>
+                                    }}</span>
                                 </p>
                             </div>
                         </div>
@@ -177,8 +177,8 @@
                         <div
                             class="space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 bg-gray-50 rounded-b-xl status-column">
                             <TaskCard v-for="task in getTasksInStatus(status.id)" :key=" task.id " :task=" task "
-                                :statuses=" taskStatuses " @edit=" openEditModal " @delete=" deleteTask "
-                                @status-change=" updateTaskStatus "
+                                :statuses=" taskStatuses " :allow-status-change=" true " @edit=" openEditModal "
+                                @delete=" deleteTask " @status-change=" updateTaskStatus "
                                 class="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" />
 
                             <!-- Empty State -->

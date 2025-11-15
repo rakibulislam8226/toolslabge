@@ -87,9 +87,10 @@
 
             <!-- Tasks Grid -->
             <div v-else>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-2 mb-8">
                     <TaskCard v-for="task in tasks" :key=" task.id " :task=" task " :statuses=" taskStatuses "
-                        @edit=" handleTaskEdit " @delete=" handleTaskDelete " @status-change=" handleStatusChange " />
+                        :allow-status-change=" false " @edit=" handleTaskEdit " @delete=" handleTaskDelete "
+                        @status-change=" handleStatusChange " />
                 </div>
 
                 <!-- Pagination -->
@@ -101,14 +102,15 @@
 
         <!-- Edit Task Modal -->
         <EditTaskModal v-if="selectedTaskForEdit" :is-open=" showTaskEdit " :task=" selectedTaskForEdit "
-            :project-slug=" selectedTaskForEdit.project?.slug " :statuses=" taskStatuses " @close="showTaskEdit = false"
-            @updated=" handleTaskUpdatedFromEditModal " />
+            :project-slug=" selectedTaskForEdit.project?.slug || selectedTaskForEdit.project?.id "
+            :statuses=" taskStatuses " @close="showTaskEdit = false" @updated=" handleTaskUpdatedFromEditModal " />
     </div>
 </template>
 
-<script>
-import { ref, onMounted, computed } from 'vue'
+<script setup>
+import { ref, onMounted, computed, inject } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from "@/plugins/axiosConfig.js"
 import TaskCard from '@/components/tasks/TaskCard.vue'
 import EditTaskModal from '@/components/modals/EditTaskModal.vue'
 import Pagination from '@/components/Pagination.vue'
@@ -116,159 +118,144 @@ import Button from '@/components/Button.vue'
 import { useAuth } from '@/composables/useAuth.js'
 import { useTasks } from '@/composables/useTasks.js'
 
-export default {
-    name: 'TasksList',
-    components: {
-        TaskCard,
-        EditTaskModal,
-        Pagination,
-        Button
-    },
-    setup() {
-        const { isAuthenticated } = useAuth()
-        const router = useRouter()
-        const { loading, error, fetchTasks: fetchTasksAPI, updateTaskStatus, deleteTask, extractTaskStatuses } = useTasks()
+const { isAuthenticated } = useAuth()
+const router = useRouter()
+const $toast = inject("toast")
+const { loading, error, fetchTasks: fetchTasksAPI, updateTaskStatus, deleteTask, extractTaskStatuses } = useTasks()
 
-        // Reactive data
-        const tasks = ref([])
-        const meta = ref(null)
-        const currentPage = ref(1)
-        const selectedPriority = ref('')
-        const taskStatuses = ref([])
-        const showTaskEdit = ref(false)
-        const selectedTaskForEdit = ref(null)
+// Reactive data
+const tasks = ref([])
+const meta = ref(null)
+const currentPage = ref(1)
+const selectedPriority = ref('')
+const taskStatuses = ref([])
+const showTaskEdit = ref(false)
+const selectedTaskForEdit = ref(null)
 
-        // Computed properties
-        const totalTasks = computed(() => meta.value?.total || 0)
-        const hasFilters = computed(() => selectedPriority.value)
+// Computed properties
+const totalTasks = computed(() => meta.value?.total || 0)
+const hasFilters = computed(() => selectedPriority.value)
 
-        // Methods
-        const fetchTasks = async (page = 1) => {
-            if (!isAuthenticated.value) {
-                error.value = 'Please log in to view your tasks'
-                return
-            }
-
-            const params = {
-                page,
-                ...(selectedPriority.value && { priority: selectedPriority.value })
-            }
-
-            const result = await fetchTasksAPI(params)
-
-            if (result.success) {
-                tasks.value = result.data
-                meta.value = result.meta
-                currentPage.value = page
-
-                // Extract and update task statuses
-                const statuses = extractTaskStatuses(result.data)
-                if (statuses.length > 0) {
-                    taskStatuses.value = statuses
-                }
-            } else {
-                tasks.value = []
-                meta.value = null
-            }
-        }
-
-        const refreshTasks = () => {
-            selectedPriority.value = ''
-            currentPage.value = 1
-            fetchTasks(1)
-        }
-
-        const handlePriorityChange = () => {
-            currentPage.value = 1
-            fetchTasks(1)
-        }
-
-        const handlePageChange = (page) => {
-            fetchTasks(page)
-        }
-
-        const handleStatusChange = async (taskId, newStatusId) => {
-            // Find task to get project context
-            const task = tasks.value.find(t => t.id === taskId)
-            const projectId = task?.project?.id
-
-            const result = await updateTaskStatus(taskId, newStatusId, projectId)
-
-            if (result.success) {
-                // Update the task in the local state
-                const taskIndex = tasks.value.findIndex(task => task.id === taskId)
-                if (taskIndex !== -1) {
-                    tasks.value[taskIndex] = result.data
-                }
-            } else {
-                // Optionally show an error message to the user
-                console.error('Failed to update task status:', result.error)
-            }
-        }
-
-        const handleTaskEdit = (task) => {
-            selectedTaskForEdit.value = task
-            showTaskEdit.value = true
-        }
-
-        const handleTaskUpdatedFromEditModal = (updatedTask) => {
-            // Update the task in the local state
-            const taskIndex = tasks.value.findIndex(t => t.id === updatedTask.id)
-            if (taskIndex !== -1) {
-                tasks.value[taskIndex] = updatedTask
-            }
-            showTaskEdit.value = false
-            selectedTaskForEdit.value = null
-        }
-
-        const handleTaskDelete = async (taskId) => {
-            // Find task to get project context
-            const task = tasks.value.find(t => t.id === taskId)
-            const projectId = task?.project?.id
-
-            const result = await deleteTask(taskId, projectId)
-
-            if (result.success) {
-                // Remove task from local state
-                tasks.value = tasks.value.filter(task => task.id !== taskId)
-                // Update meta count
-                if (meta.value) {
-                    meta.value.total = Math.max(0, meta.value.total - 1)
-                }
-            } else {
-                // Optionally show an error message to the user
-                console.error('Failed to delete task:', result.error)
-            }
-        }
-
-        // Lifecycle
-        onMounted(() => {
-            fetchTasks()
-        })
-
-        return {
-            tasks,
-            meta,
-            loading,
-            error,
-            currentPage,
-            selectedPriority,
-            taskStatuses,
-            totalTasks,
-            hasFilters,
-            showTaskEdit,
-            selectedTaskForEdit,
-            fetchTasks,
-            refreshTasks,
-            handlePriorityChange,
-            handlePageChange,
-            handleStatusChange,
-            handleTaskEdit,
-            handleTaskDelete,
-            handleTaskUpdatedFromEditModal
-        }
+// Fetch all task statuses from the dedicated endpoint
+const fetchTaskStatuses = async () => {
+    try {
+        const response = await axios.get('tasks/status/')
+        taskStatuses.value = response.data.data || response.data || []
+    } catch (err) {
+        console.error('Failed to fetch task statuses:', err)
+        taskStatuses.value = []
     }
 }
+
+// Methods
+const fetchTasks = async (page = 1) => {
+    if (!isAuthenticated.value) {
+        error.value = 'Please log in to view your tasks'
+        return
+    }
+
+    const params = {
+        page,
+        ...(selectedPriority.value && { priority: selectedPriority.value })
+    }
+
+    const result = await fetchTasksAPI(params)
+
+    if (result.success) {
+        tasks.value = result.data
+        meta.value = result.meta
+        currentPage.value = page
+
+        // If we don't have statuses yet, extract them from task data as fallback
+        if (taskStatuses.value.length === 0) {
+            const statuses = extractTaskStatuses(result.data)
+            if (statuses.length > 0) {
+                taskStatuses.value = statuses
+            }
+        }
+    } else {
+        tasks.value = []
+        meta.value = null
+    }
+}
+
+const refreshTasks = () => {
+    selectedPriority.value = ''
+    currentPage.value = 1
+    fetchTasks(1)
+}
+
+const handlePriorityChange = () => {
+    currentPage.value = 1
+    fetchTasks(1)
+}
+
+const handlePageChange = (page) => {
+    fetchTasks(page)
+}
+
+const handleStatusChange = async (taskId, newStatusId) => {
+    // Find task to get project context
+    const task = tasks.value.find(t => t.id === taskId)
+    const projectId = task?.project?.id
+
+    const result = await updateTaskStatus(taskId, newStatusId, projectId)
+
+    if (result.success) {
+        // Update the task in the local state
+        const taskIndex = tasks.value.findIndex(task => task.id === taskId)
+        if (taskIndex !== -1) {
+            tasks.value[taskIndex] = result.data
+        }
+    } else {
+        // Optionally show an error message to the user
+        console.error('Failed to update task status:', result.error)
+    }
+}
+
+const handleTaskEdit = (task) => {
+    selectedTaskForEdit.value = task
+    showTaskEdit.value = true
+}
+
+const handleTaskUpdatedFromEditModal = (updatedTask) => {
+    // Update the task in the local state
+    const taskIndex = tasks.value.findIndex(t => t.id === updatedTask.id)
+    if (taskIndex !== -1) {
+        tasks.value[taskIndex] = updatedTask
+    }
+    showTaskEdit.value = false
+    selectedTaskForEdit.value = null
+}
+
+const handleTaskDelete = async (taskId) => {
+    // Find task to get project context
+    const task = tasks.value.find(t => t.id === taskId)
+    const projectId = task?.project?.id
+
+    const result = await deleteTask(taskId, projectId)
+
+    if (result.success) {
+        // Remove task from local state
+        tasks.value = tasks.value.filter(task => task.id !== taskId)
+        // Update meta count
+        if (meta.value) {
+            meta.value.total = Math.max(0, meta.value.total - 1)
+        }
+    } else {
+        // Optionally show an error message to the user
+        console.error('Failed to delete task:', result.error)
+    }
+}
+
+// Lifecycle
+onMounted(async () => {
+    // Fetch both task statuses and tasks
+    await Promise.all([
+        fetchTaskStatuses(),
+        fetchTasks()
+    ])
+})
 </script>
 
 <style scoped>
