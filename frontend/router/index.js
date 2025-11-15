@@ -55,21 +55,9 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/projects/:slug/tasks/:id",
-    name: "projects.tasks.detail",
-    component: () => import("@/views/tasks/TaskDetail.vue"),
-    meta: { requiresAuth: true },
-  },
-  {
     path: "/tasks",
     name: "tasks.index",
     component: () => import("@/views/tasks/TasksList.vue"),
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/tasks/:id",
-    name: "tasks.detail",
-    component: () => import("@/views/tasks/TaskDetail.vue"),
     meta: { requiresAuth: true },
   },
   {

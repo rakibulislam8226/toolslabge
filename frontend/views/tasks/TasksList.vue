@@ -15,7 +15,7 @@
                     <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-3">
                         <!-- Priority Filter -->
                         <div class="relative">
-                            <select v-model="selectedPriority" @change="handlePriorityChange"
+                            <select v-model=" selectedPriority " @change=" handlePriorityChange "
                                 class="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 min-w-[130px]">
                                 <option value="" class="text-gray-500">All Priorities</option>
                                 <option value="high" class="text-red-600 font-medium">High</option>
@@ -32,8 +32,8 @@
                         </div>
 
                         <!-- Refresh Button -->
-                        <Button variant="primary" size="md" :loading="loading" loadingText="Loading..." label="Refresh"
-                            @click="refreshTasks">
+                        <Button variant="primary" size="md" :loading=" loading " loadingText="Loading..."
+                            label="Refresh" @click=" refreshTasks ">
                             <template #icon>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -67,7 +67,7 @@
                     <div>
                         <h3 class="text-sm font-medium text-red-800">Error loading tasks</h3>
                         <p class="text-sm text-red-700 mt-1">{{ error }}</p>
-                        <Button variant="ghost" size="sm" label="Try again" @click="fetchTasks" />
+                        <Button variant="ghost" size="sm" label="Try again" @click=" fetchTasks " />
                     </div>
                 </div>
             </div>
@@ -88,16 +88,21 @@
             <!-- Tasks Grid -->
             <div v-else>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <TaskCard v-for="task in tasks" :key="task.id" :task="task" :statuses="taskStatuses"
-                        @edit="handleTaskEdit" @delete="handleTaskDelete" @status-change="handleStatusChange" />
+                    <TaskCard v-for="task in tasks" :key=" task.id " :task=" task " :statuses=" taskStatuses "
+                        @edit=" handleTaskEdit " @delete=" handleTaskDelete " @status-change=" handleStatusChange " />
                 </div>
 
                 <!-- Pagination -->
                 <div v-if="meta && meta.num_pages > 1" class="mt-8">
-                    <Pagination v-model="currentPage" :total-pages="meta.num_pages" @page="handlePageChange" />
+                    <Pagination v-model=" currentPage " :total-pages=" meta.num_pages " @page=" handlePageChange " />
                 </div>
             </div>
         </div>
+
+        <!-- Edit Task Modal -->
+        <EditTaskModal v-if="selectedTaskForEdit" :is-open=" showTaskEdit " :task=" selectedTaskForEdit "
+            :project-slug=" selectedTaskForEdit.project?.slug " :statuses=" taskStatuses " @close="showTaskEdit = false"
+            @updated=" handleTaskUpdatedFromEditModal " />
     </div>
 </template>
 
@@ -105,6 +110,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import TaskCard from '@/components/tasks/TaskCard.vue'
+import EditTaskModal from '@/components/modals/EditTaskModal.vue'
 import Pagination from '@/components/Pagination.vue'
 import Button from '@/components/Button.vue'
 import { useAuth } from '@/composables/useAuth.js'
@@ -114,6 +120,7 @@ export default {
     name: 'TasksList',
     components: {
         TaskCard,
+        EditTaskModal,
         Pagination,
         Button
     },
@@ -128,6 +135,8 @@ export default {
         const currentPage = ref(1)
         const selectedPriority = ref('')
         const taskStatuses = ref([])
+        const showTaskEdit = ref(false)
+        const selectedTaskForEdit = ref(null)
 
         // Computed properties
         const totalTasks = computed(() => meta.value?.total || 0)
@@ -198,17 +207,18 @@ export default {
         }
 
         const handleTaskEdit = (task) => {
-            // Navigate to task detail page with project context if available
-            if (task.project?.id) {
-                // Pass project ID as query param for API optimization
-                router.push({
-                    name: 'tasks.detail',
-                    params: { id: task.id },
-                    query: { projectId: task.project.id }
-                })
-            } else {
-                router.push(`/tasks/${task.id}`)
+            selectedTaskForEdit.value = task
+            showTaskEdit.value = true
+        }
+
+        const handleTaskUpdatedFromEditModal = (updatedTask) => {
+            // Update the task in the local state
+            const taskIndex = tasks.value.findIndex(t => t.id === updatedTask.id)
+            if (taskIndex !== -1) {
+                tasks.value[taskIndex] = updatedTask
             }
+            showTaskEdit.value = false
+            selectedTaskForEdit.value = null
         }
 
         const handleTaskDelete = async (taskId) => {
@@ -246,13 +256,16 @@ export default {
             taskStatuses,
             totalTasks,
             hasFilters,
+            showTaskEdit,
+            selectedTaskForEdit,
             fetchTasks,
             refreshTasks,
             handlePriorityChange,
             handlePageChange,
             handleStatusChange,
             handleTaskEdit,
-            handleTaskDelete
+            handleTaskDelete,
+            handleTaskUpdatedFromEditModal
         }
     }
 }

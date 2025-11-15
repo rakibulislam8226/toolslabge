@@ -1,5 +1,5 @@
 <template>
-    <BaseModal :is-open="isOpen" title="Edit Task" size="xxl" @close="closeModal">
+    <BaseModal :is-open=" isOpen " title="Edit Task" size="xxl" @close=" closeModal ">
         <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-8">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -7,40 +7,40 @@
         </div>
 
         <!-- Form -->
-        <form v-else @submit.prevent="updateTask" class="space-y-4">
+        <form v-else @submit.prevent=" updateTask " class="space-y-4">
             <!-- Title -->
-            <BaseInput v-model="form.title" label="Title" placeholder="Enter task title" required
-                :error="fieldErrors.title" />
+            <BaseInput v-model=" form.title " label="Title" placeholder="Enter task title" required
+                :error=" fieldErrors.title " />
 
             <!-- Description -->
-            <BaseTextarea v-model="form.description" label="Description" placeholder="Enter task description" :rows="3"
-                :error="fieldErrors.description" />
+            <BaseTextarea v-model=" form.description " label="Description" placeholder="Enter task description" :rows=" 3 "
+                :error=" fieldErrors.description " />
 
             <!-- Status and Priority Row -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Status -->
-                <BaseSelect v-model="form.status_id" label="Status" placeholder="Select status" :options="statuses"
-                    option-value="id" option-label="name" :error="fieldErrors.status_id" />
+                <BaseSelect v-model=" form.status_id " label="Status" placeholder="Select status" :options=" statuses "
+                    option-value="id" option-label="name" :error=" fieldErrors.status_id " />
 
                 <!-- Priority -->
-                <BaseSelect v-model="form.priority" label="Priority" :options="priorityOptions"
-                    :error="fieldErrors.priority" />
+                <BaseSelect v-model=" form.priority " label="Priority" :options=" priorityOptions "
+                    :error=" fieldErrors.priority " />
             </div>
 
             <!-- Scheduling Section -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Scheduled Start -->
-                <BaseDatePicker v-model="form.scheduled_start" label="Scheduled Start"
-                    placeholder="Select start date & time" :error="fieldErrors.start_date" />
+                <BaseDatePicker v-model=" form.scheduled_start " label="Scheduled Start"
+                    placeholder="Select start date & time" :error=" fieldErrors.start_date " />
 
                 <!-- Target Completion -->
-                <BaseDatePicker v-model="form.target_completion" label="Target Completion"
-                    placeholder="Select completion date & time" :error="fieldErrors.due_date" />
+                <BaseDatePicker v-model=" form.target_completion " label="Target Completion"
+                    placeholder="Select completion date & time" :error=" fieldErrors.due_date " />
             </div>
 
             <!-- Estimated Hours -->
-            <BaseInput v-model="form.estimated_hours" label="Estimated Hours" type="number" placeholder="e.g., 4.5"
-                step="0.5" min="0" max="999" :error="fieldErrors.estimated_hours" />
+            <BaseInput v-model=" form.estimated_hours " label="Estimated Hours" type="number" placeholder="e.g., 4.5"
+                step="0.5" min="0" max="999" :error=" fieldErrors.estimated_hours " />
 
             <!-- Deadline Extension Section -->
             <div class="space-y-6">
@@ -108,21 +108,21 @@
                             <div class="grid gap-4">
                                 <!-- New Deadline -->
                                 <div>
-                                    <BaseDatePicker v-model="deadlineExtension.new_due_date" label="New Deadline"
+                                    <BaseDatePicker v-model=" deadlineExtension.new_due_date " label="New Deadline"
                                         placeholder="Select new deadline date & time"
-                                        :error="deadlineExtension.errors.new_due_date" class="deadline-picker" />
+                                        :error=" deadlineExtension.errors.new_due_date " class="deadline-picker" />
                                 </div>
 
                                 <!-- Reason -->
                                 <div>
-                                    <BaseTextarea v-model="deadlineExtension.reason" label="Justification"
-                                        placeholder="Briefly explain why this extension is necessary..." :rows="3"
-                                        :error="deadlineExtension.errors.reason" class="reason-input" />
+                                    <BaseTextarea v-model=" deadlineExtension.reason " label="Justification"
+                                        placeholder="Briefly explain why this extension is necessary..." :rows=" 3 "
+                                        :error=" deadlineExtension.errors.reason " class="reason-input" />
                                 </div>
 
                                 <!-- Submit Button -->
-                                <button @click="submitDeadlineExtension"
-                                    :disabled="!deadlineExtension.new_due_date || extensionLoading" type="button"
+                                <button @click=" submitDeadlineExtension "
+                                    :disabled=" !deadlineExtension.new_due_date || extensionLoading " type="button"
                                     class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none deadline-extend-btn">
                                     <span v-if="extensionLoading" class="flex items-center justify-center">
                                         <svg class="animate-spin -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -166,7 +166,7 @@
 
                             <div class="max-h-48 overflow-y-auto extension-history-scroll">
                                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <div v-for="(extension, index) in deadlineExtensions" :key="extension.id"
+                                    <div v-for="(extension, index) in deadlineExtensions" :key=" extension.id "
                                         class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150 extension-item">
                                         <div class="flex items-start justify-between space-x-4">
                                             <div class="flex-1 min-w-0">
@@ -220,7 +220,7 @@
                                             <div class="shrink-0">
                                                 <span
                                                     class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium extension-badge"
-                                                    :class="index === 0 ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'">
+                                                    :class=" index === 0 ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' ">
                                                     {{ deadlineExtensions.length - index }}
                                                 </span>
                                             </div>
@@ -248,7 +248,7 @@
                 <div v-if="form.assigned_members.length > 0" class="mb-2 p-2 bg-gray-50 dark:bg-blue-900/20 rounded-lg">
                     <div class="text-xs font-medium text-gray-600 dark:text-blue-300 mb-1">Assigned Team Members:</div>
                     <div class="flex flex-wrap gap-1">
-                        <span v-for="memberId in form.assigned_members" :key="memberId"
+                        <span v-for="memberId in form.assigned_members" :key=" memberId "
                             class="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-blue-800 text-gray-700 dark:text-blue-200 rounded-full">
                             {{ getSelectedMemberName(memberId) }}
                             <button @click="removeMember(memberId)"
@@ -270,9 +270,9 @@
                         class="text-sm text-gray-400 dark:text-gray-400 text-center py-2">
                         No members found matching "{{ memberSearchQuery }}"
                     </div>
-                    <label v-for="member in projectMembers" :key="member.id"
+                    <label v-for="member in projectMembers" :key=" member.id "
                         class="flex items-center space-x-2 hover:bg-blue-50 hover:border-blue-200 border border-transparent dark:hover:bg-gray-700 dark:hover:border-gray-600 p-1 rounded cursor-pointer transition-all duration-200">
-                        <input type="checkbox" :value="member.user" v-model="form.assigned_members"
+                        <input type="checkbox" :value=" member.user " v-model=" form.assigned_members "
                             class="rounded border-gray-200 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700" />
                         <div class="flex items-center space-x-2 flex-1 min-w-0">
                             <div
@@ -297,11 +297,11 @@
 
         <template #footer>
             <div class="flex space-x-3 justify-end">
-                <button @click="closeModal" :disabled="updating" type="button"
+                <button @click=" closeModal " :disabled=" updating " type="button"
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
                     Cancel
                 </button>
-                <button @click="updateTask" :disabled="updating || !form.title.trim()"
+                <button @click=" updateTask " :disabled=" updating || !form.title.trim() "
                     class="inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg v-if="updating" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -387,28 +387,6 @@ const deadlineExtension = reactive({
 // Computed
 const projectId = computed(() => {
     return props.task?.project?.id
-})
-
-// Watch for task changes to populate form
-watch(() => props.task, (newTask) => {
-    if (newTask) {
-        populateForm(newTask)
-    }
-}, { immediate: true })
-
-// Watch for dialog open/close
-watch(() => props.isOpen, (isOpen) => {
-    nextTick(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden'
-            if (props.task) {
-                fetchTaskDetails()
-                fetchProjectMembers()
-            }
-        } else {
-            document.body.style.overflow = ''
-        }
-    })
 })
 
 // Fetch detailed task information
@@ -651,6 +629,28 @@ const removeMember = (memberId) => {
         form.assigned_members.splice(index, 1)
     }
 }
+
+// Watch for task changes to populate form
+watch(() => props.task, (newTask) => {
+    if (newTask) {
+        populateForm(newTask)
+    }
+}, { immediate: true })
+
+// Watch for dialog open/close
+watch(() => props.isOpen, (isOpen) => {
+    nextTick(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'
+            if (props.task) {
+                fetchTaskDetails()
+                fetchProjectMembers()
+            }
+        } else {
+            document.body.style.overflow = ''
+        }
+    })
+})
 
 // Initialize on mount
 onMounted(() => {
