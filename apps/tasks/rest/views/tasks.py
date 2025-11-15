@@ -1,6 +1,6 @@
 from rest_framework import generics
 
-from common.permissions import IsCreatorOrHasModelPermission
+from common.permissions import IsUserOwnerPermissions
 
 from ..serializers.tasks import MyTaskListCreateSerializer
 from ...models import Task
@@ -8,7 +8,7 @@ from ...models import Task
 
 class MyTaskListCreateView(generics.ListCreateAPIView):
     serializer_class = MyTaskListCreateSerializer
-    permission_classes = [IsCreatorOrHasModelPermission]
+    permission_classes = [IsUserOwnerPermissions]
 
     def get_queryset(self):
         qs = (
