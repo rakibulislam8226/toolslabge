@@ -49,14 +49,14 @@
                     <!-- Deadline Extension Section -->
                     <div class="space-y-6">
                         <div
-                            class="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl border border-orange-200 dark:border-orange-800 overflow-hidden deadline-section">
+                            class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden deadline-section bg-white dark:bg-gray-800">
                             <!-- Header -->
                             <div
-                                class="px-6 py-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-b border-orange-200 dark:border-orange-800">
+                                class="px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                 <div class="flex items-center space-x-3">
                                     <div class="shrink-0">
                                         <div
-                                            class="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center shadow-sm deadline-pulse">
+                                            class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-sm deadline-pulse">
                                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,8 +66,7 @@
                                     </div>
                                     <div>
                                         <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Deadline
-                                            Management
-                                        </h3>
+                                            Extension</h3>
                                         <p class="text-xs text-gray-600 dark:text-gray-400">Extend deadlines when needed
                                         </p>
                                     </div>
@@ -93,7 +92,7 @@
                                         </div>
                                         <div class="text-right">
                                             <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 status-indicator">
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-gray-700 dark:text-blue-200 status-indicator">
                                                 Active
                                             </span>
                                         </div>
@@ -104,7 +103,7 @@
                                 <div
                                     class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-4 glass-card">
                                     <div class="flex items-center space-x-2 mb-3">
-                                        <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor"
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -134,7 +133,7 @@
                                         <button @click=" submitDeadlineExtension "
                                             :disabled=" !deadlineExtension.new_due_date || extensionLoading "
                                             type="button"
-                                            class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none deadline-extend-btn">
+                                            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none deadline-extend-btn">
                                             <span v-if="extensionLoading" class="flex items-center justify-center">
                                                 <svg class="animate-spin -ml-1 mr-3 h-4 w-4" fill="none"
                                                     viewBox="0 0 24 24">
@@ -237,7 +236,7 @@
                                                     <div class="shrink-0">
                                                         <span
                                                             class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium extension-badge"
-                                                            :class=" index === 0 ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' ">
+                                                            :class=" index === 0 ? 'bg-blue-100 text-blue-800 dark:bg-gray-700 dark:text-blue-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' ">
                                                             {{ deadlineExtensions.length - index }}
                                                         </span>
                                                     </div>
