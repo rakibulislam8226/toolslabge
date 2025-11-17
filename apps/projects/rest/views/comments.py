@@ -12,10 +12,16 @@ class TaskCommentListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         task_id = self.kwargs.get("task_id")
-        return TaskComment.objects.filter(task_id=task_id).select_related("author")
+        return (
+            TaskComment.objects.filter(task_id=task_id)
+            .select_related("author")
+            .order_by("-created_at")
+        )
 
 
 class TaskCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskCommentListSerializer
     permission_classes = [IsCommentAuthor]
-    queryset = TaskComment.objects.select_related("task", "author")
+    queryset = TaskComment.objects.select_related("task", "author").order_by(
+        "-created_at"
+    )

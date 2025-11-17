@@ -403,9 +403,8 @@
                                         {{ getCommentAuthorName(comment) }}
                                     </p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ formatCommentDate(comment.created_at) }}
-                                        <span v-if="comment.updated_at !== comment.created_at"
-                                            class="ml-1">(edited)</span>
+                                        {{ formatCommentDate(getCommentTimestamp(comment)) }}
+                                        <span v-if="isCommentEdited(comment)" class="ml-1">(edited)</span>
                                     </p>
                                 </div>
                             </div>
@@ -799,6 +798,31 @@ const formatCommentDate = (dateString) => {
     } catch (e) {
         return dateString
     }
+}
+
+// Comment timestamp helpers
+const getCommentTimestamp = (comment) => {
+    // If comment has been updated, use updated_at, otherwise use created_at
+    if (comment.updated_at && isCommentEdited(comment)) {
+        return comment.updated_at
+    }
+    return comment.created_at
+}
+
+const isCommentEdited = (comment) => {
+    // Check if comment has been edited
+    // 1. Must have updated_at field
+    // 2. updated_at must be different from created_at
+    // 3. Compare timestamps with some tolerance (1 second) to handle server timing
+    if (!comment.updated_at || !comment.created_at) {
+        return false
+    }
+
+    const createdTime = new Date(comment.created_at).getTime()
+    const updatedTime = new Date(comment.updated_at).getTime()
+
+    // If the difference is more than 1 second, consider it edited
+    return Math.abs(updatedTime - createdTime) > 1000
 }
 
 // Confirmation modal handlers
