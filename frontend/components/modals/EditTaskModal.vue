@@ -1,5 +1,5 @@
 <template>
-    <BaseModal :is-open=" isOpen " title="Edit Task" size="xxxl" @close=" closeModal ">
+    <BaseModal :is-open=" isOpen " title="Edit Task" size="xxl" @close=" closeModal ">
         <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-8">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -416,7 +416,7 @@
 
                                 <button @click=" addComment "
                                     :disabled=" (!newComment.trim() && !selectedAttachment) || addingComment || newComment.length > 1000 "
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer">
                                     <svg v-if="addingComment" class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none"
                                         viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
@@ -1315,7 +1315,7 @@ const removeMember = (memberId) => {
 // Fetch current user information
 const fetchCurrentUser = async () => {
     try {
-        const response = await axios.get('auth/user/')
+        const response = await axios.get('/users/my-info/')
         currentUser.value = response.data.data || response.data
     } catch (err) {
         console.warn('Failed to fetch current user:', err)
