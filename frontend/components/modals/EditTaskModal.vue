@@ -249,10 +249,10 @@
                         </div>
                     </div>
 
-                    <!-- Team Assignment -->
+                    <!-- Task Members -->
                     <div>
                         <div class="mb-2">
-                            <BaseInput label="Team Assignment" placeholder="Search team members..."
+                            <BaseInput label="Task Members" placeholder="Search task members..."
                                 @input="debouncedMemberSearch($event.target.value)" size="sm" />
                         </div> <!-- Selected Members Display -->
                         <div v-if="form.assigned_members.length > 0"
@@ -309,7 +309,7 @@
             </div>
 
             <!-- Right Side - Comments Section (40%) -->
-            <div class="w-96 flex flex-col">
+            <div class="w-110 flex flex-col">
                 <!-- Comments Header -->
                 <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
