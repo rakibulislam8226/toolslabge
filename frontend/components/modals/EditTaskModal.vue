@@ -54,16 +54,6 @@
                             <div
                                 class="px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                 <div class="flex items-center space-x-3">
-                                    <div class="shrink-0">
-                                        <div
-                                            class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-sm deadline-pulse">
-                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
                                     <div>
                                         <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Deadline
                                             Extension</h3>
@@ -525,14 +515,16 @@
                                             <path class="opacity-75" fill="currentColor"
                                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                         </svg>
-                                        {{ updatingComment ? 'Saving...' : 'Save' }}
+                                        {{ updatingComment ? 'Updating...' : 'Update' }}
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div v-else class="mt-2">
-                            <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{{
-                                comment.content }}</p>
+                            <p
+                                class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">
+                                {{
+                                    comment.content }}</p>
 
                             <!-- Comment Attachment -->
                             <div v-if="comment.attachment" class="mt-3">
