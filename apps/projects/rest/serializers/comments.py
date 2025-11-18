@@ -12,6 +12,7 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "content",
+            "attachment",
             "task",
             "author",
             "created_at",

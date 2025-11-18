@@ -96,7 +96,8 @@ class TaskComment(TimeStampedModel):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="task_comments"
     )
-    content = models.TextField()
+    attachment = models.FileField(upload_to="task_comments/", blank=True, null=True)
+    content = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ["created_at"]

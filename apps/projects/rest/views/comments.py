@@ -2,8 +2,8 @@ from rest_framework import generics
 
 from apps.tasks.models import TaskComment
 
-from ...permissions import IsProjectMemberForComments, IsCommentAuthor
 from ..serializers.comments import TaskCommentListSerializer
+from ...permissions import IsProjectMemberForComments, IsCommentAuthor
 
 
 class TaskCommentListCreateView(generics.ListCreateAPIView):

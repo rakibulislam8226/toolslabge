@@ -327,27 +327,95 @@
 
                 <!-- Add Comment Form -->
                 <div class="mb-4 bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                    <div class="flex items-start space-x-3">
-                        <div
-                            class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
-                            <span class="text-xs font-medium text-blue-600 dark:text-blue-300">
-                                {{ currentUserInitials }}
-                            </span>
-                        </div>
-                        <div class="flex-1">
-                            <BaseTextarea v-model=" newComment " placeholder="Add a comment... (Ctrl+Enter to submit)"
-                                :rows=" 3 " class="comment-textarea" :error=" commentErrors.content "
-                                @keydown=" handleCommentKeydown " />
-                            <!-- Character Counter and Actions -->
-                            <div class="flex justify-between items-center mt-2">
-                                <div class="text-xs text-gray-500 dark:text-gray-400">
-                                    <span :class=" newComment.length > 1000 ? 'text-red-500' : '' ">
-                                        {{ newComment.length }}
-                                    </span>
-                                    <span class="text-gray-400">/1000</span>
+                    <div class="flex-1">
+                        <!-- Comment Box with Attachment Section -->
+                        <div class="relative border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-900 transition-all duration-200"
+                            @dragenter=" handleDragEnter " @dragleave=" handleDragLeave " @dragover=" handleDragOver "
+                            @drop=" handleDrop "
+                            :class=" { 'ring-2 ring-blue-300 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500': isDragOver } ">
+                            <BaseTextarea v-model=" newComment "
+                                :placeholder=" isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Ctrl+Enter to submit)' "
+                                :rows=" 4 "
+                                class="comment-textarea border-0 rounded-none resize-none pr-16 transition-colors duration-200"
+                                :error=" commentErrors.content " @keydown=" handleCommentKeydown " />
+
+                            <!-- Attach Button Inside Comment Box -->
+                            <button v-if="!showAttachmentInput && !selectedAttachment" @click="$refs.fileInput.click()"
+                                class="absolute bottom-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                                title="Add attachment">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                            </button>
+
+                            <!-- Hidden File Input -->
+                            <input type="file" ref="fileInput" @change=" handleFileSelect "
+                                accept="image/*,.pdf,.doc,.docx,.txt,.zip" class="hidden" />
+
+                            <!-- Attachment Section Inside Comment Box -->
+                            <div v-if="selectedAttachment"
+                                class="border-t border-gray-200 dark:border-gray-600 p-3 bg-gray-50 dark:bg-gray-800">
+                                <!-- Selected File Preview -->
+                                <div
+                                    class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <!-- File Icon/Preview -->
+                                    <div class="shrink-0">
+                                        <div v-if="isImageFile(selectedAttachment)" class="relative cursor-pointer">
+                                            <img :src=" getFilePreviewUrl(selectedAttachment) "
+                                                :alt=" selectedAttachment.name "
+                                                class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-600 hover:opacity-80 transition-opacity cursor-pointer" />
+                                        </div>
+                                        <div v-else
+                                            class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+                                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- File Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                            {{ selectedAttachment.name }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ formatFileSize(selectedAttachment.size) }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Remove Button -->
+                                    <button @click=" removeAttachment "
+                                        class="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                                        title="Remove attachment">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Actions Bar Inside Comment Box -->
+                        <div
+                            class="border-t border-gray-200 dark:border-gray-600 px-3 py-2 bg-gray-50 dark:bg-gray-800">
+                            <!-- Character Counter and Actions -->
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-3">
+                                    <!-- Character Counter -->
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        <span :class=" newComment.length > 1000 ? 'text-red-500' : '' ">
+                                            {{ newComment.length }}
+                                        </span>
+                                        <span class="text-gray-400">/1000</span>
+                                    </div>
+                                </div>
+
                                 <button @click=" addComment "
-                                    :disabled=" !newComment.trim() || addingComment || newComment.length > 1000 "
+                                    :disabled=" (!newComment.trim() && !selectedAttachment) || addingComment || newComment.length > 1000 "
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                                     <svg v-if="addingComment" class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none"
                                         viewBox="0 0 24 24">
@@ -465,6 +533,28 @@
                         <div v-else class="mt-2">
                             <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{{
                                 comment.content }}</p>
+
+                            <!-- Comment Attachment -->
+                            <div v-if="comment.attachment" class="mt-3">
+                                <!-- Image Preview -->
+                                <div v-if="isImageFile(comment.attachment)">
+                                    <img :src=" comment.attachment " :alt=" getFileName(comment.attachment) "
+                                        class="max-w-xs max-h-64 object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                                        @click="openAttachment(comment.attachment)" />
+                                </div>
+
+                                <!-- File Icon for Non-Images -->
+                                <div v-else class="inline-block">
+                                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors"
+                                        @click="openAttachment(comment.attachment)">
+                                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -561,6 +651,13 @@ const editingComment = ref(null)
 const commentErrors = ref({})
 const currentUser = ref(null) // Will be set from auth context or API
 
+// Attachment related data
+const selectedAttachment = ref(null)
+const showAttachmentInput = ref(false)
+const attachmentPreview = ref(null)
+const fileInput = ref(null)
+const isDragOver = ref(false)
+
 // Confirmation modal state
 const showConfirmModal = ref(false)
 const confirmModalData = ref({
@@ -618,22 +715,40 @@ const fetchComments = async () => {
 }
 
 const addComment = async () => {
-    if (!newComment.value.trim() || !props.task?.id || !projectId.value) return
+    if ((!newComment.value.trim() && !selectedAttachment.value) || !props.task?.id || !projectId.value) return
 
     try {
         addingComment.value = true
         commentErrors.value = {}
 
-        const payload = {
-            content: newComment.value.trim()
+        // Use FormData for file uploads
+        const formData = new FormData()
+        formData.append('content', newComment.value.trim() || '')
+
+        // Add attachment if selected
+        if (selectedAttachment.value) {
+            formData.append('attachment', selectedAttachment.value)
         }
 
-        const response = await axios.post(`projects/${projectId.value}/tasks/${props.task.id}/comments/`, payload)
+        const response = await axios.post(
+            `projects/${projectId.value}/tasks/${props.task.id}/comments/`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        )
         const comment = response.data.data || response.data
 
         // Add comment to the beginning of the list
         comments.value.unshift(comment)
         newComment.value = ''
+
+        // Clear attachment
+        selectedAttachment.value = null
+        attachmentPreview.value = null
+        attachmentPreview.value = null
 
         $toast.success('Comment added successfully')
     } catch (err) {
@@ -847,6 +962,101 @@ const handleCommentKeydown = (event) => {
         event.preventDefault()
         addComment()
     }
+}
+
+// Attachment functions
+const handleFileSelect = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        selectedAttachment.value = file
+
+        // Create preview for images
+        if (isImageFile(file)) {
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                attachmentPreview.value = e.target.result
+            }
+            reader.readAsDataURL(file)
+        } else {
+            attachmentPreview.value = null
+        }
+
+        showAttachmentInput.value = false
+    }
+}
+
+const removeAttachment = () => {
+    selectedAttachment.value = null
+    attachmentPreview.value = null
+    showAttachmentInput.value = false
+    if (fileInput.value) {
+        fileInput.value.value = ''
+    }
+}
+
+// Drag and drop handlers
+const handleDragEnter = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    isDragOver.value = true
+}
+
+const handleDragLeave = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    isDragOver.value = false
+}
+
+const handleDragOver = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+}
+
+const handleDrop = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    isDragOver.value = false
+
+    const files = event.dataTransfer.files
+    if (files && files.length > 0) {
+        const file = files[0]
+        selectedAttachment.value = file
+
+        // Create preview for images
+        if (isImageFile(file)) {
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                attachmentPreview.value = e.target.result
+            }
+            reader.readAsDataURL(file)
+        } else {
+            attachmentPreview.value = null
+        }
+
+        showAttachmentInput.value = false
+    }
+}
+
+const cancelAttachment = () => {
+    showAttachmentInput.value = false
+    if (!selectedAttachment.value && fileInput.value) {
+        fileInput.value.value = ''
+    }
+}
+
+const getFilePreviewUrl = (file) => {
+    if (attachmentPreview.value) {
+        return attachmentPreview.value
+    }
+    return URL.createObjectURL(file)
+}
+
+const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 // Fetch detailed task information
@@ -1151,6 +1361,37 @@ onMounted(() => {
         fetchComments()
     }
 })
+
+// Helper functions for attachment handling
+const isImageFile = (fileOrUrl) => {
+    if (!fileOrUrl) return false
+
+    let fileName = ''
+    if (typeof fileOrUrl === 'string') {
+        // It's a URL string
+        fileName = fileOrUrl.split('/').pop() || ''
+    } else if (fileOrUrl.name) {
+        // It's a File object
+        fileName = fileOrUrl.name
+    } else {
+        return false
+    }
+
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']
+    const extension = fileName.split('.').pop()?.toLowerCase()
+    return imageExtensions.includes(extension)
+}
+
+const getFileName = (url) => {
+    if (!url) return 'Unknown file'
+    return url.split('/').pop() || 'Unknown file'
+}
+
+const openAttachment = (url) => {
+    if (!url) return
+    // Open in new tab/window
+    window.open(url, '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <style scoped>
