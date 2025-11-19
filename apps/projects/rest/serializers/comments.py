@@ -62,3 +62,18 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
                 )
 
         return comment
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        attachments_data = request.FILES.getlist("attachment")
+        if attachments_data:
+            TasksCommentAttachments.objects.filter(comment=instance).delete()
+            for attachment_file in attachments_data:
+                TasksCommentAttachments.objects.create(
+                    comment=instance,
+                    file=attachment_file,
+                )
+
+        instance.content = validated_data.get("content", instance.content)
+        instance.save()
+        return instance
