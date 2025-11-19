@@ -8,6 +8,7 @@ from .models import (
     TaskActivity,
     TaskMember,
     TaskDeadlineExtension,
+    TasksCommentAttachments,
 )
 
 
@@ -63,3 +64,10 @@ class TaskActivityAdmin(admin.ModelAdmin):
     list_display = ("task", "updated_at", "created_by", "action")
     search_fields = ("task__title", "created_by__username", "details")
     ordering = ("-updated_at",)
+
+
+@admin.register(TasksCommentAttachments)
+class TasksCommentAttachmentsAdmin(admin.ModelAdmin):
+    list_display = ("comment", "file", "created_at")
+    search_fields = ("comment__content",)
+    ordering = ("-created_at",)

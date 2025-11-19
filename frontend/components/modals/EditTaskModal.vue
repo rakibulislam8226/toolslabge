@@ -153,11 +153,6 @@
                                     <div
                                         class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                                         <div class="flex items-center space-x-2">
-                                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                            </svg>
                                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Extension
                                                 History
                                             </h4>
@@ -171,7 +166,7 @@
                                     <div class="max-h-48 overflow-y-auto extension-history-scroll">
                                         <div class="divide-y divide-gray-200 dark:divide-gray-700">
                                             <div v-for="(extension, index) in deadlineExtensions" :key=" extension.id "
-                                                class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150 extension-item">
+                                                class="p-4 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150 extension-item">
                                                 <div class="flex items-start justify-between space-x-4">
                                                     <div class="flex-1 min-w-0">
                                                         <!-- Timeline -->
@@ -323,68 +318,73 @@
                             @dragenter=" handleDragEnter " @dragleave=" handleDragLeave " @dragover=" handleDragOver "
                             @drop=" handleDrop "
                             :class=" { 'ring-2 ring-blue-300 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500': isDragOver } ">
-                            <BaseTextarea v-model=" newComment "
-                                :placeholder=" isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Ctrl+Enter to submit)' "
-                                :rows=" 4 "
-                                class="comment-textarea border-0 rounded-none resize-none pr-16 transition-colors duration-200"
-                                :error=" commentErrors.content " @keydown=" handleCommentKeydown " />
+                            <!-- Textarea Container -->
+                            <div class="relative">
+                                <BaseTextarea v-model=" newComment "
+                                    :placeholder=" isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Ctrl+Enter to submit)' "
+                                    :rows=" 4 "
+                                    class="comment-textarea border-0 rounded-none resize-none pr-16 transition-colors duration-200"
+                                    :error=" commentErrors.content " @keydown=" handleCommentKeydown " />
 
-                            <!-- Attach Button Inside Comment Box -->
-                            <button v-if="!showAttachmentInput && !selectedAttachment" @click="$refs.fileInput.click()"
-                                class="absolute bottom-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
-                                title="Add attachment">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                </svg>
-                            </button>
+                                <!-- Attach Button Inside Textarea -->
+                                <button v-if="!showAttachmentInput" @click="$refs.fileInput.click()"
+                                    class="absolute bottom-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    title="Add attachment">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                </button>
+                            </div>
 
                             <!-- Hidden File Input -->
-                            <input type="file" ref="fileInput" @change=" handleFileSelect "
+                            <input type="file" ref="fileInput" @change=" handleFileSelect " multiple
                                 accept="image/*,.pdf,.doc,.docx,.txt,.zip" class="hidden" />
 
-                            <!-- Attachment Section Inside Comment Box -->
-                            <div v-if="selectedAttachment"
+                            <!-- Attachments Section Inside Comment Box -->
+                            <div v-if="selectedAttachments.length > 0"
                                 class="border-t border-gray-200 dark:border-gray-600 p-3 bg-gray-50 dark:bg-gray-800">
-                                <!-- Selected File Preview -->
-                                <div
-                                    class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <!-- File Icon/Preview -->
-                                    <div class="shrink-0">
-                                        <div v-if="isImageFile(selectedAttachment)" class="relative cursor-pointer">
-                                            <img :src=" getFilePreviewUrl(selectedAttachment) "
-                                                :alt=" selectedAttachment.name "
-                                                class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-600 hover:opacity-80 transition-opacity cursor-pointer" />
+                                <!-- Simple file list -->
+                                <div class="space-y-2 max-h-32 overflow-y-auto">
+                                    <div v-for="(attachment, index) in selectedAttachments"
+                                        :key=" `attachment-${ index }` "
+                                        class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 attachment-item">
+                                        <!-- File Icon/Preview -->
+                                        <div class="shrink-0">
+                                            <div v-if="isImageFile(attachment)" class="relative cursor-pointer">
+                                                <img :src=" getFilePreviewUrl(attachment) " :alt=" attachment.name "
+                                                    class="w-8 h-8 rounded object-cover border border-gray-200 dark:border-gray-600 hover:opacity-80 transition-opacity cursor-pointer"
+                                                    @click="previewAttachment(attachment)" />
+                                            </div>
+                                            <div v-else
+                                                class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                                                @click="previewAttachment(attachment)">
+                                                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
                                         </div>
-                                        <div v-else
-                                            class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
-                                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+
+                                        <!-- File Name Only -->
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm text-gray-700 dark:text-gray-300 truncate">
+                                                {{ attachment.name }}
+                                            </p>
+                                        </div>
+
+                                        <!-- Remove Button -->
+                                        <button @click="removeAttachment(index)"
+                                            class="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                                            :title=" `Remove ${ attachment.name }` ">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    d="M6 18L18 6M6 6l12 12" />
                                             </svg>
-                                        </div>
+                                        </button>
                                     </div>
-
-                                    <!-- File Info -->
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                                            {{ selectedAttachment.name }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ formatFileSize(selectedAttachment.size) }}
-                                        </p>
-                                    </div>
-
-                                    <!-- Remove Button -->
-                                    <button @click=" removeAttachment "
-                                        class="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
-                                        title="Remove attachment">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -405,7 +405,7 @@
                                 </div>
 
                                 <BaseButton variant="primary" size="sm" @click=" addComment "
-                                    :disabled=" (!newComment.trim() && !selectedAttachment) || addingComment || newComment.length > 1000 "
+                                    :disabled=" (!newComment.trim() && selectedAttachments.length === 0) || addingComment || newComment.length > 1000 "
                                     :loading=" addingComment " loadingText="Adding...">
                                     <template v-if=" !addingComment " #icon>
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -520,24 +520,77 @@
                                 {{
                                     comment.content }}</p>
 
-                            <!-- Comment Attachment -->
-                            <div v-if="comment.attachment" class="mt-3">
-                                <!-- Image Preview -->
-                                <div v-if="isImageFile(comment.attachment)">
-                                    <img :src=" comment.attachment " :alt=" getFileName(comment.attachment) "
-                                        class="max-w-xs max-h-64 object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
-                                        @click="openAttachment(comment.attachment)" />
-                                </div>
+                            <!-- Comment Attachments -->
+                            <div v-if="comment.attachment && comment.attachment.length > 0" class="mt-3">
+                                <!-- Multiple attachments from new structure -->
+                                <div
+                                    v-if="comment.attachment && Array.isArray(comment.attachment) && comment.attachment.length > 0">
+                                    <div v-if="comment.attachment.length > 1" class="space-y-2">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                            {{ comment.attachment.length }} attachments
+                                        </p>
+                                        <div class="grid grid-cols-2 gap-2 max-w-md">
+                                            <div v-for="(attachment, index) in comment.attachment"
+                                                :key=" `comment-${ comment.id }-attachment-${ index }` "
+                                                class="attachment-preview cursor-pointer"
+                                                @click="openAttachment(attachment.file)">
+                                                <!-- Image Preview -->
+                                                <div v-if="isImageFile(attachment.file)" class="relative group">
+                                                    <img :src=" attachment.file " :alt=" getFileName(attachment.file) "
+                                                        class="w-full h-20 object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+                                                        @error="$event.target.style.display = 'none'" />
+                                                    <div
+                                                        class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
+                                                        <svg class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <!-- File Icon for Non-Images -->
+                                                <div v-else
+                                                    class="w-full h-20 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex flex-col items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors">
+                                                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <span
+                                                        class="text-xs text-blue-600 dark:text-blue-400 mt-1 truncate max-w-full px-1">
+                                                        {{ getFileName(attachment.file).substring(0, 10) }}...
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                <!-- File Icon for Non-Images -->
-                                <div v-else class="inline-block">
-                                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors"
-                                        @click="openAttachment(comment.attachment)">
-                                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
+                                    <!-- Single attachment from new structure -->
+                                    <div v-else-if="comment.attachment.length === 1"
+                                        class="attachment-preview cursor-pointer"
+                                        @click="openAttachment(comment.attachment[0].file)">
+                                        <div v-if="isImageFile(comment.attachment[0].file)">
+                                            <img :src=" comment.attachment[0].file "
+                                                :alt=" getFileName(comment.attachment[0].file) "
+                                                class="max-w-xs max-h-64 object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
+                                                @error="$event.target.style.display = 'none'" />
+                                        </div>
+                                        <div v-else class="inline-block">
+                                            <div
+                                                class="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors">
+                                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-16 truncate">
+                                                {{ getFileName(comment.attachment[0].file) }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -630,9 +683,8 @@ const commentErrors = ref({})
 const currentUser = ref(null) // Will be set from auth context or API
 
 // Attachment related data
-const selectedAttachment = ref(null)
+const selectedAttachments = ref([])
 const showAttachmentInput = ref(false)
-const attachmentPreview = ref(null)
 const fileInput = ref(null)
 const isDragOver = ref(false)
 
@@ -693,7 +745,7 @@ const fetchComments = async () => {
 }
 
 const addComment = async () => {
-    if ((!newComment.value.trim() && !selectedAttachment.value) || !props.task?.id || !projectId.value) return
+    if ((!newComment.value.trim() && selectedAttachments.value.length === 0) || !props.task?.id || !projectId.value) return
 
     try {
         addingComment.value = true
@@ -703,10 +755,10 @@ const addComment = async () => {
         const formData = new FormData()
         formData.append('content', newComment.value.trim() || '')
 
-        // Add attachment if selected
-        if (selectedAttachment.value) {
-            formData.append('attachment', selectedAttachment.value)
-        }
+        // Add multiple attachments
+        selectedAttachments.value.forEach((file, index) => {
+            formData.append('attachment', file)
+        })
 
         const response = await axios.post(
             `projects/${projectId.value}/tasks/${props.task.id}/comments/`,
@@ -723,10 +775,8 @@ const addComment = async () => {
         comments.value.unshift(comment)
         newComment.value = ''
 
-        // Clear attachment
-        selectedAttachment.value = null
-        attachmentPreview.value = null
-        attachmentPreview.value = null
+        // Clear attachments
+        selectedAttachments.value = []
 
         $toast.success('Comment added successfully')
     } catch (err) {
@@ -944,31 +994,43 @@ const handleCommentKeydown = (event) => {
 
 // Attachment functions
 const handleFileSelect = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-        selectedAttachment.value = file
-
-        // Create preview for images
-        if (isImageFile(file)) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                attachmentPreview.value = e.target.result
-            }
-            reader.readAsDataURL(file)
-        } else {
-            attachmentPreview.value = null
-        }
+    const files = Array.from(event.target.files)
+    if (files.length > 0) {
+        // Add new files to existing attachments
+        selectedAttachments.value = [...selectedAttachments.value, ...files]
 
         showAttachmentInput.value = false
     }
 }
 
-const removeAttachment = () => {
-    selectedAttachment.value = null
-    attachmentPreview.value = null
+const removeAttachment = (index) => {
+    if (typeof index === 'number') {
+        // Remove specific attachment by index
+        selectedAttachments.value.splice(index, 1)
+    } else {
+        // Legacy support - clear all attachments
+        selectedAttachments.value = []
+    }
+
+    if (fileInput.value) {
+        fileInput.value.value = ''
+    }
+}
+
+const clearAllAttachments = () => {
+    selectedAttachments.value = []
     showAttachmentInput.value = false
     if (fileInput.value) {
         fileInput.value.value = ''
+    }
+}
+
+const previewAttachment = (file) => {
+    if (file instanceof File) {
+        const url = URL.createObjectURL(file)
+        window.open(url, '_blank', 'noopener,noreferrer')
+    } else if (typeof file === 'string') {
+        openAttachment(file)
     }
 }
 
@@ -995,38 +1057,26 @@ const handleDrop = (event) => {
     event.stopPropagation()
     isDragOver.value = false
 
-    const files = event.dataTransfer.files
-    if (files && files.length > 0) {
-        const file = files[0]
-        selectedAttachment.value = file
-
-        // Create preview for images
-        if (isImageFile(file)) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                attachmentPreview.value = e.target.result
-            }
-            reader.readAsDataURL(file)
-        } else {
-            attachmentPreview.value = null
-        }
-
+    const files = Array.from(event.dataTransfer.files)
+    if (files.length > 0) {
+        // Add dropped files to existing attachments
+        selectedAttachments.value = [...selectedAttachments.value, ...files]
         showAttachmentInput.value = false
     }
 }
 
 const cancelAttachment = () => {
     showAttachmentInput.value = false
-    if (!selectedAttachment.value && fileInput.value) {
+    if (selectedAttachments.value.length === 0 && fileInput.value) {
         fileInput.value.value = ''
     }
 }
 
 const getFilePreviewUrl = (file) => {
-    if (attachmentPreview.value) {
-        return attachmentPreview.value
+    if (file instanceof File) {
+        return URL.createObjectURL(file)
     }
-    return URL.createObjectURL(file)
+    return file // If it's already a URL string
 }
 
 const formatFileSize = (bytes) => {
@@ -1345,24 +1395,73 @@ const isImageFile = (fileOrUrl) => {
     if (!fileOrUrl) return false
 
     let fileName = ''
-    if (typeof fileOrUrl === 'string') {
-        // It's a URL string
-        fileName = fileOrUrl.split('/').pop() || ''
-    } else if (fileOrUrl.name) {
-        // It's a File object
+
+    // Handle File object
+    if (fileOrUrl instanceof File) {
         fileName = fileOrUrl.name
-    } else {
+    }
+    // Handle string URL
+    else if (typeof fileOrUrl === 'string') {
+        fileName = fileOrUrl.split('/').pop() || ''
+    }
+    // Handle object with file property
+    else if (typeof fileOrUrl === 'object' && fileOrUrl.file) {
+        if (typeof fileOrUrl.file === 'string') {
+            fileName = fileOrUrl.file.split('/').pop() || ''
+        } else if (fileOrUrl.file instanceof File) {
+            fileName = fileOrUrl.file.name
+        }
+    }
+    // Handle object with name property
+    else if (typeof fileOrUrl === 'object' && fileOrUrl.name) {
+        fileName = fileOrUrl.name
+    }
+    // Handle object with attachment property
+    else if (typeof fileOrUrl === 'object' && fileOrUrl.attachment) {
+        if (typeof fileOrUrl.attachment === 'string') {
+            fileName = fileOrUrl.attachment.split('/').pop() || ''
+        }
+    }
+    else {
         return false
     }
+
+    if (!fileName) return false
 
     const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']
     const extension = fileName.split('.').pop()?.toLowerCase()
     return imageExtensions.includes(extension)
 }
 
-const getFileName = (url) => {
-    if (!url) return 'Unknown file'
-    return url.split('/').pop() || 'Unknown file'
+const getFileName = (fileData) => {
+    if (!fileData) return 'Unknown file'
+
+    // If it's a File object
+    if (fileData instanceof File) {
+        return fileData.name
+    }
+
+    // If it's a string URL
+    if (typeof fileData === 'string') {
+        return fileData.split('/').pop() || 'Unknown file'
+    }
+
+    // If it's an object with file property
+    if (typeof fileData === 'object' && fileData.file) {
+        if (typeof fileData.file === 'string') {
+            return fileData.file.split('/').pop() || 'Unknown file'
+        }
+        if (fileData.file instanceof File) {
+            return fileData.file.name
+        }
+    }
+
+    // If it's an object with name property
+    if (typeof fileData === 'object' && fileData.name) {
+        return fileData.name
+    }
+
+    return 'Unknown file'
 }
 
 const openAttachment = (url) => {
@@ -1704,6 +1803,71 @@ const openAttachment = (url) => {
     transform: scale(1.05);
 }
 
+/* Multiple attachments styling */
+.attachment-item {
+    transition: all 0.2s ease-out;
+    animation: slideInAttachment 0.3s ease-out;
+}
+
+.attachment-item:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark .attachment-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.attachment-preview {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideInAttachment {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Attachment grid hover effects */
+.attachment-preview .group:hover img {
+    filter: brightness(1.1);
+}
+
+/* Scrollbar styling for attachment lists */
+.max-h-40::-webkit-scrollbar {
+    width: 4px;
+}
+
+.max-h-40::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 2px;
+}
+
+.max-h-40::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #3b82f6, #2563eb);
+    border-radius: 2px;
+}
+
+.dark .max-h-40::-webkit-scrollbar-track {
+    background: #374151;
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
     .deadline-section {
@@ -1732,6 +1896,11 @@ const openAttachment = (url) => {
 
     .dark .border-r {
         border-bottom-color: #374151;
+    }
+
+    /* Mobile attachment grid */
+    .attachment-preview .grid-cols-2 {
+        grid-template-columns: repeat(1, 1fr);
     }
 }
 </style>

@@ -58,6 +58,9 @@ class IsProjectMemberForComments(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        
         task_id = view.kwargs.get("task_id")
         if not task_id:
             return False

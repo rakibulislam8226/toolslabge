@@ -1,11 +1,28 @@
 from rest_framework import serializers
 
 from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
-from apps.tasks.models import TaskComment, Task
+from apps.tasks.models import TaskComment, Task, TasksCommentAttachments
+
+
+class TasksCommentAttachmentsSlimSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TasksCommentAttachments
+        fields = [
+            "id",
+            "file",
+            "created_at",
+            "updated_at",
+        ]
 
 
 class TaskCommentListSerializer(serializers.ModelSerializer):
     author = UserSlimSerializer(read_only=True)
+    attachment = TasksCommentAttachmentsSlimSerializer(
+        source="attachments",
+        many=True,
+        read_only=True,
+        allow_null=True,
+    )
 
     class Meta:
         model = TaskComment
@@ -26,13 +43,22 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        user = self.context["request"].user
-        task_id = self.context["view"].kwargs.get("task_id")
-        task = Task.objects.get(id=task_id)
+        request = self.context.get("request")
+        task = self.context.get("task")
+        author = request.user
 
-        return TaskComment.objects.create(
-            created_by=user,
-            author=user,
+        comment = TaskComment.objects.create(
             task=task,
-            **validated_data,
+            author=author,
+            content=validated_data.get("content"),
         )
+
+        attachments_data = request.FILES.getlist("attachment")
+        if attachments_data:
+            for attachment_file in attachments_data:
+                TasksCommentAttachments.objects.create(
+                    comment=comment,
+                    file=attachment_file,
+                )
+
+        return comment
