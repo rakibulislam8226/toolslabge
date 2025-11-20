@@ -8,13 +8,15 @@
             <h1 class="text-3xl font-bold text-gray-900">Projects</h1>
             <p class="mt-2 text-gray-600">Manage and track all your organization's projects</p>
           </div>
-          <Button variant="primary" size="lg" label="Create Project" @click="createNewProject">
-            <template #icon>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-            </template>
-          </Button>
+          <div v-if="hasRole('owner', 'manager')">
+            <Button variant="primary" size="lg" label="Create Project" @click="createNewProject">
+              <template #icon>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </template>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -151,8 +153,10 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
 import CreateProjectModal from '@/components/modals/CreateProjectModal.vue'
+import { useAuth } from '../../composables/useAuth'
 
 const router = useRouter()
+const { hasRole } = useAuth();
 
 // Reactive data
 const projects = ref([])
