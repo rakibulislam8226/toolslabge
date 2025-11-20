@@ -26,6 +26,7 @@ class UserOrganizationSerializer(serializers.ModelSerializer):
 class MyInfoSerializer(serializers.ModelSerializer):
     organizations = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField(read_only=True)
+    organization_role = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -39,6 +40,7 @@ class MyInfoSerializer(serializers.ModelSerializer):
             "is_verified",
             "organizations",
             "permissions",
+            "organization_role",
             "created_at",
             "updated_at",
         ]
@@ -59,3 +61,12 @@ class MyInfoSerializer(serializers.ModelSerializer):
 
     def get_permissions(self, user):
         return user.get_all_permissions()
+
+    def get_organization_role(self, user):
+        user_organizations = OrganizationMember.objects.filter(
+            user=user, is_active=True
+        )
+        if not user_organizations.exists():
+            return None
+        primary_membership = user_organizations.first()
+        return primary_membership.role
