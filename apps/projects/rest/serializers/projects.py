@@ -106,6 +106,7 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
 
 class ProjectListSerializer(serializers.ModelSerializer):
     manager_id = serializers.IntegerField(write_only=True, required=False)
+    project_role = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
@@ -118,8 +119,19 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "end_date",
             "status",
             "manager_id",
+            "project_role",
         ]
         read_only_fields = ["status", "slug"]
+
+    def get_project_role(self, obj):
+        """Get the role of the requesting user in this project."""
+        request = self.context.get("request")
+        user = request.user
+        try:
+            membership = obj.memberships.get(user=user)
+            return membership.role
+        except ProjectMember.DoesNotExist:
+            return None
 
     def validate(self, data):
         request = self.context["request"]
@@ -201,6 +213,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     organization = serializers.StringRelatedField(read_only=True)
     manager = serializers.SerializerMethodField()
     members = ProjectMemberSerializer(many=True, read_only=True)
+    project_role = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
@@ -215,6 +228,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "status",
             "organization",
             "members",
+            "project_role",
             "created_at",
             "updated_at",
         ]
@@ -227,6 +241,16 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_project_role(self, obj):
+        """Get the role of the requesting user in this project."""
+        request = self.context.get("request")
+        user = request.user
+        try:
+            membership = obj.memberships.get(user=user)
+            return membership.role
+        except ProjectMember.DoesNotExist:
+            return None
 
     def get_manager(self, obj):
         """Get the project manager from ProjectMember with MANAGER role."""
