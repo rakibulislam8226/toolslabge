@@ -50,8 +50,8 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: 'md', // sm, md, lg, xl, xxl
-    validator: (value) => ['sm', 'md', 'lg', 'xl', 'xxl'].includes(value)
+    default: 'md', // sm, md, lg, xl, xxl, xxxl
+    validator: (value) => ['sm', 'md', 'lg', 'xl', 'xxl', 'xxxl'].includes(value)
   },
   showCloseButton: {
     type: Boolean,

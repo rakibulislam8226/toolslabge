@@ -343,7 +343,9 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
 import Button from '@/components/Button.vue'
+import { useAuth } from "@/composables/useAuth.js";
 
+const { hasRole } = useAuth()
 const router = useRouter()
 const route = useRoute()
 
