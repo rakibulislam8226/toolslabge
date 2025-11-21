@@ -268,7 +268,6 @@ const projectSlug = computed(() => route.params.slug)
 // Get project ID from project data for nested API calls
 const projectId = computed(() => {
     if (project.value?.id) {
-        console.log('TasksList: using project ID from fetched project data:', project.value.id)
         return project.value.id
     }
     return null
@@ -336,18 +335,12 @@ const fetchProject = async () => {
     try {
         const slug = projectSlug.value
 
-        console.log('fetchProject: slug =', slug)
-
         if (!slug) {
             throw new Error('Missing project slug')
         }
-
-        // Use backend slug directly
-        console.log('fetchProject: fetching by slug:', slug)
         const response = await axios.get(`projects/${slug}/`)
 
         project.value = response.data.data
-        console.log('fetchProject: fetched project:', project.value)
     } catch (err) {
         console.error('Failed to fetch project:', err)
         if (err.response?.status === 404) {
@@ -376,17 +369,14 @@ const fetchTasks = async () => {
         error.value = ''
 
         const id = projectId.value
-        console.log('fetchTasks: using project ID:', id)
 
         if (!id) {
-            console.warn('fetchTasks: no project ID available yet')
             error.value = 'Project not loaded yet - cannot fetch tasks'
             return
         }
 
         const response = await axios.get(`projects/${id}/tasks/`)
         tasks.value = response.data.data || response.data || []
-        console.log('fetchTasks: loaded', tasks.value.length, 'tasks')
     } catch (err) {
         console.error('Failed to fetch tasks:', err)
         if (err.response?.status === 404) {

@@ -187,7 +187,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField(read_only=True)
     assigned_members = serializers.SerializerMethodField(read_only=True)
     deadline_extensions = serializers.SerializerMethodField(read_only=True)
-    project_role = serializers.SerializerMethodField(read_only=True)
+    my_project_role = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Task
@@ -206,7 +206,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             "members",
             "assigned_members",
             "deadline_extensions",
-            "project_role",
+            "my_project_role",
             "created_by",
             "created_at",
             "updated_at",
@@ -220,7 +220,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             "assigned_members",
         ]
 
-    def get_project_role(self, instance):
+    def get_my_project_role(self, instance):
         user = self.context["request"].user
         membership = ProjectMember.objects.get(project=instance.project, user=user)
         return membership.role if membership else None

@@ -20,9 +20,7 @@ class TaskCommentListCreateView(generics.ListCreateAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["task"] = (
-            self.get_queryset().first().task if self.get_queryset().exists() else None
-        )
+        context["task_id"] = self.kwargs.get("task_id")
         return context
 
 

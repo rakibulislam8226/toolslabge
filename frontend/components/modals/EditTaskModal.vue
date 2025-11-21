@@ -34,54 +34,50 @@
 
             <!-- Desktop Layout & Mobile Tab Content -->
             <div class="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0">
-                <!-- Left Side - Task Form -->
                 <div :class=" [
                     'flex-1 lg:pr-6 lg:border-r border-gray-200 dark:border-gray-700 lg:min-w-0 min-h-0',
                     { 'hidden lg:block': activeTab !== 'edit' }
                 ] ">
                     <div class="h-full overflow-y-auto pr-2 custom-scrollbar">
                         <form @submit.prevent=" updateTask " class="space-y-4 pb-4">
-                            <!-- Title -->
+                             <pre>{{ canEditTask }}</pre>
                             <BaseInput v-model=" form.title " label="Title" placeholder="Enter task title" required
-                                :error=" fieldErrors.title " />
+                                :error=" fieldErrors.title " :disabled=" !canEditTask " />
 
-                            <!-- Description -->
                             <BaseTextarea v-model=" form.description " label="Description"
-                                placeholder="Enter task description" :rows=" 3 " :error=" fieldErrors.description " />
+                                placeholder="Enter task description" :rows=" 3 " :error=" fieldErrors.description "
+                                :disabled=" !canEditTask " />
 
                             <!-- Status and Priority Row -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Status -->
                                 <BaseSelect v-model=" form.status_id " label="Status" placeholder="Select status"
                                     :options=" statuses " option-value="id" option-label="name"
-                                    :error=" fieldErrors.status_id " />
+                                    :error=" fieldErrors.status_id " :disabled=" !canEditTask " />
 
-                                <!-- Priority -->
                                 <BaseSelect v-model=" form.priority " label="Priority" :options=" priorityOptions "
-                                    :error=" fieldErrors.priority " />
+                                    :error=" fieldErrors.priority " :disabled=" !canEditTask " />
                             </div>
 
                             <!-- Scheduling Section -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Scheduled Start -->
                                 <BaseDatePicker v-model=" form.scheduled_start " label="Scheduled Start"
-                                    placeholder="Select start date & time" :error=" fieldErrors.start_date " />
+                                    placeholder="Select start date & time" :error=" fieldErrors.start_date "
+                                    :disabled=" !canEditTask " />
 
-                                <!-- Target Completion -->
                                 <BaseDatePicker v-model=" form.target_completion " label="Target Completion"
-                                    placeholder="Select completion date & time" :error=" fieldErrors.due_date " />
+                                    placeholder="Select completion date & time" :error=" fieldErrors.due_date "
+                                    :disabled=" !canEditTask " />
                             </div>
 
                             <!-- Estimated Hours -->
                             <BaseInput v-model=" form.estimated_hours " label="Estimated Hours" type="number"
                                 placeholder="e.g., 4.5" step="0.5" min="0" max="999"
-                                :error=" fieldErrors.estimated_hours " />
+                                :error=" fieldErrors.estimated_hours " :disabled=" !canEditTask " />
 
                             <!-- Deadline Extension Section -->
                             <div class="space-y-4 deadline-extension-responsive">
                                 <div
                                     class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
-                                    <!-- Header -->
                                     <div
                                         class="px-3 lg:px-6 py-3 lg:py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex items-center space-x-3">
@@ -141,7 +137,7 @@
                                                         label="New Deadline"
                                                         placeholder="Select new deadline date & time"
                                                         :error=" deadlineExtension.errors.new_due_date "
-                                                        class="deadline-picker" />
+                                                        class="deadline-picker" :disabled=" !canEditTask " />
                                                 </div>
 
                                                 <!-- Reason -->
@@ -150,12 +146,12 @@
                                                         label="Justification"
                                                         placeholder="Briefly explain why this extension is necessary..."
                                                         :rows=" 3 " :error=" deadlineExtension.errors.reason "
-                                                        class="reason-input" />
+                                                        class="reason-input" :disabled=" !canEditTask " />
                                                 </div>
 
                                                 <!-- Submit Button -->
                                                 <button @click=" submitDeadlineExtension "
-                                                    :disabled=" !deadlineExtension.new_due_date || extensionLoading "
+                                                    :disabled=" !deadlineExtension.new_due_date || extensionLoading || !canEditTask "
                                                     type="button"
                                                     class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none deadline-extend-btn">
                                                     <span v-if="extensionLoading"
@@ -280,7 +276,8 @@
                             <div>
                                 <div class="mb-2">
                                     <BaseInput label="Task Members" placeholder="Search task members..."
-                                        @input="debouncedMemberSearch($event.target.value)" size="sm" />
+                                        @input="debouncedMemberSearch($event.target.value)" size="sm"
+                                        :disabled=" !canEditTask " />
                                 </div> <!-- Selected Members Display -->
                                 <div v-if="form.assigned_members.length > 0"
                                     class="mb-2 p-2 bg-gray-50 dark:bg-blue-900/20 rounded-lg">
@@ -290,7 +287,7 @@
                                         <span v-for="memberId in form.assigned_members" :key=" memberId "
                                             class="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-blue-800 text-gray-700 dark:text-blue-200 rounded-full">
                                             {{ getSelectedMemberName(memberId) }}
-                                            <button @click="removeMember(memberId)"
+                                            <button v-if="canEditTask" @click="removeMember(memberId)"
                                                 class="ml-1 text-gray-500 dark:text-blue-400 hover:text-gray-700 dark:hover:text-blue-200">
                                                 ×
                                             </button>
@@ -310,9 +307,11 @@
                                         No members found matching "{{ memberSearchQuery }}"
                                     </div>
                                     <label v-for="member in projectMembers" :key=" member.id "
-                                        class="flex items-center space-x-2 hover:bg-blue-50 hover:border-blue-200 border border-transparent dark:hover:bg-gray-700 dark:hover:border-gray-600 p-1 rounded cursor-pointer transition-all duration-200">
+                                        class="flex items-center space-x-2 hover:bg-blue-50 hover:border-blue-200 border border-transparent dark:hover:bg-gray-700 dark:hover:border-gray-600 p-1 rounded cursor-pointer transition-all duration-200"
+                                        :class=" { 'opacity-50 cursor-not-allowed': !canEditTask } ">
                                         <input type="checkbox" :value=" member.user " v-model=" form.assigned_members "
-                                            class="rounded border-gray-200 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700" />
+                                            class="rounded border-gray-200 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700"
+                                            :disabled=" !canEditTask " />
                                         <div class="flex items-center space-x-2 flex-1 min-w-0">
                                             <div
                                                 class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
@@ -445,11 +444,9 @@
                                 <!-- Bottom Actions Bar Inside Comment Box -->
                                 <div
                                     class="border-t border-gray-200 dark:border-gray-600 px-3 py-2 bg-gray-50 dark:bg-gray-800">
-                                    <!-- Character Counter and Actions -->
                                     <div
                                         class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 p-2 lg:p-3">
                                         <div class="flex items-center space-x-3">
-                                            <!-- Character Counter -->
                                             <div class="text-xs text-gray-500 dark:text-gray-400">
                                                 <span :class=" newComment.length > 1000 ? 'text-red-500' : '' ">
                                                     {{ newComment.length }}
@@ -773,8 +770,9 @@
                     Cancel
                 </BaseButton>
 
-                <BaseButton variant="primary" @click=" updateTask " :disabled=" updating || !form.title.trim() "
-                    :loading=" updating " loadingText="Updating...">
+                <BaseButton variant="primary" @click=" updateTask "
+                    :disabled=" updating || !form.title.trim() || !canEditTask " :loading=" updating "
+                    loadingText="Updating...">
                     Update Task
                 </BaseButton>
             </div>
@@ -791,11 +789,11 @@
 <script setup>
 import { ref, reactive, watch, computed, onMounted, nextTick, inject } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
+import { useAuth } from '@/composables/useAuth.js'
 import BaseModal from './BaseModal.vue'
 import ConfirmModal from './ConfirmModal.vue'
 import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker, BaseButton } from '@/components/forms'
 
-// Props
 const props = defineProps({
     isOpen: {
         type: Boolean,
@@ -819,6 +817,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'updated'])
 
 const $toast = inject("toast")
+const { user } = useAuth()
 
 // Priority options
 const priorityOptions = [
@@ -849,9 +848,9 @@ const addingComment = ref(false)
 const deletingComment = ref(null)
 const updatingComment = ref(false)
 const editingComment = ref(null)
-const editingAttachments = ref([]) // New attachments to add during edit
+const editingAttachments = ref([])
 const commentErrors = ref({})
-const currentUser = ref(null) // Will be set from auth context or API
+const currentUser = ref(null)
 
 // Attachment related data
 const selectedAttachments = ref([])
@@ -890,6 +889,32 @@ const projectId = computed(() => {
     return props.task?.project?.id
 })
 
+// Permission checking computed properties
+const isTaskOwner = computed(() => {
+    return user.value && props.task && user.value.id === props.task.created_by
+})
+
+const canEditTask = computed(() => {
+    console.log("props", props.task);
+    return true;  //FIXME; from sadhin bhai call Temporarily allow all edits
+    
+    if (!props.task || !user.value) return false
+
+    const role = props.task.my_project_role
+
+    // Manager can edit everything regardless of ownership
+    if (role === 'manager') return true
+
+    // Contributor can edit only if they are the task owner
+    // if (role === 'contributor' && isTaskOwner.value) return true
+    if (role === 'contributor') return true
+
+    // Viewer cannot edit anything
+    if (role === 'viewer') return false
+
+    return false
+})
+
 // Comments Methods
 const fetchComments = async () => {
     if (!props.task?.id || !projectId.value) return
@@ -912,6 +937,8 @@ const addComment = async () => {
     try {
         addingComment.value = true
         commentErrors.value = {}
+        console.log('props.task.id', props.task.id);
+        
 
         // Use FormData for file uploads
         const formData = new FormData()
@@ -1237,7 +1264,6 @@ const handleDrop = (event) => {
 
     const files = Array.from(event.dataTransfer.files)
     if (files.length > 0) {
-        // Add dropped files to existing attachments
         selectedAttachments.value = [...selectedAttachments.value, ...files]
         showAttachmentInput.value = false
     }
@@ -1247,10 +1273,8 @@ const handleDrop = (event) => {
 const handleEditFileSelect = (event) => {
     const files = Array.from(event.target.files)
     if (files.length > 0) {
-        // Add new files to editing attachments
         editingAttachments.value = [...editingAttachments.value, ...files]
     }
-    // Clear the file input
     event.target.value = ''
 }
 

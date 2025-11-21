@@ -44,7 +44,8 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        task = self.context.get("task")
+        task_id = self.context.get("task_id")
+        task = Task.objects.get(id=task_id)
         author = request.user
 
         comment = TaskComment.objects.create(
