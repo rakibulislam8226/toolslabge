@@ -850,7 +850,6 @@ const deletingComment = ref(null)
 const updatingComment = ref(false)
 const editingComment = ref(null)
 const editingAttachments = ref([]) // New attachments to add during edit
-const attachmentsToDelete = ref([]) // IDs of attachments to delete during edit
 const commentErrors = ref({})
 const currentUser = ref(null) // Will be set from auth context or API
 
@@ -967,14 +966,12 @@ const startEditComment = (comment) => {
         attachments: comment.attachment || [] // Include existing attachments
     }
     editingAttachments.value = [] // Reset new attachments
-    attachmentsToDelete.value = [] // Reset deleted attachments
     commentErrors.value = {}
 }
 
 const cancelEditComment = () => {
     editingComment.value = null
     editingAttachments.value = []
-    attachmentsToDelete.value = []
     commentErrors.value = {}
 }
 
@@ -989,17 +986,24 @@ const saveEditComment = async () => {
         const formData = new FormData()
         formData.append('content', editingComment.value.content.trim())
 
-        // Check if we have any changes to attachments
-        const hasAttachmentChanges = editingAttachments.value.length > 0 || attachmentsToDelete.value.length > 0
+        // Always indicate that we want to process attachments during edit
+        // This ensures that even when removing all attachments, the backend processes them
+        formData.append('process_attachments', 'true')
 
-        if (hasAttachmentChanges) {
-            // We have attachment changes, so we need to send ALL attachments we want to keep
+        // Add new attachment files
+        editingAttachments.value.forEach((file) => {
+            formData.append('attachment', file)
+        })
 
-            editingAttachments.value.forEach((file) => {
-                formData.append('attachment', file)
-            })
-            // TODO: Implement proper existing attachment preservation if needed
-        }
+        // Add IDs of existing attachments to keep
+        // When user clicks X to remove an attachment, it gets removed from editingComment.value.attachments
+        // So only attachments that should be kept remain in this array
+        const attachmentsToKeep = editingComment.value.attachments || []
+        attachmentsToKeep.forEach((attachment) => {
+            if (attachment.id) {
+                formData.append('keep_attachment_ids[]', attachment.id.toString())
+            }
+        })
 
         const response = await axios.patch(
             `projects/${projectId.value}/tasks/${props.task.id}/comments/${editingComment.value.id}/`,
@@ -1020,7 +1024,6 @@ const saveEditComment = async () => {
 
         editingComment.value = null
         editingAttachments.value = []
-        attachmentsToDelete.value = []
         $toast.success('Comment updated successfully')
     } catch (err) {
         const responseData = err.response?.data
@@ -1256,11 +1259,7 @@ const removeEditAttachment = (index) => {
 }
 
 const markAttachmentForDeletion = (attachment) => {
-    // Add attachment ID to deletion list
-    if (attachment.id && !attachmentsToDelete.value.includes(attachment.id)) {
-        attachmentsToDelete.value.push(attachment.id)
-    }
-    // Remove from the editing comment's attachments
+    // Remove from the editing comment's attachments - this attachment won't be sent in keep_attachment_ids
     if (editingComment.value && editingComment.value.attachments) {
         editingComment.value.attachments = editingComment.value.attachments.filter(a => a.id !== attachment.id)
     }
