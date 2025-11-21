@@ -9,7 +9,7 @@
             <p class="mt-2 text-gray-600">Manage and track all your organization's projects</p>
           </div>
           <div v-if="hasRole('owner', 'manager')">
-            <Button variant="primary" size="lg" label="Create Project" @click="createNewProject">
+            <Button variant="primary" size="lg" label="Create Project" @click=" createNewProject ">
               <template #icon>
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -37,7 +37,7 @@
         </svg>
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load projects</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
-        <Button variant="danger" size="md" label="Try Again" @click="fetchProjects" />
+        <Button variant="danger" size="md" label="Try Again" @click=" fetchProjects " />
       </div>
 
       <!-- Empty State -->
@@ -49,7 +49,7 @@
         </svg>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No projects yet</h3>
         <p class="text-gray-600 mb-6">Get started by creating your first project</p>
-        <Button variant="primary" size="lg" label="Create Your First Project" @click="createNewProject">
+        <Button variant="primary" size="lg" label="Create Your First Project" @click=" createNewProject ">
           <template #icon>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -60,7 +60,7 @@
 
       <!-- Projects Grid -->
       <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div v-for="project in projects" :key="project.id"
+        <div v-for="project in projects" :key=" project.id "
           class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer border border-gray-200"
           @click="viewProject(project)">
           <!-- Project Header -->
@@ -76,7 +76,7 @@
               </div>
 
               <!-- Status Badge -->
-              <span :class="getStatusBadgeClass(project.status)"
+              <span :class=" getStatusBadgeClass(project.status) "
                 class="px-2 py-1 text-xs font-medium rounded-full ml-3 shrink-0">
                 {{ project.status || 'Active' }}
               </span>
@@ -111,7 +111,7 @@
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
                 <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  :style="{ width: `${getStaticProgress(project)}%` }"></div>
+                  :style=" { width: `${ getStaticProgress(project) }%` } "></div>
               </div>
             </div>
 
@@ -129,7 +129,9 @@
             </div>
           </div> <!-- Project Actions -->
           <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-            <Button variant="secondary" size="sm" label="Edit" @click.stop="editProject(project)" />
+            <div v-if="hasRole('owner', 'manager')">
+              <Button variant="secondary" size="sm" label="Edit" @click.stop="editProject(project)" />
+            </div>
             <Button variant="outline" size="sm" label="View Details" @click.stop="viewProject(project)" />
           </div>
         </div>
@@ -137,13 +139,13 @@
 
       <!-- Load More Button (if pagination exists) -->
       <div v-if="hasMore && !loading" class="text-center mt-8">
-        <Button variant="secondary" size="lg" label="Load More Projects" @click="loadMore" />
+        <Button variant="secondary" size="lg" label="Load More Projects" @click=" loadMore " />
       </div>
     </div>
 
     <!-- Create Project Modal -->
-    <CreateProjectModal :is-open="showCreateModal" @close="closeCreateModal"
-      @created="(e) => { closeCreateModal(); onProjectCreated(e) }" />
+    <CreateProjectModal :is-open=" showCreateModal " @close=" closeCreateModal "
+      @created=" (e) => { closeCreateModal(); onProjectCreated(e) } " />
   </div>
 </template>
 

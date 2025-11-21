@@ -24,7 +24,7 @@
         <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
           Create Organization
         </h1>
-        <p class="text-gray-600">Start your journey with BaseTrack</p>
+        <p class="text-gray-600">Start your journey with TrackTools</p>
       </div>
 
       <!-- Registration Form -->
@@ -177,7 +177,7 @@ const handleSubmit = async () => {
   try {
     const response = await axios.post('organizations/register/', form)
 
-    toast.success('Organization created successfully! Welcome to BaseTrack.')
+    toast.success('Organization created successfully! Welcome to TrackTools.')
 
     // Handle authentication
     const authData = response.data.access ? response.data : response.data.data

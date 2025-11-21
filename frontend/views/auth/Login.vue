@@ -10,7 +10,7 @@
           </svg>
         </div>
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-        <p class="text-gray-600">Sign in to your BaseTrack account</p>
+        <p class="text-gray-600">Sign in to your TrackTools account</p>
       </div>
 
       <!-- General Error Alert -->
@@ -82,7 +82,7 @@
             <div class="w-full border-t border-gray-300"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">New to BaseTrack?</span>
+            <span class="px-2 bg-white text-gray-500">New to TrackTools?</span>
           </div>
         </div>
 

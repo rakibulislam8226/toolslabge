@@ -17,7 +17,7 @@
             Welcome to <span :class="[
               isDark ? 'text-cyan-400' : 'text-blue-600',
               'transition-colors duration-300'
-            ]">BaseTrack</span>
+            ]">TrackTools</span>
           </h1>
           <p :class="[
             isDark ? 'text-slate-300' : 'text-gray-600',
@@ -59,7 +59,7 @@
           isDark ? 'text-slate-100' : 'text-gray-800',
           'text-3xl font-bold text-center mb-12 transition-colors duration-300'
         ]">
-          Why Choose BaseTrack?
+          Why Choose TrackTools?
         </h2>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -150,7 +150,7 @@
           isDark ? 'text-slate-200' : 'text-blue-100',
           'mb-8 max-w-2xl mx-auto transition-colors duration-300'
         ]">
-          Join thousands of organizations already using BaseTrack to streamline their operations and boost productivity.
+          Join thousands of organizations already using TrackTools to streamline their operations and boost productivity.
         </p>
         <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
           <router-link to="/register" :class="[

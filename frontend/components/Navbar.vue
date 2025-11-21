@@ -8,7 +8,7 @@
                     <router-link :to="isAuthenticated ? '/dashboard' : '/'"
                         class="text-2xl font-bold transition-colors duration-300"
                         :class="isDark ? 'text-cyan-400' : 'text-indigo-600'">
-                        BaseTrack
+                        TrackTools
                     </router-link>
                 </div>
 
@@ -38,13 +38,13 @@
                                     : (isDark ? 'text-slate-300 hover:text-white hover:bg-slate-700 font-semibold' : 'text-gray-800 hover:text-indigo-600 hover:bg-indigo-50 font-semibold')">
                                 Projects
                             </router-link>
-                            <router-link to="/organizations/members"
+                            <!-- <router-link to="/organizations/members"
                                 class="px-4 py-2 rounded-lg text-sm transition-all duration-300 hover:scale-105"
                                 :class="$route.path.startsWith('/organizations/members')
                                     ? (isDark ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 font-bold' : 'bg-emerald-100 text-emerald-900 shadow-lg font-bold')
                                     : (isDark ? 'text-slate-300 hover:text-white hover:bg-slate-700 font-semibold' : 'text-gray-800 hover:text-emerald-600 hover:bg-emerald-50 font-semibold')">
                                 Members
-                            </router-link>
+                            </router-link> -->
                             <router-link to="/tasks"
                                 class="px-4 py-2 rounded-lg text-sm transition-all duration-300 hover:scale-105"
                                 :class="$route.path.startsWith('/tasks')
@@ -143,7 +143,7 @@
                                                 </svg>
                                                 View Profile
                                             </router-link>
-                                            <router-link to="/organizations" @click="dropdownOpen = false"
+                                            <router-link to="/organizations" v-if="hasRole('owner', 'admin')" @click="dropdownOpen = false"
                                                 class="flex items-center px-4 py-2 text-sm transition-colors duration-200"
                                                 :class="isDark ? 'text-slate-300 hover:bg-slate-700 hover:text-slate-100' : 'text-gray-900 hover:bg-gray-100 hover:text-black'">
                                                 <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
@@ -154,6 +154,18 @@
                                                     </path>
                                                 </svg>
                                                 Organization
+                                            </router-link>
+                                            <router-link to="/organizations/members" v-if="hasRole('owner', 'manager')" @click="dropdownOpen = false"
+                                                class="flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                                                :class="isDark ? 'text-slate-300 hover:bg-slate-700 hover:text-slate-100' : 'text-gray-900 hover:bg-gray-100 hover:text-black'">
+                                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zm-10 0a2 2 0 11-4 0 2 2 0 014 0z">
+                                                    </path>
+                                                </svg>
+                                                Members
                                             </router-link>
                                             <div class="my-1 border-t"
                                                 :class="isDark ? 'border-slate-700' : 'border-gray-200'"></div>
@@ -311,6 +323,7 @@ import { useLogoutModal } from "@/composables/useLogoutModal.js";
 import { useTheme } from "@/composables/useTheme.js";
 import LogoutModal from "./modals/LogoutModal.vue";
 
+const { hasRole } = useAuth();
 const mobileMenuOpen = ref(false);
 const dropdownOpen = ref(false);
 const { isAuthenticated, user } = useAuth();

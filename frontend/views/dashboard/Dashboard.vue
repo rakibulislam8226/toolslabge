@@ -13,7 +13,7 @@
         <h2 :class="[
           isDark ? 'text-slate-100' : 'text-gray-900',
           'text-2xl font-bold mb-4 transition-colors duration-300'
-        ]">Welcome to BaseTrack!</h2>
+        ]">Welcome to TrackTools!</h2>
         <p :class="[
           isDark ? 'text-slate-300' : 'text-gray-600',
           'mb-4 transition-colors duration-300'

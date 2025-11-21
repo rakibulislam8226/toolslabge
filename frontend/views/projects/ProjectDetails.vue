@@ -71,7 +71,7 @@
             <!-- Action Buttons -->
             <div
               class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
-              <Button @click="editProject" variant="primary" size="md"
+              <Button v-if="hasRole('owner', 'manager')" @click="editProject" variant="primary" size="md"
                 class="bg-blue-600 px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
                 style="color: white !important;" label="Edit Project">
                 <template #prepend>
