@@ -64,25 +64,25 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <BaseInput label="First Name" v-model=" form.first_name " placeholder="Enter your first name"
                         :error=" errors.first_name " size="md" @blur="validateField('first_name')"
-                        @input="clearError('first_name')" required />
+                        @input="handleFieldInput('first_name')" required />
 
                     <BaseInput label="Last Name" v-model=" form.last_name " placeholder="Enter your last name"
                         :error=" errors.last_name " size="md" @blur="validateField('last_name')"
-                        @input="clearError('last_name')" required />
+                        @input="handleFieldInput('last_name')" required />
                 </div>
 
                 <BaseInput label="Password" type="password" v-model=" form.password "
                     placeholder="Create a secure password" :error=" errors.password "
                     help-text="Password must be at least 8 characters long" size="md" @blur="validateField('password')"
-                    @input="clearError('password')" required />
+                    @input="handleFieldInput('password')" required />
 
                 <BaseInput label="Confirm Password" type="password" v-model=" form.confirm_password "
                     placeholder="Confirm your password" :error=" errors.confirm_password " size="md"
-                    @blur="validateField('confirm_password')" @input="clearError('confirm_password')" required />
+                    @blur="validateField('confirm_password')" @input="handleFieldInput('confirm_password')" required />
 
-                <Button type="submit" variant="primary" size="lg" fullWidth :loading=" loading "
-                    loadingText="Accepting Invitation..." label="Accept Invitation"
-                    class="mt-8 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" />
+                <Button type="submit" variant="primary" size="lg" fullWidth :disabled=" !isFormValid || loading "
+                    :loading=" loading " loadingText="Accepting Invitation..." label="Accept Invitation"
+                    class="mt-8 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg" />
             </form>
 
             <div class="mt-8 text-center space-y-3 relative z-10">
@@ -115,7 +115,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, inject, onMounted } from 'vue'
+import { ref, reactive, inject, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js";
 import { useAuth } from "@/composables/useAuth.js";
@@ -152,6 +152,26 @@ const fieldLabels = {
     confirm_password: 'Confirm password'
 }
 
+// Computed property to check if form is valid
+const isFormValid = computed(() => {
+    // Check if all required fields have values
+    const hasAllValues = requiredFields.every(field => {
+        const value = form[field]?.toString().trim()
+        return value && value.length > 0
+    })
+
+    // Check if passwords match
+    const passwordsMatch = form.password === form.confirm_password
+
+    // Check if password meets minimum length
+    const passwordValid = form.password && form.password.length >= 8
+
+    // Check if there are no current errors
+    const noErrors = Object.keys(errors.value).length === 0
+
+    return hasAllValues && passwordsMatch && passwordValid && noErrors
+})
+
 // Check if token exists and is valid on component mount
 onMounted(async () => {
     token.value = route.query.token
@@ -171,7 +191,7 @@ onMounted(async () => {
 
 // Validate single field
 const validateField = (fieldName) => {
-    const value = form[fieldName]?.trim()
+    const value = form[fieldName]?.toString().trim()
 
     // Required field validation
     if (requiredFields.includes(fieldName) && !value) {
@@ -198,6 +218,22 @@ const validateField = (fieldName) => {
     return true
 }
 
+// Real-time validation on input change
+const handleFieldInput = (fieldName) => {
+    // Clear error immediately when user starts typing
+    if (errors.value[fieldName]) {
+        delete errors.value[fieldName]
+    }
+
+    // If confirm password field and password field has value, revalidate both
+    if (fieldName === 'password' && form.confirm_password) {
+        validateField('confirm_password')
+    }
+    if (fieldName === 'confirm_password' && form.password) {
+        validateField('confirm_password')
+    }
+}
+
 // Validate all fields
 const validateForm = () => {
     let isValid = true
@@ -221,15 +257,22 @@ const clearError = (fieldName) => {
     delete errors.value[fieldName]
 }
 
-// Handle form submission
+// Check if token exists and is valid on component mount
 const handleSubmit = async () => {
-    if (!validateForm()) {
+    // Validate all fields before submission
+    let isValid = true
+    requiredFields.forEach(field => {
+        if (!validateField(field)) {
+            isValid = false
+        }
+    })
+
+    if (!isValid) {
         toast.error('Please fix the errors below and try again.')
         return
     }
 
     loading.value = true
-    errors.value = {}
 
     try {
         // Prepare data for API (exclude confirm_password)
@@ -241,7 +284,11 @@ const handleSubmit = async () => {
 
         const response = await axios.post(`organizations/accept-invite/?token=${token.value}`, apiData)
         toast.success('Invitation accepted successfully! You can now log in.')
-        router.push('/login')
+
+        // Redirect to login page after successful acceptance
+        setTimeout(() => {
+            router.push('/login')
+        }, 1500)
 
     } catch (error) {
         console.error('Accept invitation error:', error)
@@ -255,22 +302,44 @@ const handleSubmit = async () => {
             // If token is invalid, update the UI state
             if (errorMessage.toLowerCase().includes('token') || errorMessage.toLowerCase().includes('invitation')) {
                 tokenValid.value = false
+                return
             }
-        } else if (errorData?.data?.errors) {
-            // Handle API error format: { data: { errors: [{ field: "message" }] } }
-            errorData.data.errors.forEach(errorObj => {
-                Object.assign(errors.value, errorObj)
-            })
-            toast.error(errorData.message || 'Please fix the errors below and try again.')
-        } else if (errorData && typeof errorData === 'object') {
-            // Handle standard validation errors
-            Object.keys(errorData).forEach(field => {
-                const message = Array.isArray(errorData[field]) ? errorData[field][0] : errorData[field]
-                if (typeof message === 'string') {
-                    errors.value[field] = message
-                }
-            })
-            toast.error('Please fix the errors below and try again.')
+        }
+
+        // Handle field-specific validation errors
+        if (errorData && typeof errorData === 'object') {
+            let hasFieldErrors = false
+
+            // Clear previous errors
+            errors.value = {}
+
+            // Handle different error response formats
+            if (errorData.data?.errors) {
+                // Handle API error format: { data: { errors: [{ field: "message" }] } }
+                errorData.data.errors.forEach(errorObj => {
+                    Object.assign(errors.value, errorObj)
+                    hasFieldErrors = true
+                })
+            } else {
+                // Handle standard validation errors
+                Object.keys(errorData).forEach(field => {
+                    if (requiredFields.includes(field)) {
+                        const message = Array.isArray(errorData[field]) ? errorData[field][0] : errorData[field]
+                        if (typeof message === 'string') {
+                            errors.value[field] = message
+                            hasFieldErrors = true
+                        }
+                    }
+                })
+            }
+
+            if (hasFieldErrors) {
+                toast.error('Please fix the errors below and try again.')
+            } else {
+                // General error message if no field-specific errors
+                const message = errorData?.detail || errorData?.message || 'Something went wrong. Please try again.'
+                toast.error(message)
+            }
         } else {
             // Handle general errors
             const message = errorData?.detail || errorData?.message || 'Something went wrong. Please try again.'
