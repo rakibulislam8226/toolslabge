@@ -135,8 +135,7 @@ const send = async () => {
   message.value = ''
 
   try {
-    const orgId = user.value?.organizations?.[0]?.organization_id
-    const response = await axios.post(`organizations/${orgId}/invite/`, form.value)
+    const response = await axios.post(`organizations/invite/`, form.value)
     message.value = response.data.message || 'Invitation sent successfully'
     isError.value = false
     emit('invited', form.value)

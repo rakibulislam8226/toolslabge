@@ -4,7 +4,7 @@ from ..views.invitations import SendInvitationView, AcceptInvitationView
 
 urlpatterns = [
     path(
-        "<int:org_id>/invite/",
+        "invite/",
         SendInvitationView.as_view(),
         name="send-invite",
     ),

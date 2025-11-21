@@ -12,16 +12,18 @@ from ...choices import OrganizationMemberRoleChoices
 from ...models import Organization
 
 
-# FIXME:Permissions check exact organizationuser with org_id
 class SendInvitationView(generics.CreateAPIView):
     serializer_class = SendInvitationSerializer
-    # permission_classes = [IsOrgOwnerAdminOrManager]
+    permission_classes = [IsOrgOwnerAdminOrManager]
 
     def get_queryset(self):
         return Organization.objects.none()
 
     def get_organization(self):
-        org_id = self.kwargs.get("org_id")
+        user = self.request.user
+        org_id = (
+            user.organization_memberships.filter(is_active=True).first().organization.id
+        )
         return Organization.objects.get(id=org_id)
 
     def create(self, request, *args, **kwargs):
@@ -39,16 +41,14 @@ class SendInvitationView(generics.CreateAPIView):
             )
 
         serializer = self.get_serializer(
-            data=request.data, context={"organization": org, "request": request}
+            data=request.data,
+            context={"organization": org, "request": request},
         )
         serializer.is_valid(raise_exception=True)
-        invitation = serializer.save()
-        print("invitation token:", invitation.token)
+        serializer.save()
+
         return Response(
-            {
-                "detail": f"Invitation sent to {invitation.email}.",
-                "token": invitation.token,  # show for now (remove in prod)
-            },
+            {"detail": "Invitation sent successfully."},
             status=status.HTTP_201_CREATED,
         )
 
@@ -58,9 +58,21 @@ class AcceptInvitationView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        token = request.GET.get("token")
+
+        if not token:
+            return Response(
+                {"detail": "Token is required in the URL."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"token": token},
+        )
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        serializer.save()
+
         return Response(
             {"detail": "Invitation accepted successfully. You can now log in."},
             status=status.HTTP_201_CREATED,

@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from ...choices import OrganizationMemberRoleChoices
 from ...models import OrganizationInvitation, OrganizationMember
+from ...tasks import send_invitation_email
 
 User = get_user_model()
 
@@ -34,9 +35,11 @@ class SendInvitationSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         org = self.context["organization"]
-        created_by = self.context["request"].user
+        request = self.context["request"]
 
+        created_by = request.user
         token = secrets.token_urlsafe(32)
+
         invitation = OrganizationInvitation.objects.create(
             organization=org,
             created_by=created_by,
@@ -44,23 +47,33 @@ class SendInvitationSerializer(serializers.ModelSerializer):
             **validated_data,
         )
 
-        # TODO: send email here
+        # Build dynamic frontend URL using request
+        base_url = request.build_absolute_uri("/")[:-1]
+        accept_url = f"{base_url}/accept-invite/?token={token}"
+
+        # Send email async
+        send_invitation_email.delay(
+            invitation.email,
+            accept_url,
+            org.name,
+        )
+
         return invitation
 
 
 class AcceptInvitationSerializer(serializers.Serializer):
-    token = serializers.CharField()
     first_name = serializers.CharField(max_length=50)
     last_name = serializers.CharField(max_length=50)
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
+        token = self.context["token"]
+
         try:
-            invitation = OrganizationInvitation.objects.get(
-                token=data["token"], accepted=False
-            )
+            invitation = OrganizationInvitation.objects.get(token=token, accepted=False)
         except OrganizationInvitation.DoesNotExist:
             raise serializers.ValidationError("Invalid or expired invitation token.")
+
         data["invitation"] = invitation
         return data
 

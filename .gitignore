@@ -191,3 +191,6 @@ package-lock.json
 jsconfig.json
 
 .hotfile
+
+celerybeat-schedule-shm
+celerybeat-schedule-wal
