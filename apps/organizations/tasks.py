@@ -8,24 +8,27 @@ from celery import shared_task
 def send_invitation_email(email, accept_url, organization_name):
     subject = f"You've been invited to join {organization_name}"
 
-    message = f"""
-        Hi,
-
-        You have been invited to join {organization_name}.
-
-        Click the link below to accept your invitation:
-        {accept_url}
-
-        If you didn't expect this, you can ignore the email.
-
-        Thanks,
-        {organization_name} Team
-        """
+    html_message = f"""
+        <p>Hi Dear,</p>
+        <p>You have been invited to join {organization_name}.</p>
+        <p>
+            <a href="{accept_url}" style="display:inline-block;padding:10px 20px;background-color:#007bff;color:#fff;text-decoration:none;border-radius:4px;">
+                Click here to accept your invitation
+            </a>
+        </p>
+        <p>
+            Or click the link below:<br>
+            <a href="{accept_url}">{accept_url}</a>
+        </p>
+        <p>If you didn't expect this, you can ignore the email.</p>
+        <p>Thanks,<br>{organization_name}</p>
+    """
 
     send_mail(
         subject,
-        message,
+        "",
         settings.DEFAULT_FROM_EMAIL,
         [email],
         fail_silently=False,
+        html_message=html_message,
     )
