@@ -19,6 +19,12 @@ const routes = [
     meta: { requiresGuest: true },
   },
   {
+    path: "/accept-invite",
+    name: "auth.accept-invite",
+    component: () => import("@/views/auth/AcceptInvite.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
     path: "/dashboard",
     name: "dashboard.index",
     component: () => import("@/views/dashboard/Dashboard.vue"),
