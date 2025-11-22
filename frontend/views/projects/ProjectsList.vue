@@ -48,8 +48,11 @@
           </path>
         </svg>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No projects yet</h3>
-        <p class="text-gray-600 mb-6">Get started by creating your first project</p>
-        <Button variant="primary" size="lg" label="Create Your First Project" @click=" createNewProject ">
+        <p class="text-gray-600 mb-6">Get started by creating your first project or contact your administrator for
+          access.
+        </p>
+        <Button v-if="hasRole('admin', 'owner')" variant="primary" size="lg" label="Create Your First Project"
+          @click=" createNewProject ">
           <template #icon>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -129,7 +132,7 @@
             </div>
           </div> <!-- Project Actions -->
           <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-            <div v-if="hasRole('owner','admin', 'manager')">
+            <div v-if="hasRole('owner', 'admin', 'manager')">
               <Button variant="secondary" size="sm" label="Edit" @click.stop="editProject(project)" />
             </div>
             <Button variant="outline" size="sm" label="View Details" @click.stop="viewProject(project)" />
