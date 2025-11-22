@@ -17,11 +17,11 @@
         <h3 class="text-base sm:text-lg font-semibold text-red-800 mb-2">Failed to load project members</h3>
         <p class="text-sm sm:text-base text-red-600 mb-4">{{ error }}</p>
         <div class="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3">
-          <button @click="fetchMembers"
+          <button @click=" fetchMembers "
             class="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 text-sm sm:text-base cursor-pointer">
             Try Again
           </button>
-          <button @click="goBack"
+          <button @click=" goBack "
             class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 text-sm sm:text-base cursor-pointer">
             Back to Project
           </button>
@@ -50,7 +50,7 @@
                     </svg>
                   </li>
                   <li>
-                    <button @click="goBack"
+                    <button @click=" goBack "
                       class="hover:text-blue-600 transition duration-300 truncate max-w-[120px] sm:max-w-none cursor-pointer focus:outline-none focus:text-blue-600">
                       {{ projectName }}
                     </button>
@@ -76,14 +76,14 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center justify-end lg:ml-6">
+            <div v-if="hasRole('owner', 'admin')" class="flex items-center justify-end lg:ml-6">
               <button @click="showAddMemberModal = true"
-              class="bg-blue-600 text-white font-bold px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md">
-              <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              <span class="hidden sm:inline">Add Member</span>
-              <span class="sm:hidden">Add</span>
+                class="bg-blue-600 text-white font-bold px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md">
+                <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span class="hidden sm:inline">Add Member</span>
+                <span class="sm:hidden">Add</span>
               </button>
             </div>
           </div>
@@ -173,7 +173,7 @@
         </div>
 
         <div v-else class="divide-y divide-gray-200">
-          <div v-for="member in members" :key="member.id"
+          <div v-for="member in members" :key=" member.id "
             class="px-4 sm:px-6 py-4 hover:bg-gray-50 transition duration-300">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
               <div class="flex items-center min-w-0 flex-1">
@@ -200,11 +200,11 @@
 
               <!-- Role and Actions -->
               <div class="flex items-center justify-between sm:justify-end space-x-3 flex-shrink-0">
-                <span :class="getRoleBadgeClass(member.role)" class="px-2 py-1 text-xs font-medium rounded-full">
+                <span :class=" getRoleBadgeClass(member.role) " class="px-2 py-1 text-xs font-medium rounded-full">
                   {{ formatRole(member.role) }}
                 </span>
 
-                <div class="flex items-center space-x-1">
+                <div v-if="hasRole('owner', 'admin')" class="flex items-center space-x-1">
                   <button @click="editMember(member)"
                     class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded-lg cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     title="Edit role">
@@ -232,18 +232,18 @@
     </div>
 
     <!-- Add Member Modal -->
-    <AddProjectMemberModal :is-open="showAddMemberModal" :project-slug="projectSlug" @close="closeAddMemberModal"
-      @added="onMemberAdded" />
+    <AddProjectMemberModal :is-open=" showAddMemberModal " :project-slug=" projectSlug " @close=" closeAddMemberModal "
+      @added=" onMemberAdded " />
 
     <!-- Edit Member Modal -->
-    <EditProjectMemberModal v-if="editingMember" :is-open="showEditMemberModal" :member="editingMember"
-      :project-slug="projectSlug" @close="showEditMemberModal = false" @updated="handleMemberUpdated" />
+    <EditProjectMemberModal v-if="editingMember" :is-open=" showEditMemberModal " :member=" editingMember "
+      :project-slug=" projectSlug " @close="showEditMemberModal = false" @updated=" handleMemberUpdated " />
 
     <!-- Remove Member Confirmation Modal -->
-    <ConfirmModal :is-open="showRemoveModal" title="Remove Member"
-      :message="`Are you sure you want to remove ${removingMember?.user_name ? removingMember.user_name : removingMember?.user_email} from this project?`"
+    <ConfirmModal :is-open=" showRemoveModal " title="Remove Member"
+      :message=" `Are you sure you want to remove ${ removingMember?.user_name ? removingMember.user_name : removingMember?.user_email } from this project?` "
       confirm-text="Remove" confirm-class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
-      @confirm="confirmRemoveMember" @cancel="showRemoveModal = false" />
+      @confirm=" confirmRemoveMember " @cancel="showRemoveModal = false" />
   </div>
 </template>
 
@@ -254,7 +254,9 @@ import axios from "@/plugins/axiosConfig.js"
 import AddProjectMemberModal from '@/components/modals/AddProjectMemberModal.vue'
 import EditProjectMemberModal from '@/components/modals/EditProjectMemberModal.vue'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
+import { useAuth } from '@/composables/useAuth.js'
 
+const { hasRole } = useAuth()
 const router = useRouter()
 const route = useRoute()
 

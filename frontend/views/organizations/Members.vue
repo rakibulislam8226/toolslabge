@@ -13,7 +13,6 @@
                         </p>
                     </div>
                     <div v-if="hasRole('owner', 'admin')" class="flex-shrink-0">
-                    <!-- <div v-if="hasPermission('organizations.add_organizationinvitation')" class="flex-shrink-0"> -->
                         <button @click="openInviteModal = true"
                             class="bg-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-lg flex items-center transform hover:scale-105"
                             style="color: white !important;">

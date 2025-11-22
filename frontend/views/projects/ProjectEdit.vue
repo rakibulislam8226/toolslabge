@@ -16,7 +16,7 @@
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load project</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
         <div class="space-x-3">
-          <Button variant="danger" size="md" label="Try Again" @click="fetchProject" />
+          <Button variant="danger" size="md" label="Try Again" @click=" fetchProject " />
           <router-link to="/projects"
             class="bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block"
             style="color: white !important;">
@@ -45,7 +45,7 @@
                 </svg>
               </li>
               <li>
-                <router-link :to="`/projects/${project.slug}`" class="hover:text-blue-600 transition duration-300">
+                <router-link :to=" `/projects/${ project.slug }` " class="hover:text-blue-600 transition duration-300">
                   {{ project.name }}
                 </router-link>
               </li>
@@ -61,8 +61,8 @@
           <h1 class="text-3xl font-bold text-gray-900">Edit Project</h1>
           <p class="mt-2 text-gray-600">Update your project information</p>
         </div>
-        <div>
-          <router-link :to="`/projects/${project.slug}/members`"
+        <div v-if="hasRole('owner', 'admin')" class="space-x-3 flex-shrink-0">
+          <router-link :to=" `/projects/${ project.slug }/members` "
             class="bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300 flex items-center"
             style="color: white !important;">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -77,50 +77,47 @@
 
       <!-- Form -->
       <div class="bg-white rounded-lg shadow-sm border">
-        <form @submit.prevent="updateProject" class="p-6 space-y-6">
+        <form @submit.prevent=" updateProject " class="p-6 space-y-6">
           <!-- Project Name -->
-          <BaseInput v-model="form.name" label="Project Name" placeholder="Enter project name" required
-            :error="fieldErrors.name" />
+          <BaseInput v-model=" form.name " label="Project Name" placeholder="Enter project name" required
+            :error=" fieldErrors.name " />
 
           <!-- Project Description -->
-          <BaseTextarea v-model="form.description" label="Description" placeholder="Enter project description" :rows="4"
-            :error="fieldErrors.description" />
+          <BaseTextarea v-model=" form.description " label="Description" placeholder="Enter project description"
+            :rows=" 4 " :error=" fieldErrors.description " />
 
           <!-- Date Fields -->
           <div class="grid md:grid-cols-2 gap-6">
             <!-- Start Date -->
-            <BaseDatePicker v-model="form.start_date" label="Start Date" placeholder="Select start date"
-              :enable-time="false" date-format="Y-m-d" alt-format="F j, Y" :error="fieldErrors.start_date" />
+            <BaseDatePicker v-model=" form.start_date " label="Start Date" placeholder="Select start date"
+              :enable-time=" false " date-format="Y-m-d" alt-format="F j, Y" :error=" fieldErrors.start_date " />
 
             <!-- End Date -->
-            <BaseDatePicker v-model="form.end_date" label="End Date" placeholder="Select end date" :enable-time="false"
-              date-format="Y-m-d" alt-format="F j, Y" :error="fieldErrors.end_date" />
+            <BaseDatePicker v-model=" form.end_date " label="End Date" placeholder="Select end date"
+              :enable-time=" false " date-format="Y-m-d" alt-format="F j, Y" :error=" fieldErrors.end_date " />
           </div>
 
           <!-- Status -->
-          <BaseSelect v-model="form.status" label="Status" :options="statusOptions" :error="fieldErrors.status" />
+          <BaseSelect v-model=" form.status " label="Status" :options=" statusOptions " :error=" fieldErrors.status " />
 
           <!-- Form Actions -->
           <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-            <router-link :to="`/projects/${project.slug}`"
-              class="text-gray-600 hover:text-gray-800 font-medium transition duration-300">
-              Cancel
-            </router-link>
+            <Button variant="outline" size="md" label="< Back" @click=" router.push(`/projects/${ project.slug }`)" />
 
-            <div class="flex space-x-3">
-              <button type="button" @click="showDeleteModal = true"
-                class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300 flex items-center cursor-pointer"
-                style="color: white !important;">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                  </path>
-                </svg>
-                <span style="color: white !important;">Delete Project</span>
-              </button>
+            <div class="flex space-x-3" v-if="hasRole('owner', 'admin')">
+              <Button variant="danger" size="md" @click="showDeleteModal = true" :disabled=" deleting "
+                class="flex items-center" label="Delete">
+                <template #icon>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4">
+                    </path>
+                  </svg>
+                </template>
+              </Button>
 
-              <Button type="submit" variant="primary" size="md" :loading="updating" loadingText="Updating..."
-                label="Update Project">
+              <Button type="submit" variant="primary" size="md" :loading=" updating " loadingText="Updating..."
+                label="Update">
                 <template #icon>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -153,11 +150,11 @@
         </p>
 
         <div class="flex space-x-3 justify-end">
-          <button @click="showDeleteModal = false" :disabled="deleting"
+          <button @click="showDeleteModal = false" :disabled=" deleting "
             class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300 disabled:opacity-50">
             Cancel
           </button>
-          <button @click="deleteProject" :disabled="deleting"
+          <button @click=" deleteProject " :disabled=" deleting "
             class="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition duration-300 disabled:opacity-50 flex items-center"
             style="color: white !important;">
             <span v-if="deleting" class="flex items-center" style="color: white !important;">
@@ -184,6 +181,9 @@ import { useRouter, useRoute } from 'vue-router'
 import Button from '@/components/Button.vue'
 import axios from "@/plugins/axiosConfig.js"
 import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker } from '@/components/forms'
+import { useAuth } from '../../composables/useAuth'
+
+const { hasRole } = useAuth();
 
 const router = useRouter()
 const route = useRoute()

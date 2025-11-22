@@ -20,9 +20,11 @@ class ProjectListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
+        org = user.organization_memberships.first().organization
+
         return (
             Project.objects.select_related("organization")
-            .filter(organization=user.organization_memberships.first().organization)
+            .filter(Q(organization=org) & Q(memberships__user=user))
             .distinct()
         )
 

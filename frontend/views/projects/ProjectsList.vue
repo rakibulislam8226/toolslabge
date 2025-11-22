@@ -8,7 +8,7 @@
             <h1 class="text-3xl font-bold text-gray-900">Projects</h1>
             <p class="mt-2 text-gray-600">Manage and track all your organization's projects</p>
           </div>
-          <div v-if="hasRole('owner', 'manager')">
+          <div v-if="hasRole('owner', 'admin')">
             <Button variant="primary" size="lg" label="Create Project" @click=" createNewProject ">
               <template #icon>
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,7 +129,7 @@
             </div>
           </div> <!-- Project Actions -->
           <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-            <div v-if="hasRole('owner', 'manager')">
+            <div v-if="hasRole('owner','admin', 'manager')">
               <Button variant="secondary" size="sm" label="Edit" @click.stop="editProject(project)" />
             </div>
             <Button variant="outline" size="sm" label="View Details" @click.stop="viewProject(project)" />
