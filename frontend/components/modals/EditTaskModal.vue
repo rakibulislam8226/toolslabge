@@ -1,5 +1,5 @@
 <template>
-    <BaseModal :is-open=" isOpen " title="Edit Task" size="xxxl" @close=" closeModal ">
+    <BaseModal :is-open="isOpen" title="Edit Task" size="xxxl" @close="closeModal">
         <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-8">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -12,20 +12,20 @@
             <div class="lg:hidden mb-4">
                 <div class="border-b border-gray-200 dark:border-gray-700">
                     <nav class="-mb-px flex space-x-8">
-                        <button @click="activeTab = 'edit'" :class=" [
+                        <button @click="activeTab = 'edit'" :class="[
                             'py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap',
                             activeTab === 'edit'
                                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                        ] ">
+                        ]">
                             Edit Task
                         </button>
-                        <button @click="activeTab = 'comments'" :class=" [
+                        <button @click="activeTab = 'comments'" :class="[
                             'py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap',
                             activeTab === 'comments'
                                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                        ] ">
+                        ]">
                             Comments ({{ comments.length }})
                         </button>
                     </nav>
@@ -34,45 +34,44 @@
 
             <!-- Desktop Layout & Mobile Tab Content -->
             <div class="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0">
-                <div :class=" [
+                <div :class="[
                     'flex-1 lg:pr-6 lg:border-r border-gray-200 dark:border-gray-700 lg:min-w-0 min-h-0',
                     { 'hidden lg:block': activeTab !== 'edit' }
-                ] ">
+                ]">
                     <div class="h-full overflow-y-auto pr-2 custom-scrollbar">
-                        <form @submit.prevent=" updateTask " class="space-y-4 pb-4">
-                             <pre>{{ canEditTask }}</pre>
-                            <BaseInput v-model=" form.title " label="Title" placeholder="Enter task title" required
-                                :error=" fieldErrors.title " :disabled=" !canEditTask " />
+                        <form @submit.prevent="updateTask" class="space-y-4 pb-4">
+                            <BaseInput v-model="form.title" label="Title" placeholder="Enter task title" required
+                                :error="fieldErrors.title" :disabled="!canEditTask" />
 
-                            <BaseTextarea v-model=" form.description " label="Description"
-                                placeholder="Enter task description" :rows=" 3 " :error=" fieldErrors.description "
-                                :disabled=" !canEditTask " />
+                            <BaseTextarea v-model="form.description" label="Description"
+                                placeholder="Enter task description" :rows="3" :error="fieldErrors.description"
+                                :disabled="!canEditTask" />
 
                             <!-- Status and Priority Row -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <BaseSelect v-model=" form.status_id " label="Status" placeholder="Select status"
-                                    :options=" statuses " option-value="id" option-label="name"
-                                    :error=" fieldErrors.status_id " :disabled=" !canEditTask " />
+                                <BaseSelect v-model="form.status_id" label="Status" placeholder="Select status"
+                                    :options="statuses" option-value="id" option-label="name"
+                                    :error="fieldErrors.status_id" :disabled="!canEditTask" />
 
-                                <BaseSelect v-model=" form.priority " label="Priority" :options=" priorityOptions "
-                                    :error=" fieldErrors.priority " :disabled=" !canEditTask " />
+                                <BaseSelect v-model="form.priority" label="Priority" :options="priorityOptions"
+                                    :error="fieldErrors.priority" :disabled="!canEditTask" />
                             </div>
 
                             <!-- Scheduling Section -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <BaseDatePicker v-model=" form.scheduled_start " label="Scheduled Start"
-                                    placeholder="Select start date & time" :error=" fieldErrors.start_date "
-                                    :disabled=" !canEditTask " />
+                                <BaseDatePicker v-model="form.scheduled_start" label="Scheduled Start"
+                                    placeholder="Select start date & time" :error="fieldErrors.start_date"
+                                    :disabled="!canEditTask || !canEditDateRelated" />
 
-                                <BaseDatePicker v-model=" form.target_completion " label="Target Completion"
-                                    placeholder="Select completion date & time" :error=" fieldErrors.due_date "
-                                    :disabled=" !canEditTask " />
+                                <BaseDatePicker v-model="form.target_completion" label="Target Completion"
+                                    placeholder="Select completion date & time" :error="fieldErrors.due_date"
+                                    :disabled="!canEditTask || !canEditDateRelated" />
                             </div>
 
                             <!-- Estimated Hours -->
-                            <BaseInput v-model=" form.estimated_hours " label="Estimated Hours" type="number"
+                            <BaseInput v-model="form.estimated_hours" label="Estimated Hours" type="number"
                                 placeholder="e.g., 4.5" step="0.5" min="0" max="999"
-                                :error=" fieldErrors.estimated_hours " :disabled=" !canEditTask " />
+                                :error="fieldErrors.estimated_hours" :disabled="!canEditTask || !canEditDateRelated" />
 
                             <!-- Deadline Extension Section -->
                             <div class="space-y-4 deadline-extension-responsive">
@@ -133,25 +132,25 @@
                                             <div class="grid gap-4">
                                                 <!-- New Deadline -->
                                                 <div>
-                                                    <BaseDatePicker v-model=" deadlineExtension.new_due_date "
+                                                    <BaseDatePicker v-model="deadlineExtension.new_due_date"
                                                         label="New Deadline"
                                                         placeholder="Select new deadline date & time"
-                                                        :error=" deadlineExtension.errors.new_due_date "
-                                                        class="deadline-picker" :disabled=" !canEditTask " />
+                                                        :error="deadlineExtension.errors.new_due_date"
+                                                        class="deadline-picker" :disabled="!canEditTask || !canEditDateRelated" />
                                                 </div>
 
                                                 <!-- Reason -->
                                                 <div>
-                                                    <BaseTextarea v-model=" deadlineExtension.reason "
+                                                    <BaseTextarea v-model="deadlineExtension.reason"
                                                         label="Justification"
                                                         placeholder="Briefly explain why this extension is necessary..."
-                                                        :rows=" 3 " :error=" deadlineExtension.errors.reason "
-                                                        class="reason-input" :disabled=" !canEditTask " />
+                                                        :rows="3" :error="deadlineExtension.errors.reason"
+                                                        class="reason-input" :disabled="!canEditTask || !canEditDateRelated" />
                                                 </div>
 
                                                 <!-- Submit Button -->
-                                                <button @click=" submitDeadlineExtension "
-                                                    :disabled=" !deadlineExtension.new_due_date || extensionLoading || !canEditTask "
+                                                <button @click="submitDeadlineExtension"
+                                                    :disabled="!deadlineExtension.new_due_date || extensionLoading || !canEditTask || !canEditDateRelated"
                                                     type="button"
                                                     class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none deadline-extend-btn">
                                                     <span v-if="extensionLoading"
@@ -198,7 +197,7 @@
                                             <div class="max-h-48 overflow-y-auto extension-history-scroll">
                                                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                                                     <div v-for="(extension, index) in deadlineExtensions"
-                                                        :key=" extension.id "
+                                                        :key="extension.id"
                                                         class="p-4 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150 extension-item">
                                                         <div class="flex items-start justify-between space-x-4">
                                                             <div class="flex-1 min-w-0">
@@ -240,7 +239,7 @@
                                                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                                         </svg>
                                                                         <span>{{ extension.created_by || 'Unknown'
-                                                                            }}</span>
+                                                                        }}</span>
                                                                     </span>
                                                                     <span class="flex items-center space-x-1">
                                                                         <svg class="w-3 h-3" fill="none"
@@ -250,7 +249,7 @@
                                                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
                                                                         <span>{{ formatDateTime(extension.created_at)
-                                                                            }}</span>
+                                                                        }}</span>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -259,7 +258,7 @@
                                                             <div class="shrink-0">
                                                                 <span
                                                                     class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium extension-badge"
-                                                                    :class=" index === 0 ? 'bg-blue-100 text-blue-800 dark:bg-gray-700 dark:text-blue-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' ">
+                                                                    :class="index === 0 ? 'bg-blue-100 text-blue-800 dark:bg-gray-700 dark:text-blue-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'">
                                                                     {{ deadlineExtensions.length - index }}
                                                                 </span>
                                                             </div>
@@ -277,17 +276,17 @@
                                 <div class="mb-2">
                                     <BaseInput label="Task Members" placeholder="Search task members..."
                                         @input="debouncedMemberSearch($event.target.value)" size="sm"
-                                        :disabled=" !canEditTask " />
+                                        :disabled="!canEditTask || !canEditDateRelated" />
                                 </div> <!-- Selected Members Display -->
                                 <div v-if="form.assigned_members.length > 0"
                                     class="mb-2 p-2 bg-gray-50 dark:bg-blue-900/20 rounded-lg">
                                     <div class="text-xs font-medium text-gray-600 dark:text-blue-300 mb-1">Assigned Team
                                         Members:</div>
                                     <div class="flex flex-wrap gap-1">
-                                        <span v-for="memberId in form.assigned_members" :key=" memberId "
+                                        <span v-for="memberId in form.assigned_members" :key="memberId"
                                             class="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-blue-800 text-gray-700 dark:text-blue-200 rounded-full">
                                             {{ getSelectedMemberName(memberId) }}
-                                            <button v-if="canEditTask" @click="removeMember(memberId)"
+                                            <button v-if="canEditTask && canEditDateRelated" @click="removeMember(memberId)"
                                                 class="ml-1 text-gray-500 dark:text-blue-400 hover:text-gray-700 dark:hover:text-blue-200">
                                                 ×
                                             </button>
@@ -306,12 +305,12 @@
                                         class="text-sm text-gray-400 dark:text-gray-400 text-center py-2">
                                         No members found matching "{{ memberSearchQuery }}"
                                     </div>
-                                    <label v-for="member in projectMembers" :key=" member.id "
+                                    <label v-for="member in projectMembers" :key="member.id"
                                         class="flex items-center space-x-2 hover:bg-blue-50 hover:border-blue-200 border border-transparent dark:hover:bg-gray-700 dark:hover:border-gray-600 p-1 rounded cursor-pointer transition-all duration-200"
-                                        :class=" { 'opacity-50 cursor-not-allowed': !canEditTask } ">
-                                        <input type="checkbox" :value=" member.user " v-model=" form.assigned_members "
+                                        :class="{ 'opacity-50 cursor-not-allowed': !canEditTask || !canEditDateRelated }">
+                                        <input type="checkbox" :value="member.user" v-model="form.assigned_members"
                                             class="rounded border-gray-200 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700"
-                                            :disabled=" !canEditTask " />
+                                            :disabled="!canEditTask || !canEditDateRelated" />
                                         <div class="flex items-center space-x-2 flex-1 min-w-0">
                                             <div
                                                 class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
@@ -336,10 +335,10 @@
                 </div>
 
                 <!-- Right Side - Comments Section -->
-                <div :class=" [
+                <div :class="[
                     'w-full lg:w-96 min-h-0',
                     { 'hidden lg:block': activeTab !== 'comments' }
-                ] ">
+                ]">
                     <div class="h-full flex flex-col">
                         <!-- Comments Header (hidden on mobile, shown in tabs) -->
                         <div
@@ -364,16 +363,16 @@
                             <div class="flex-1">
                                 <!-- Comment Box with Attachment Section -->
                                 <div class="relative border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-900 transition-all duration-200"
-                                    @dragenter=" handleDragEnter " @dragleave=" handleDragLeave "
-                                    @dragover=" handleDragOver " @drop=" handleDrop "
-                                    :class=" { 'ring-2 ring-blue-300 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500': isDragOver } ">
+                                    @dragenter="handleDragEnter" @dragleave="handleDragLeave" @dragover="handleDragOver"
+                                    @drop="handleDrop"
+                                    :class="{ 'ring-2 ring-blue-300 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500': isDragOver }">
                                     <!-- Textarea Container -->
                                     <div class="relative">
-                                        <BaseTextarea v-model=" newComment "
-                                            :placeholder=" isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Ctrl+Enter to submit)' "
-                                            :rows=" 4 "
+                                        <BaseTextarea v-model="newComment"
+                                            :placeholder="isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Ctrl+Enter to submit)'"
+                                            :rows="4"
                                             class="comment-textarea border-0 rounded-none resize-none pr-16 transition-colors duration-200"
-                                            :error=" commentErrors.content " @keydown=" handleCommentKeydown " />
+                                            :error="commentErrors.content" @keydown="handleCommentKeydown" />
 
                                         <!-- Attach Button Inside Textarea -->
                                         <button v-if="!showAttachmentInput" @click="$refs.fileInput.click()"
@@ -387,7 +386,7 @@
                                     </div>
 
                                     <!-- Hidden File Input -->
-                                    <input type="file" ref="fileInput" @change=" handleFileSelect " multiple
+                                    <input type="file" ref="fileInput" @change="handleFileSelect" multiple
                                         accept="image/*,.pdf,.doc,.docx,.txt,.zip" class="hidden" />
 
                                     <!-- Attachments Section Inside Comment Box -->
@@ -396,13 +395,12 @@
                                         <!-- Simple file list -->
                                         <div class="space-y-1 lg:space-y-2 max-h-32 overflow-y-auto">
                                             <div v-for="(attachment, index) in selectedAttachments"
-                                                :key=" `attachment-${ index }` "
+                                                :key="`attachment-${index}`"
                                                 class="flex items-center space-x-2 lg:space-x-3 p-1.5 lg:p-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 attachment-item">
                                                 <!-- File Icon/Preview -->
                                                 <div class="shrink-0">
                                                     <div v-if="isImageFile(attachment)" class="relative cursor-pointer">
-                                                        <img :src=" getFilePreviewUrl(attachment) "
-                                                            :alt=" attachment.name "
+                                                        <img :src="getFilePreviewUrl(attachment)" :alt="attachment.name"
                                                             class="w-8 h-8 rounded object-cover border border-gray-200 dark:border-gray-600 hover:opacity-80 transition-opacity cursor-pointer"
                                                             @click="previewAttachment(attachment)" />
                                                     </div>
@@ -429,7 +427,7 @@
                                                 <!-- Remove Button -->
                                                 <button @click="removeAttachment(index)"
                                                     class="text-red-400 hover:text-red-600 transition-colors cursor-pointer p-1"
-                                                    :title=" `Remove ${ attachment.name }` ">
+                                                    :title="`Remove ${attachment.name}`">
                                                     <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -448,17 +446,17 @@
                                         class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 p-2 lg:p-3">
                                         <div class="flex items-center space-x-3">
                                             <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                <span :class=" newComment.length > 1000 ? 'text-red-500' : '' ">
+                                                <span :class="newComment.length > 1000 ? 'text-red-500' : ''">
                                                     {{ newComment.length }}
                                                 </span>
                                                 <span class="text-gray-400">/1000</span>
                                             </div>
                                         </div>
 
-                                        <BaseButton variant="primary" size="sm" @click=" addComment "
-                                            :disabled=" (!newComment.trim() && selectedAttachments.length === 0) || addingComment || newComment.length > 1000 "
-                                            :loading=" addingComment " loadingText="Adding..." class="w-full sm:w-auto">
-                                            <template v-if=" !addingComment " #icon>
+                                        <BaseButton variant="primary" size="sm" @click="addComment"
+                                            :disabled="(!newComment.trim() && selectedAttachments.length === 0) || addingComment || newComment.length > 1000"
+                                            :loading="addingComment" loadingText="Adding..." class="w-full sm:w-auto">
+                                            <template v-if="!addingComment" #icon>
                                                 <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -492,7 +490,7 @@
                                 </div>
 
                                 <!-- Comment Items -->
-                                <div v-for="comment in comments" :key=" comment.id "
+                                <div v-for="comment in comments" :key="comment.id"
                                     class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-3 lg:p-4 comment-item">
                                     <!-- Comment Header -->
                                     <div class="flex items-start justify-between mb-2">
@@ -529,7 +527,7 @@
                                                 </svg>
                                             </button>
                                             <button @click="deleteComment(comment.id)"
-                                                :disabled=" deletingComment === comment.id "
+                                                :disabled="deletingComment === comment.id"
                                                 class="text-red-400 hover:text-red-600 transition-colors disabled:opacity-50 cursor-pointer p-1"
                                                 title="Delete comment">
                                                 <svg v-if="deletingComment === comment.id"
@@ -554,8 +552,8 @@
                                     <div v-if="editingComment?.id === comment.id">
                                         <!-- Edit Form -->
                                         <div class="mt-2 space-y-3">
-                                            <BaseTextarea v-model=" editingComment.content " :rows=" 3 "
-                                                class="comment-textarea" :error=" commentErrors.content " />
+                                            <BaseTextarea v-model="editingComment.content" :rows="3"
+                                                class="comment-textarea" :error="commentErrors.content" />
 
                                             <!-- Existing Attachments -->
                                             <div v-if="editingComment.attachments && editingComment.attachments.length > 0"
@@ -565,14 +563,14 @@
                                                 </h6>
                                                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                                                     <div v-for="attachment in editingComment.attachments"
-                                                        :key=" attachment.id "
+                                                        :key="attachment.id"
                                                         class="relative group bg-gray-50 dark:bg-gray-700 rounded-lg p-2 border">
                                                         <!-- Attachment Preview -->
                                                         <div class="flex items-center space-x-2">
                                                             <div v-if="isImageFile(attachment.file)"
                                                                 class="flex-shrink-0">
-                                                                <img :src=" attachment.file "
-                                                                    :alt=" getFileName(attachment.file) "
+                                                                <img :src="attachment.file"
+                                                                    :alt="getFileName(attachment.file)"
                                                                     class="w-8 h-8 object-cover rounded">
                                                             </div>
                                                             <div v-else class="flex-shrink-0">
@@ -605,7 +603,7 @@
                                                 </h6>
                                                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                                                     <div v-for="(file, index) in editingAttachments"
-                                                        :key=" `new-${ index }` "
+                                                        :key="`new-${index}`"
                                                         class="relative group bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
                                                         <div class="flex items-center space-x-2">
                                                             <div class="flex-shrink-0">
@@ -642,19 +640,19 @@
                                                             d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                                     </svg>
                                                     Add Attachments
-                                                    <input type="file" @change=" handleEditFileSelect " multiple
+                                                    <input type="file" @change="handleEditFileSelect" multiple
                                                         class="hidden">
                                                 </label>
                                             </div>
 
                                             <div
                                                 class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-3">
-                                                <button @click=" cancelEditComment "
+                                                <button @click="cancelEditComment"
                                                     class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 transition-colors">
                                                     Cancel
                                                 </button>
-                                                <button @click=" saveEditComment "
-                                                    :disabled=" !editingComment.content.trim() || updatingComment "
+                                                <button @click="saveEditComment"
+                                                    :disabled="!editingComment.content.trim() || updatingComment"
                                                     class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                                                     <svg v-if="updatingComment" class="animate-spin -ml-1 mr-1 h-3 w-3"
                                                         fill="none" viewBox="0 0 24 24">
@@ -686,14 +684,14 @@
                                                     <div
                                                         class="grid grid-cols-2 lg:grid-cols-3 gap-1.5 lg:gap-2 max-w-full lg:max-w-md">
                                                         <div v-for="(attachment, index) in comment.attachment"
-                                                            :key=" `comment-${ comment.id }-attachment-${ index }` "
+                                                            :key="`comment-${comment.id}-attachment-${index}`"
                                                             class="attachment-preview cursor-pointer"
                                                             @click="openAttachment(attachment.file)">
                                                             <!-- Image Preview -->
                                                             <div v-if="isImageFile(attachment.file)"
                                                                 class="relative group">
-                                                                <img :src=" attachment.file "
-                                                                    :alt=" getFileName(attachment.file) "
+                                                                <img :src="attachment.file"
+                                                                    :alt="getFileName(attachment.file)"
                                                                     class="w-full h-20 object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
                                                                     @error="$event.target.style.display = 'none'" />
                                                                 <div
@@ -732,8 +730,8 @@
                                                     class="attachment-preview cursor-pointer"
                                                     @click="openAttachment(comment.attachment[0].file)">
                                                     <div v-if="isImageFile(comment.attachment[0].file)">
-                                                        <img :src=" comment.attachment[0].file "
-                                                            :alt=" getFileName(comment.attachment[0].file) "
+                                                        <img :src="comment.attachment[0].file"
+                                                            :alt="getFileName(comment.attachment[0].file)"
                                                             class="w-20 h-20 object-cover rounded-lg shadow-sm hover:opacity-90 transition-opacity"
                                                             @error="$event.target.style.display = 'none'" />
                                                     </div>
@@ -766,12 +764,12 @@
 
         <template #footer>
             <div class="flex space-x-3 justify-end">
-                <BaseButton variant="secondary" @click=" closeModal " :disabled=" updating " type="button">
+                <BaseButton variant="secondary" @click="closeModal" :disabled="updating" type="button">
                     Cancel
                 </BaseButton>
 
-                <BaseButton variant="primary" @click=" updateTask "
-                    :disabled=" updating || !form.title.trim() || !canEditTask " :loading=" updating "
+                <BaseButton variant="primary" @click="updateTask"
+                    :disabled="updating || !form.title.trim() || !canEditTask" :loading="updating"
                     loadingText="Updating...">
                     Update Task
                 </BaseButton>
@@ -780,10 +778,10 @@
     </BaseModal>
 
     <!-- Confirmation Modal -->
-    <ConfirmModal :is-open=" showConfirmModal " :title=" confirmModalData.title " :message=" confirmModalData.message "
-        :confirm-text=" confirmModalData.confirmText " cancel-text="Cancel"
-        confirm-class="bg-red-600 hover:bg-red-700 focus:ring-red-500" @confirm=" handleConfirmAction "
-        @cancel=" handleCancelConfirm " />
+    <ConfirmModal :is-open="showConfirmModal" :title="confirmModalData.title" :message="confirmModalData.message"
+        :confirm-text="confirmModalData.confirmText" cancel-text="Cancel"
+        confirm-class="bg-red-600 hover:bg-red-700 focus:ring-red-500" @confirm="handleConfirmAction"
+        @cancel="handleCancelConfirm" />
 </template>
 
 <script setup>
@@ -857,6 +855,7 @@ const selectedAttachments = ref([])
 const showAttachmentInput = ref(false)
 const fileInput = ref(null)
 const isDragOver = ref(false)
+const myProjectRole = ref('')
 
 // Confirmation modal state
 const showConfirmModal = ref(false)
@@ -895,23 +894,27 @@ const isTaskOwner = computed(() => {
 })
 
 const canEditTask = computed(() => {
-    console.log("props", props.task);
-    return true;  //FIXME; from sadhin bhai call Temporarily allow all edits
-    
     if (!props.task || !user.value) return false
 
-    const role = props.task.my_project_role
-
     // Manager can edit everything regardless of ownership
-    if (role === 'manager') return true
+    if (myProjectRole.value === 'manager') return true
 
-    // Contributor can edit only if they are the task owner
-    // if (role === 'contributor' && isTaskOwner.value) return true
-    if (role === 'contributor') return true
+    if (myProjectRole.value === 'contributor') return true
 
     // Viewer cannot edit anything
-    if (role === 'viewer') return false
+    if (myProjectRole.value === 'viewer') return false
 
+    return false
+})
+
+const canEditDateRelated = computed(() => {
+    // Managers can always edit deadlines
+    if (myProjectRole.value === 'manager') return true
+
+    // Contributors can edit if they are the task owner
+    if (myProjectRole.value === 'contributor' && isTaskOwner.value) return true
+
+    // Viewers cannot edit deadlines
     return false
 })
 
@@ -937,9 +940,6 @@ const addComment = async () => {
     try {
         addingComment.value = true
         commentErrors.value = {}
-        console.log('props.task.id', props.task.id);
-        
-
         // Use FormData for file uploads
         const formData = new FormData()
         formData.append('content', newComment.value.trim() || '')
@@ -1305,6 +1305,7 @@ const fetchTaskDetails = async () => {
         const response = await axios.get(`projects/${projectId.value}/tasks/${props.task.id}/`)
         const taskDetails = response.data.data || response.data
         populateForm(taskDetails)
+        myProjectRole.value = taskDetails.my_project_role || ''
 
         // Fetch deadline extensions separately if not included
         if (!taskDetails.deadline_extensions) {
