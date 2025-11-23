@@ -150,8 +150,8 @@
                     <div v-for="status in taskStatuses" :key="status.id" class="flex-shrink-0 w-80 sm:w-96">
                         <!-- Sticky Header -->
                         <div
-                            class="bg-white rounded-t-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 sticky top-0 z-20">
-                            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+                            class="bg-white rounded-t-md shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 sticky top-0 z-20">
+                            <div class="px-4 sm:px-6 py-1.5 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
                                         <div class="w-4 h-4 rounded-full mr-3 shadow-sm"
@@ -176,7 +176,7 @@
                         <!-- Independent Scrollable Tasks -->
                         <div class="space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 bg-gray-50 rounded-b-xl status-column transition-all duration-200"
                             :class="{
-                                'bg-blue-50 border-2 border-blue-300 border-dashed': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                'bg-blue-50 border border-blue-300 border-dashed': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
                                 'bg-gray-50': draggedOverStatus !== status.id || !draggedTask || !canStatusChange(draggedTask)
                             }" @dragover="onDragOver($event, status.id)" @dragleave="onDragLeave"
                             @drop="onDrop($event, status.id)">

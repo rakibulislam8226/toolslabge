@@ -1,16 +1,16 @@
 <template>
-    <div class="bg-white rounded-xl border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 p-4 group"
+    <div class="bg-white rounded-md border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 p-3 group"
         @dragstart="$emit('dragstart', $event)" @dragend="$emit('dragend', $event)">
         <!-- Task Header -->
         <div class="flex items-start justify-between mb-2">
             <div class="flex-1 min-w-0">
-                <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 cursor-pointer hover:text-blue-600 transition-colors duration-200"
+                <h6 class="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 cursor-pointer hover:text-blue-600 transition-colors duration-200"
                     @click="editTask">
                     {{ task.title }}
-                </h4>
+                </h6>
                 <div class="flex items-center justify-between">
                     <!-- Priority Badge -->
-                    <span class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full"
+                    <span class="inline-flex items-center px-1.5 py-1 text-xs font-medium rounded-sm"
                         :class="getPriorityColor(task.priority)">
                         {{ formatPriority(task.priority) }}
                     </span>
@@ -19,7 +19,7 @@
                     <div v-if="typeof allowStatusChange === 'function' ? allowStatusChange(task) === true : allowStatusChange"
                         class="relative">
                         <select :value="task.status?.id || ''" @change="onStatusChange"
-                            :class="`text-sm bg-gradient-to-r ${getStatusColorClasses(task.status?.id, 'gradient')} border ${getStatusColorClasses(task.status?.id, 'border')} rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-md font-medium ${getStatusColorClasses(task.status?.id, 'text')} shadow-sm cursor-pointer`">
+                            :class="`text-sm bg-linear-to-r ${getStatusColorClasses(task.status?.id, 'gradient')} border ${getStatusColorClasses(task.status?.id, 'border')} rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-md font-medium ${getStatusColorClasses(task.status?.id, 'text')} shadow-sm cursor-pointer`">
                             <option v-for="status in statuses" :key="status.id" :value="status.id">
                                 {{ status.name }}
                             </option>
@@ -29,7 +29,7 @@
                     <!-- Status Badge (read-only when allowStatusChange is false) -->
                     <div v-else class="relative">
                         <span
-                            :class="`text-sm bg-gradient-to-r ${getStatusColorClasses(task.status?.id, 'gradient')} border ${getStatusColorClasses(task.status?.id, 'border')} rounded-lg px-3 py-1.5 font-medium ${getStatusColorClasses(task.status?.id, 'text')} shadow-sm`">
+                            :class="`text-sm bg-linear-to-r ${getStatusColorClasses(task.status?.id, 'gradient')} border ${getStatusColorClasses(task.status?.id, 'border')} rounded-lg px-3 py-1.5 font-medium ${getStatusColorClasses(task.status?.id, 'text')} shadow-sm`">
                             {{ task.status?.name || 'No Status' }}
                         </span>
                     </div>
@@ -71,11 +71,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Task Description -->
-        <p v-if="task.description" class="text-sm text-gray-600 mb-3 line-clamp-2">
-            {{ task.description }}
-        </p>
 
         <!-- Task Metadata -->
         <div class="space-y-2">
@@ -138,12 +133,6 @@
                         </span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Task ID and Created Date -->
-            <div class="flex items-center justify-between text-xs text-gray-400">
-                <span>#{{ task.id }}</span>
-                <span>{{ formatDate(task.created_at) }}</span>
             </div>
         </div>
     </div>
