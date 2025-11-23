@@ -500,17 +500,6 @@ const onTaskUpdated = (updatedTask) => {
     closeEditModal()
 }
 
-// const onTaskUpdatedFromView = (updatedTask) => {
-//     const index = tasks.value.findIndex(t => t.id === updatedTask.id)
-//     if (index !== -1) {
-//         tasks.value[index] = updatedTask
-//     }
-// }
-
-// const onTaskDeletedFromView = (taskId) => {
-//     tasks.value = tasks.value.filter(t => t.id !== taskId)
-//     closeViewModal()
-// }
 
 const updateTaskStatus = async (taskId, newStatusId) => {
     try {
