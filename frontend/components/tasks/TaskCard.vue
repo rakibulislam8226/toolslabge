@@ -5,21 +5,22 @@
         <div class="flex items-start justify-between mb-2">
             <div class="flex-1 min-w-0">
                 <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 cursor-pointer hover:text-blue-600 transition-colors duration-200"
-                    @click=" editTask ">
+                    @click="editTask">
                     {{ task.title }}
                 </h4>
                 <div class="flex items-center justify-between">
                     <!-- Priority Badge -->
                     <span class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-full"
-                        :class=" getPriorityColor(task.priority) ">
+                        :class="getPriorityColor(task.priority)">
                         {{ formatPriority(task.priority) }}
                     </span>
 
                     <!-- Status Change Dropdown (only if allowStatusChange is true) -->
-                    <div v-if="allowStatusChange" class="relative">
-                        <select :value=" task.status?.id || '' " @change=" onStatusChange "
-                            :class=" `text-sm bg-gradient-to-r ${ getStatusColorClasses(task.status?.id, 'gradient') } border ${ getStatusColorClasses(task.status?.id, 'border') } rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-md font-medium ${ getStatusColorClasses(task.status?.id, 'text') } shadow-sm cursor-pointer` ">
-                            <option v-for="status in statuses" :key=" status.id " :value=" status.id ">
+                    <div v-if="typeof allowStatusChange === 'function' ? allowStatusChange(task) === true : allowStatusChange"
+                        class="relative">
+                        <select :value="task.status?.id || ''" @change="onStatusChange"
+                            :class="`text-sm bg-gradient-to-r ${getStatusColorClasses(task.status?.id, 'gradient')} border ${getStatusColorClasses(task.status?.id, 'border')} rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-md font-medium ${getStatusColorClasses(task.status?.id, 'text')} shadow-sm cursor-pointer`">
+                            <option v-for="status in statuses" :key="status.id" :value="status.id">
                                 {{ status.name }}
                             </option>
                         </select>
@@ -28,7 +29,7 @@
                     <!-- Status Badge (read-only when allowStatusChange is false) -->
                     <div v-else class="relative">
                         <span
-                            :class=" `text-sm bg-gradient-to-r ${ getStatusColorClasses(task.status?.id, 'gradient') } border ${ getStatusColorClasses(task.status?.id, 'border') } rounded-lg px-3 py-1.5 font-medium ${ getStatusColorClasses(task.status?.id, 'text') } shadow-sm` ">
+                            :class="`text-sm bg-gradient-to-r ${getStatusColorClasses(task.status?.id, 'gradient')} border ${getStatusColorClasses(task.status?.id, 'border')} rounded-lg px-3 py-1.5 font-medium ${getStatusColorClasses(task.status?.id, 'text')} shadow-sm`">
                             {{ task.status?.name || 'No Status' }}
                         </span>
                     </div>
@@ -37,7 +38,7 @@
 
             <!-- Actions Dropdown -->
             <div class="relative ml-2">
-                <button @click=" toggleDropdown "
+                <button @click="toggleDropdown"
                     class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -46,9 +47,9 @@
                 </button>
 
                 <!-- Dropdown Menu -->
-                <div v-if="showDropdown" v-click-outside=" closeDropdown "
+                <div v-if="showDropdown" v-click-outside="closeDropdown"
                     class="absolute right-0 top-6 mt-1 w-40 bg-white rounded-xl shadow-lg border border-gray-200 z-10">
-                    <button @click=" editTask "
+                    <button @click="editTask"
                         class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center rounded-lg transition-colors duration-200">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -58,7 +59,7 @@
                         Edit
                     </button>
 
-                    <button @click=" deleteTask "
+                    <button @click="deleteTask"
                         class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center rounded-lg transition-colors duration-200">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -90,7 +91,7 @@
                 </div>
                 <!-- FIXME: temporary fix but it will come from backend later -->
                 <div class="flex items-center"
-                    :class=" { 'text-red-500': isOverdue && (task.status?.slug.toLowerCase() === 'to-do' || task.status?.slug.toLowerCase() === 'in-progress') } ">
+                    :class="{ 'text-red-500': isOverdue && (task.status?.slug.toLowerCase() === 'to-do' || task.status?.slug.toLowerCase() === 'in-progress') }">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -100,7 +101,7 @@
                     <!-- Extension indicator -->
                     <span v-if="hasDeadlineExtensions"
                         class="ml-1 inline-flex items-center px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full"
-                        :title=" `Extended ${ task.deadline_extensions?.length || 0 } time(s)` ">
+                        :title="`Extended ${task.deadline_extensions?.length || 0} time(s)`">
                         <svg class="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -117,14 +118,13 @@
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
                 <div class="flex -space-x-1">
-                    <div v-for="(member, index) in task.assigned_members.slice(0, 3)" :key=" member.id "
-                        class="relative">
-                        <img v-if="member.photo" :src=" member.photo " :alt=" member.first_name || member.email "
+                    <div v-for="(member, index) in task.assigned_members.slice(0, 3)" :key="member.id" class="relative">
+                        <img v-if="member.photo" :src="member.photo" :alt="member.first_name || member.email"
                             class="w-6 h-6 rounded-full border-2 border-white"
-                            :title=" `${ member.first_name || '' } ${ member.last_name || '' } (${ member.email })` " />
+                            :title="`${member.first_name || ''} ${member.last_name || ''} (${member.email})`" />
                         <div v-else
                             class="w-6 h-6 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center"
-                            :title=" `${ member.first_name || '' } ${ member.last_name || '' } (${ member.email })` ">
+                            :title="`${member.first_name || ''} ${member.last_name || ''} (${member.email})`">
                             <span class="text-xs font-medium text-gray-600">
                                 {{ getInitials(member) }}
                             </span>
@@ -132,7 +132,7 @@
                     </div>
                     <div v-if="task.assigned_members.length > 3"
                         class="w-6 h-6 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center"
-                        :title=" `+${ task.assigned_members.length - 3 } more members` ">
+                        :title="`+${task.assigned_members.length - 3} more members`">
                         <span class="text-xs font-medium text-gray-600">
                             +{{ task.assigned_members.length - 3 }}
                         </span>
@@ -163,7 +163,7 @@ const props = defineProps({
         default: () => []
     },
     allowStatusChange: {
-        type: Boolean,
+        type: [Boolean, Function],
         default: true
     }
 })
@@ -173,7 +173,6 @@ const emit = defineEmits(['edit', 'delete', 'status-change'])
 
 // Status color mapping based on status names
 const statusColorMapping = {
-    // Fixed status colors
     'todo': { bg: 'bg-gray-100', text: 'text-gray-700', gradient: 'from-gray-50 to-gray-100', border: 'border-gray-200' },
     'in progress': { bg: 'bg-blue-100', text: 'text-blue-700', gradient: 'from-blue-50 to-blue-100', border: 'border-blue-200' },
     'review': { bg: 'bg-yellow-100', text: 'text-yellow-700', gradient: 'from-yellow-50 to-yellow-100', border: 'border-yellow-200' },

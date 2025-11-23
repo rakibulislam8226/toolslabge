@@ -1218,7 +1218,6 @@ const handleFileSelect = (event) => {
     if (files.length > 0) {
         // Add new files to existing attachments
         selectedAttachments.value = [...selectedAttachments.value, ...files]
-
         showAttachmentInput.value = false
     }
 }

@@ -106,7 +106,7 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
 
 class ProjectListSerializer(serializers.ModelSerializer):
     manager_id = serializers.IntegerField(write_only=True, required=False)
-    project_role = serializers.SerializerMethodField(read_only=True)
+    my_project_role = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
@@ -119,11 +119,11 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "end_date",
             "status",
             "manager_id",
-            "project_role",
+            "my_project_role",
         ]
         read_only_fields = ["status", "slug"]
 
-    def get_project_role(self, obj):
+    def get_my_project_role(self, obj):
         """Get the role of the requesting user in this project."""
         request = self.context.get("request")
         user = request.user
@@ -213,7 +213,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     organization = serializers.StringRelatedField(read_only=True)
     manager = serializers.SerializerMethodField()
     members = ProjectMemberSerializer(many=True, read_only=True)
-    project_role = serializers.SerializerMethodField(read_only=True)
+    my_project_role = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
@@ -228,7 +228,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "status",
             "organization",
             "members",
-            "project_role",
+            "my_project_role",
             "created_at",
             "updated_at",
         ]
@@ -242,7 +242,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-    def get_project_role(self, obj):
+    def get_my_project_role(self, obj):
         """Get the role of the requesting user in this project."""
         request = self.context.get("request")
         user = request.user

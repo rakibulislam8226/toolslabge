@@ -31,6 +31,7 @@ class TaskSerializer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField(read_only=True)
     status = serializers.SerializerMethodField(read_only=True)
     assigned_members = serializers.SerializerMethodField(read_only=True)
+    my_project_role = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Task
@@ -48,6 +49,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "status",
             "members",
             "assigned_members",
+            "my_project_role",
             "created_by",
             "created_at",
             "updated_at",
@@ -77,6 +79,11 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def get_project(self, obj):
         return {"id": obj.project.id, "name": obj.project.name}
+
+    def get_my_project_role(self, obj):
+        user = self.context["request"].user
+        membership = ProjectMember.objects.get(project=obj.project, user=user)
+        return membership.role if membership else None
 
     def get_status(self, obj):
         if not obj.status:

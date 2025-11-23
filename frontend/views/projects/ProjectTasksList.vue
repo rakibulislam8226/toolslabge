@@ -22,7 +22,7 @@
                                     </svg>
                                 </li>
                                 <li>
-                                    <button @click=" goToProject "
+                                    <button @click="goToProject"
                                         class="hover:text-blue-600 transition-all duration-300 truncate max-w-[200px] font-medium hover:underline">
                                         {{ project?.name || 'Project' }}
                                     </button>
@@ -39,7 +39,7 @@
 
                         <div class="flex items-center mb-2">
                             <div
-                                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                                class="w-8 h-8 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -58,10 +58,10 @@
 
                     <div
                         class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
-                        <button @click=" refreshTasks " :disabled=" loading "
+                        <button @click="refreshTasks" :disabled="loading"
                             class="bg-white text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-md border border-gray-200 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
-                            :class=" { 'opacity-50 cursor-not-allowed': loading } ">
-                            <svg class="w-4 h-4 mr-2" :class=" { 'animate-spin': loading } " fill="none"
+                            :class="{ 'opacity-50 cursor-not-allowed': loading }">
+                            <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -101,7 +101,7 @@
                 </div>
                 <h3 class="text-xl font-bold text-red-900 mb-3">Error Loading Tasks</h3>
                 <p class="text-red-700 mb-6 max-w-md mx-auto">{{ error }}</p>
-                <button @click=" fetchTasks "
+                <button @click="fetchTasks"
                     class="bg-red-600 px-6 py-3 rounded-xl hover:bg-red-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     style="color: white !important;">
                     Try Again
@@ -129,12 +129,12 @@
 
                     <!-- Status indicators on the right -->
                     <div class="flex items-center space-x-3 overflow-x-auto">
-                        <div v-for="status in taskStatuses" :key=" status.id "
+                        <div v-for="status in taskStatuses" :key="status.id"
                             class="flex items-center space-x-1.5 px-2 py-1 rounded-md border transition-all duration-200 hover:shadow-sm flex-shrink-0"
-                            :class=" getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'border') ">
+                            :class="getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'border')">
                             <div class="w-5 h-5 rounded flex items-center justify-center"
-                                :class=" getStatusColor(status.id, 'bg') ">
-                                <span class="text-xs font-bold" :class=" getStatusColor(status.id, 'text') ">
+                                :class="getStatusColor(status.id, 'bg')">
+                                <span class="text-xs font-bold" :class="getStatusColor(status.id, 'text')">
                                     {{ getTasksInStatus(status.id).length }}
                                 </span>
                             </div>
@@ -147,7 +147,7 @@
             <!-- Kanban Board -->
             <div class="overflow-x-auto scrollbar-modern">
                 <div class="flex space-x-4 pb-8" style="min-width: max-content;">
-                    <div v-for="status in taskStatuses" :key=" status.id " class="flex-shrink-0 w-80 sm:w-96">
+                    <div v-for="status in taskStatuses" :key="status.id" class="flex-shrink-0 w-80 sm:w-96">
                         <!-- Sticky Header -->
                         <div
                             class="bg-white rounded-t-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 sticky top-0 z-20">
@@ -155,10 +155,10 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
                                         <div class="w-4 h-4 rounded-full mr-3 shadow-sm"
-                                            :class=" getStatusColor(status.id, 'bg') "></div>
+                                            :class="getStatusColor(status.id, 'bg')"></div>
                                         <h3 class="font-bold text-gray-900 text-lg">{{ status.name }}</h3>
                                         <span class="ml-3 px-3 py-1 text-xs font-semibold rounded-full shadow-sm"
-                                            :class=" getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'text') ">
+                                            :class="getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'text')">
                                             {{ getTasksInStatus(status.id).length }}
                                         </span>
                                     </div>
@@ -176,9 +176,9 @@
                         <!-- Independent Scrollable Tasks -->
                         <div
                             class="space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 bg-gray-50 rounded-b-xl status-column">
-                            <TaskCard v-for="task in getTasksInStatus(status.id)" :key=" task.id " :task=" task "
-                                :statuses=" taskStatuses " :allow-status-change=" true " @edit=" openEditModal "
-                                @delete=" deleteTask " @status-change=" updateTaskStatus "
+                            <TaskCard v-for="task in getTasksInStatus(status.id)" :key="task.id" :task="task"
+                                :statuses="taskStatuses" :allow-status-change="canStatusChange(task)"
+                                @edit="openEditModal" @delete="deleteTask" @status-change="updateTaskStatus"
                                 class="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" />
 
                             <!-- Empty State -->
@@ -217,7 +217,7 @@
                 <p class="text-gray-600 mb-8 max-w-md mx-auto">Contact your organization admin to set up task statuses
                     before you can start managing tasks</p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                    <button @click=" fetchTaskStatuses "
+                    <button @click="fetchTaskStatuses"
                         class="bg-gray-600 px-6 py-3 rounded-xl hover:bg-gray-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                         style="color: white !important;">
                         Refresh Statuses
@@ -227,13 +227,13 @@
         </div>
 
         <!-- Create Task Modal -->
-        <CreateTaskModal :is-open=" showCreateModal " :project-id=" projectId " :project-slug=" projectSlug "
-            :initial-status-id=" selectedStatusId " :statuses=" taskStatuses " @close=" closeCreateModal "
-            @created=" onTaskCreated " />
+        <CreateTaskModal :is-open="showCreateModal" :project-id="projectId" :project-slug="projectSlug"
+            :initial-status-id="selectedStatusId" :statuses="taskStatuses" @close="closeCreateModal"
+            @created="onTaskCreated" />
 
         <!-- Edit Task Modal -->
-        <EditTaskModal :is-open=" showEditModal " :task=" selectedTask " :project-slug=" projectSlug "
-            :statuses=" taskStatuses " @close=" closeEditModal " @updated=" onTaskUpdated " />
+        <EditTaskModal :is-open="showEditModal" :task="selectedTask" :project-slug="projectSlug"
+            :statuses="taskStatuses" @close="closeEditModal" @updated="onTaskUpdated" />
     </div>
 </template>
 
@@ -469,17 +469,17 @@ const onTaskUpdated = (updatedTask) => {
     closeEditModal()
 }
 
-const onTaskUpdatedFromView = (updatedTask) => {
-    const index = tasks.value.findIndex(t => t.id === updatedTask.id)
-    if (index !== -1) {
-        tasks.value[index] = updatedTask
-    }
-}
+// const onTaskUpdatedFromView = (updatedTask) => {
+//     const index = tasks.value.findIndex(t => t.id === updatedTask.id)
+//     if (index !== -1) {
+//         tasks.value[index] = updatedTask
+//     }
+// }
 
-const onTaskDeletedFromView = (taskId) => {
-    tasks.value = tasks.value.filter(t => t.id !== taskId)
-    closeViewModal()
-}
+// const onTaskDeletedFromView = (taskId) => {
+//     tasks.value = tasks.value.filter(t => t.id !== taskId)
+//     closeViewModal()
+// }
 
 const updateTaskStatus = async (taskId, newStatusId) => {
     try {
@@ -513,6 +513,22 @@ const deleteTask = async (taskId) => {
         console.error('Failed to delete task:', err)
         $toast?.error('Failed to delete task')
     }
+}
+
+const canStatusChange = (task) => {
+    console.log(user);
+    
+    console.log(task.assigned_members.some(member => member.id));
+
+    if (task.status?.name.toLowerCase() === 'closed') {
+        return false
+    }
+    if (task.my_project_role === 'manager') return true
+    if (task.my_project_role === 'contributor' && task.assigned_members.some(member => member.id === task.current_user_id)) {
+        return true
+    }
+    return false
+
 }
 
 // Initialize on mount
