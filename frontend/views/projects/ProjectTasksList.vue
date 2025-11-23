@@ -174,26 +174,51 @@
                         </div>
 
                         <!-- Independent Scrollable Tasks -->
-                        <div
-                            class="space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 bg-gray-50 rounded-b-xl status-column">
+                        <div class="space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 bg-gray-50 rounded-b-xl status-column transition-all duration-200"
+                            :class="{
+                                'bg-blue-50 border-2 border-blue-300 border-dashed': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                'bg-gray-50': draggedOverStatus !== status.id || !draggedTask || !canStatusChange(draggedTask)
+                            }" @dragover="onDragOver($event, status.id)" @dragleave="onDragLeave"
+                            @drop="onDrop($event, status.id)">
                             <TaskCard v-for="task in getTasksInStatus(status.id)" :key="task.id" :task="task"
                                 :statuses="taskStatuses" :allow-status-change="canStatusChange(task)"
                                 @edit="openEditModal" @delete="deleteTask" @status-change="updateTaskStatus"
-                                class="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1" />
+                                @dragstart="onDragStart($event, task)" @dragend="onDragEnd"
+                                :draggable="canStatusChange(task)"
+                                class="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                                :class="{
+                                    'opacity-50 transform rotate-1 scale-95': draggedTask && draggedTask.id === task.id,
+                                    'cursor-grab': canStatusChange(task),
+                                    'cursor-not-allowed': !canStatusChange(task)
+                                }" />
 
                             <!-- Empty State -->
                             <div v-if="getTasksInStatus(status.id).length === 0"
-                                class="text-center py-12 text-gray-400">
-                                <div
-                                    class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                class="text-center py-12 text-gray-400 transition-all duration-200" :class="{
+                                    'text-blue-600': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)
+                                }">
+                                <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm transition-all duration-200"
+                                    :class="{
+                                        'bg-blue-100 border-2 border-blue-300 border-dashed': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)
+                                    }">
+                                    <svg class="w-8 h-8" :class="{
+                                        'text-blue-500': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                        'text-gray-400': !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))
+                                    }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
-                                <p class="text-sm font-medium text-gray-500">No tasks in this status</p>
-                                <button @click="openCreateModal(status.id)"
+                                <p class="text-sm font-medium" :class="{
+                                    'text-blue-600': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                    'text-gray-500': !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))
+                                }">
+                                    {{ draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask) ?
+                                    'Drop task here' : 'No tasks in this status' }}
+                                </p>
+                                <button
+                                    v-if="!(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))"
+                                    @click="openCreateModal(status.id)"
                                     class="mt-3 text-blue-600 hover:text-blue-800 text-sm font-semibold transition-colors duration-200 hover:underline">
                                     Add a task
                                 </button>
@@ -241,6 +266,7 @@
 import { ref, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from "@/plugins/axiosConfig.js"
+import { useAuthStore } from '@/stores/auth.js'
 import TaskCard from '@/components/tasks/TaskCard.vue'
 import CreateTaskModal from '@/components/modals/CreateTaskModal.vue'
 import EditTaskModal from '@/components/modals/EditTaskModal.vue'
@@ -248,6 +274,7 @@ import EditTaskModal from '@/components/modals/EditTaskModal.vue'
 const router = useRouter()
 const route = useRoute()
 const $toast = inject("toast")
+const authStore = useAuthStore()
 
 // Reactive data
 const project = ref(null)
@@ -261,6 +288,10 @@ const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const selectedTask = ref(null)
 const selectedStatusId = ref(null)
+
+// Drag and drop state
+const draggedTask = ref(null)
+const draggedOverStatus = ref(null)
 
 // Get project slug from route
 const projectSlug = computed(() => route.params.slug)
@@ -516,19 +547,76 @@ const deleteTask = async (taskId) => {
 }
 
 const canStatusChange = (task) => {
-    console.log(user);
-    
-    console.log(task.assigned_members.some(member => member.id));
-
+    // Cannot change status of closed tasks
     if (task.status?.name.toLowerCase() === 'closed') {
         return false
     }
-    if (task.my_project_role === 'manager') return true
-    if (task.my_project_role === 'contributor' && task.assigned_members.some(member => member.id === task.current_user_id)) {
+
+    // Managers can change any task status in their project
+    if (task.my_project_role === 'manager') {
         return true
     }
-    return false
 
+    // Contributors can only change status of tasks they are assigned to
+    if (task.my_project_role === 'contributor') {
+        const currentUserId = authStore.myInfo?.id
+        if (currentUserId && task.assigned_members.some(member => member.id === currentUserId)) {
+            return true
+        }
+    }
+
+    // All other cases: no permission to change status
+    return false
+}
+
+// Drag and drop handlers
+const onDragStart = (event, task) => {
+    if (!canStatusChange(task)) {
+        event.preventDefault()
+        return
+    }
+    draggedTask.value = task
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/html', '')
+
+    // Add visual feedback
+    if (event.target) {
+        event.target.style.opacity = '0.5'
+        event.target.style.transform = 'rotate(1deg) scale(0.95)'
+    }
+}
+
+const onDragEnd = (event) => {
+    // Reset visual feedback
+    if (event.target) {
+        event.target.style.opacity = ''
+        event.target.style.transform = ''
+    }
+
+    draggedTask.value = null
+    draggedOverStatus.value = null
+}
+
+const onDragOver = (event, statusId) => {
+    if (draggedTask.value && canStatusChange(draggedTask.value)) {
+        event.preventDefault()
+        draggedOverStatus.value = statusId
+    }
+}
+
+const onDragLeave = () => {
+    draggedOverStatus.value = null
+}
+
+const onDrop = async (event, statusId) => {
+    event.preventDefault()
+
+    if (draggedTask.value && canStatusChange(draggedTask.value) && draggedTask.value.status?.id !== statusId) {
+        await updateTaskStatus(draggedTask.value.id, statusId)
+    }
+
+    draggedTask.value = null
+    draggedOverStatus.value = null
 }
 
 // Initialize on mount
@@ -790,5 +878,65 @@ button:focus,
 
 .status-column::-webkit-scrollbar-thumb:hover {
     background-color: rgba(100, 116, 139, 0.5);
+}
+
+/* Drag and Drop Styles */
+.drag-ghost {
+    opacity: 0.5;
+    transform: rotate(2deg) scale(0.95);
+    z-index: 1000;
+}
+
+.drag-over {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    transform: scale(1.02);
+}
+
+.drop-zone {
+    transition: all 0.3s ease;
+    border: 2px dashed transparent;
+}
+
+.drop-zone-active {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: scale(1.01);
+}
+
+.task-draggable {
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.task-draggable:active {
+    cursor: grabbing;
+}
+
+.task-being-dragged {
+    opacity: 0.5;
+    transform: rotate(1deg) scale(0.95);
+    cursor: grabbing;
+}
+
+.task-not-draggable {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+@keyframes dropZonePulse {
+
+    0%,
+    100% {
+        background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    50% {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+}
+
+.drop-zone-pulse {
+    animation: dropZonePulse 1.5s ease-in-out infinite;
 }
 </style>

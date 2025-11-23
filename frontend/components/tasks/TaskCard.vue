@@ -1,6 +1,6 @@
 <template>
-    <div
-        class="bg-white rounded-xl border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 p-4 group">
+    <div class="bg-white rounded-xl border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 p-4 group"
+        @dragstart="$emit('dragstart', $event)" @dragend="$emit('dragend', $event)">
         <!-- Task Header -->
         <div class="flex items-start justify-between mb-2">
             <div class="flex-1 min-w-0">
@@ -169,7 +169,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['edit', 'delete', 'status-change'])
+const emit = defineEmits(['edit', 'delete', 'status-change', 'dragstart', 'dragend'])
 
 // Status color mapping based on status names
 const statusColorMapping = {
