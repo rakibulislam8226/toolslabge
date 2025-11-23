@@ -325,6 +325,9 @@ class TaskDetailSerializer(serializers.ModelSerializer):
         # Update allowed fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
+        # Track who made the change for signal
+        instance._changed_by = user
         instance.save()
 
         return instance

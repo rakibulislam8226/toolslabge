@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from autoslug import AutoSlugField
@@ -10,6 +11,8 @@ from apps.organizations.models import Organization
 from apps.projects.models import Project, ProjectMember
 
 from .choices import TasksPriorityChoices, TasksActivityTypeChoices
+
+User = get_user_model()
 
 
 class TaskStatus(TimeStampedModel):
@@ -56,6 +59,28 @@ class Task(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+
+class TaskStatusHistory(TimeStampedModel):
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE, related_name="status_history"
+    )
+    previous_status = models.ForeignKey(
+        TaskStatus, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    new_status = models.ForeignKey(
+        TaskStatus, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    changed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="task_status_changes",
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class TaskDeadlineExtension(TimeStampedModel):

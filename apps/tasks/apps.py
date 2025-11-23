@@ -7,3 +7,4 @@ class TasksConfig(AppConfig):
 
     def ready(self):
         import apps.organizations.signals
+        import apps.tasks.signals
