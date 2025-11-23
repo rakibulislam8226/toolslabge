@@ -241,7 +241,7 @@
                                                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                                         </svg>
                                                                         <span>{{ extension.created_by || 'Unknown'
-                                                                            }}</span>
+                                                                        }}</span>
                                                                     </span>
                                                                     <span class="flex items-center space-x-1">
                                                                         <svg class="w-3 h-3" fill="none"
@@ -251,7 +251,7 @@
                                                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
                                                                         <span>{{ formatDateTime(extension.created_at)
-                                                                            }}</span>
+                                                                        }}</span>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -850,7 +850,7 @@ const updatingComment = ref(false)
 const editingComment = ref(null)
 const editingAttachments = ref([])
 const commentErrors = ref({})
-const currentUser = ref(null)
+// const currentUser = ref(null)
 
 // Attachment related data
 const selectedAttachments = ref([])
@@ -1115,14 +1115,19 @@ const performDeleteComment = async (commentId) => {
     }
 }
 
+
 const canEditComment = (comment) => {
-    return currentUser.value && (
-        comment.created_by === currentUser.value.id ||
-        comment.created_by === currentUser.value.email ||
-        comment.author?.id === currentUser.value.id ||
-        comment.author?.email === currentUser.value.email
-    )
+    return comment.author?.id == user.value.id;
 }
+
+// const canEditComment = (comment) => {
+//     return currentUser.value && (
+//         comment.created_by === currentUser.value.id ||
+//         comment.created_by === currentUser.value.email ||
+//         comment.author?.id === currentUser.value.id ||
+//         comment.author?.email === currentUser.value.email
+//     )
+// }
 
 const getCommentAuthorName = (comment) => {
     return comment.author?.name ||
@@ -1552,21 +1557,21 @@ const removeMember = (memberId) => {
     }
 }
 
-// Fetch current user information
-const fetchCurrentUser = async () => {
-    try {
-        const response = await axios.get('/users/my-info/')
-        currentUser.value = response.data.data || response.data
-    } catch (err) {
-        console.warn('Failed to fetch current user:', err)
-        // Set a fallback user object
-        currentUser.value = {
-            id: 1,
-            email: 'current@user.com',
-            first_name: 'User'
-        }
-    }
-}
+// // Fetch current user information
+// const fetchCurrentUser = async () => {
+//     try {
+//         const response = await axios.get('/users/my-info/')
+//         currentUser.value = response.data.data || response.data
+//     } catch (err) {
+//         console.warn('Failed to fetch current user:', err)
+//         // Set a fallback user object
+//         currentUser.value = {
+//             id: 1,
+//             email: 'current@user.com',
+//             first_name: 'User'
+//         }
+//     }
+// }
 
 // Watch for task changes to populate form
 watch(() => props.task, (newTask) => {
@@ -1585,7 +1590,7 @@ watch(() => props.isOpen, (isOpen) => {
                 fetchTaskDetails()
                 fetchProjectMembers()
                 fetchComments()
-                fetchCurrentUser()
+                // fetchCurrentUser()
             }
         } else {
             document.body.style.overflow = ''
@@ -1593,15 +1598,15 @@ watch(() => props.isOpen, (isOpen) => {
     })
 })
 
-// Initialize on mount
-onMounted(() => {
-    fetchCurrentUser()
-    if (props.isOpen && props.task) {
-        populateForm(props.task)
-        fetchProjectMembers()
-        fetchComments()
-    }
-})
+// // Initialize on mount
+// onMounted(() => {
+//     fetchCurrentUser()
+//     if (props.isOpen && props.task) {
+//         populateForm(props.task)
+//         fetchProjectMembers()
+//         fetchComments()
+//     }
+// })
 
 // Helper functions for attachment handling
 const isImageFile = (fileOrUrl) => {
