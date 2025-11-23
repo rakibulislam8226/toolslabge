@@ -136,7 +136,8 @@
                                                         label="New Deadline"
                                                         placeholder="Select new deadline date & time"
                                                         :error="deadlineExtension.errors.new_due_date"
-                                                        class="deadline-picker" :disabled="!canEditTask || !canEditDateRelated" />
+                                                        class="deadline-picker"
+                                                        :disabled="!canEditTask || !canEditDateRelated" />
                                                 </div>
 
                                                 <!-- Reason -->
@@ -145,7 +146,8 @@
                                                         label="Justification"
                                                         placeholder="Briefly explain why this extension is necessary..."
                                                         :rows="3" :error="deadlineExtension.errors.reason"
-                                                        class="reason-input" :disabled="!canEditTask || !canEditDateRelated" />
+                                                        class="reason-input"
+                                                        :disabled="!canEditTask || !canEditDateRelated" />
                                                 </div>
 
                                                 <!-- Submit Button -->
@@ -239,7 +241,7 @@
                                                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                                         </svg>
                                                                         <span>{{ extension.created_by || 'Unknown'
-                                                                        }}</span>
+                                                                            }}</span>
                                                                     </span>
                                                                     <span class="flex items-center space-x-1">
                                                                         <svg class="w-3 h-3" fill="none"
@@ -249,7 +251,7 @@
                                                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
                                                                         <span>{{ formatDateTime(extension.created_at)
-                                                                        }}</span>
+                                                                            }}</span>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -286,7 +288,8 @@
                                         <span v-for="memberId in form.assigned_members" :key="memberId"
                                             class="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-blue-800 text-gray-700 dark:text-blue-200 rounded-full">
                                             {{ getSelectedMemberName(memberId) }}
-                                            <button v-if="canEditTask && canEditDateRelated" @click="removeMember(memberId)"
+                                            <button v-if="canEditTask && canEditDateRelated"
+                                                @click="removeMember(memberId)"
                                                 class="ml-1 text-gray-500 dark:text-blue-400 hover:text-gray-700 dark:hover:text-blue-200">
                                                 ×
                                             </button>
@@ -342,7 +345,7 @@
                     <div class="h-full flex flex-col">
                         <!-- Comments Header (hidden on mobile, shown in tabs) -->
                         <div
-                            class="hidden lg:flex items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                            class="hidden lg:flex items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
                             <h3
                                 class="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                                 <svg class="w-4 h-4 lg:w-5 lg:h-5 mr-2 text-blue-600" fill="none" stroke="currentColor"
@@ -359,7 +362,7 @@
                         </div>
 
                         <!-- Add Comment Form -->
-                        <div class="mb-4 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 lg:p-4 flex-shrink-0">
+                        <div class="mb-4 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 lg:p-4 shrink-0">
                             <div class="flex-1">
                                 <!-- Comment Box with Attachment Section -->
                                 <div class="relative border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-900 transition-all duration-200"
@@ -567,13 +570,12 @@
                                                         class="relative group bg-gray-50 dark:bg-gray-700 rounded-lg p-2 border">
                                                         <!-- Attachment Preview -->
                                                         <div class="flex items-center space-x-2">
-                                                            <div v-if="isImageFile(attachment.file)"
-                                                                class="flex-shrink-0">
+                                                            <div v-if="isImageFile(attachment.file)" class="shrink-0">
                                                                 <img :src="attachment.file"
                                                                     :alt="getFileName(attachment.file)"
                                                                     class="w-8 h-8 object-cover rounded">
                                                             </div>
-                                                            <div v-else class="flex-shrink-0">
+                                                            <div v-else class="shrink-0">
                                                                 <svg class="w-8 h-8 text-gray-400" fill="currentColor"
                                                                     viewBox="0 0 20 20">
                                                                     <path
@@ -606,7 +608,7 @@
                                                         :key="`new-${index}`"
                                                         class="relative group bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
                                                         <div class="flex items-center space-x-2">
-                                                            <div class="flex-shrink-0">
+                                                            <div class="shrink-0">
                                                                 <svg class="w-8 h-8 text-blue-500" fill="currentColor"
                                                                     viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd"
@@ -668,7 +670,7 @@
                                     </div>
                                     <div v-else class="mt-2">
                                         <p
-                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">
+                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap wrap-break-words overflow-wrap-anywhere">
                                             {{
                                                 comment.content }}</p>
 
