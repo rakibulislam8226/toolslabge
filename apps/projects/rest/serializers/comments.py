@@ -123,7 +123,6 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
             user_email = mention.get("email")
 
             try:
-                # Find the mentioned user
                 if user_id:
                     mentioned_user = User.objects.get(id=user_id)
                 elif user_email:
@@ -131,8 +130,6 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
                 else:
                     continue
 
-                # Print mention information (replace with actual notification logic)
-                print(f"\n📧 MENTION DETECTED:")
                 print(f"   Task: {comment.task.title}")
                 print(f"   Comment by: {comment.author.email}")
                 print(f"   Mentioned user: {mentioned_user.email}")
