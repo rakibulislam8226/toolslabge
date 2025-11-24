@@ -122,6 +122,7 @@ class TaskComment(TimeStampedModel):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="task_comments"
     )
     content = models.TextField(null=True, blank=True)
+    mentions = models.JSONField(default=list, blank=True)  # Store mentioned users
 
     class Meta:
         ordering = ["created_at"]

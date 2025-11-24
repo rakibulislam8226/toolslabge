@@ -1,7 +1,9 @@
 from rest_framework import serializers
+import json
 
 from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
 from apps.tasks.models import TaskComment, Task, TasksCommentAttachments
+from apps.users.models import User
 
 
 class TasksCommentAttachmentsSlimSerializer(serializers.ModelSerializer):
@@ -23,6 +25,7 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
         read_only=True,
         allow_null=True,
     )
+    mentions = serializers.JSONField(required=False)
 
     class Meta:
         model = TaskComment
@@ -30,6 +33,7 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
             "id",
             "content",
             "attachment",
+            "mentions",
             "task",
             "author",
             "created_at",
@@ -48,11 +52,26 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
         task = Task.objects.get(id=task_id)
         author = request.user
 
+        # Handle mentions data
+        mentions_data = request.data.get("mentions")
+        if mentions_data and isinstance(mentions_data, str):
+            try:
+                mentions_data = json.loads(mentions_data)
+            except json.JSONDecodeError:
+                mentions_data = []
+        elif not mentions_data:
+            mentions_data = []
+
         comment = TaskComment.objects.create(
             task=task,
             author=author,
             content=validated_data.get("content"),
+            mentions=mentions_data,
         )
+
+        # Process mentions for notifications
+        if mentions_data:
+            self.process_mentions(comment, mentions_data)
 
         attachments_data = request.FILES.getlist("attachment")
         if attachments_data:
@@ -94,3 +113,40 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
         instance.content = validated_data.get("content", instance.content)
         instance.save()
         return instance
+
+    def process_mentions(self, comment, mentions_data):
+        """
+        Process mentions and send notifications
+        """
+        for mention in mentions_data:
+            user_id = mention.get("userId")
+            user_email = mention.get("email")
+
+            try:
+                # Find the mentioned user
+                if user_id:
+                    mentioned_user = User.objects.get(id=user_id)
+                elif user_email:
+                    mentioned_user = User.objects.get(email=user_email)
+                else:
+                    continue
+
+                # Print mention information (replace with actual notification logic)
+                print(f"\n📧 MENTION DETECTED:")
+                print(f"   Task: {comment.task.title}")
+                print(f"   Comment by: {comment.author.email}")
+                print(f"   Mentioned user: {mentioned_user.email}")
+                print(f"   User ID: {mentioned_user.id}")
+                print(f"   Comment content: {comment.content[:50]}...")
+                print(
+                    f"   Task URL: /projects/{comment.task.project.slug}/tasks/{comment.task.id}"
+                )
+
+                # TODO: Uncomment these lines to enable notifications
+                # from mention_notifications_example import MentionNotificationService
+                # MentionNotificationService.send_mention_email(mentioned_user, comment)
+                # MentionNotificationService.create_in_app_notification(mentioned_user, comment)
+
+            except User.DoesNotExist:
+                print(f"⚠️  User not found for mention: {mention}")
+                continue

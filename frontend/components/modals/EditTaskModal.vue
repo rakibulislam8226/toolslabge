@@ -371,11 +371,12 @@
                                     :class="{ 'ring-2 ring-blue-300 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500': isDragOver }">
                                     <!-- Textarea Container -->
                                     <div class="relative">
-                                        <BaseTextarea v-model="newComment"
-                                            :placeholder="isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Ctrl+Enter to submit)'"
+                                        <BaseTextarea ref="commentTextarea" v-model="newComment"
+                                            :placeholder="isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Type @ to mention members, Ctrl+Enter to submit)'"
                                             :rows="4"
                                             class="comment-textarea border-0 rounded-none resize-none pr-16 transition-colors duration-200"
-                                            :error="commentErrors.content" @keydown="handleCommentKeydown" />
+                                            :error="commentErrors.content" @keydown="handleCommentKeydown"
+                                            @input="handleCommentInput" />
 
                                         <!-- Attach Button Inside Textarea -->
                                         <button v-if="!showAttachmentInput" @click="$refs.fileInput.click()"
@@ -388,7 +389,47 @@
                                         </button>
                                     </div>
 
-                                    <!-- Hidden File Input -->
+                                    <!-- Mention Dropdown -->
+                                    <div v-if="mentionDropdownVisible"
+                                        class="fixed mention-dropdown bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                                        :style="{ top: mentionPosition.top + 'px', left: mentionPosition.left + 'px' }">
+                                        <div v-if="filteredMentionMembers.length === 0"
+                                            class="px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400">
+                                            No members found
+                                        </div>
+                                        <button v-for="(member, index) in filteredMentionMembers" :key="member.id"
+                                            @click="selectMentionMember(member)" :class="[
+                                                'mention-member-item w-full text-left px-3 py-1.5 text-sm flex items-center space-x-2',
+                                                selectedMentionIndex === index
+                                                    ? 'mention-member-selected'
+                                                    : 'hover:bg-blue-50 dark:hover:bg-gray-700'
+                                            ]">
+                                            <div
+                                                class="w-5 h-5 rounded-full bg-blue-100 dark:bg-gray-600 flex items-center justify-center shrink-0">
+                                                <span class="text-xs font-medium text-blue-600 dark:text-gray-300">
+                                                    {{ getInitials(member) }}
+                                                </span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div :class="[
+                                                    'truncate text-sm',
+                                                    selectedMentionIndex === index
+                                                        ? 'font-bold mention-selected-text'
+                                                        : 'font-medium text-gray-800 dark:text-gray-100'
+                                                ]">
+                                                    {{ member.user_name || member.user_email }}
+                                                </div>
+                                                <div v-if="member.user_name && member.user_email" :class="[
+                                                    'text-xs truncate',
+                                                    selectedMentionIndex === index
+                                                        ? 'mention-selected-email'
+                                                        : 'text-gray-500 dark:text-gray-400'
+                                                ]">
+                                                    {{ member.user_email }}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </div> <!-- Hidden File Input -->
                                     <input type="file" ref="fileInput" @change="handleFileSelect" multiple
                                         accept="image/*,.pdf,.doc,.docx,.txt,.zip" class="hidden" />
 
@@ -449,10 +490,16 @@
                                         class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 p-2 lg:p-3">
                                         <div class="flex items-center space-x-3">
                                             <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                <span :class="newComment.length > 1000 ? 'text-red-500' : ''">
-                                                    {{ newComment.length }}
-                                                </span>
-                                                <span class="text-gray-400">/1000</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <span>Type @ to mention members</span>
+                                                    <span>•</span>
+                                                    <span>Ctrl+Enter to submit</span>
+                                                    <span>•</span>
+                                                    <span :class="newComment.length > 1000 ? 'text-red-500' : ''">
+                                                        {{ newComment.length }}
+                                                    </span>
+                                                    <span class="text-gray-400">/1000</span>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -850,7 +897,14 @@ const updatingComment = ref(false)
 const editingComment = ref(null)
 const editingAttachments = ref([])
 const commentErrors = ref({})
-// const currentUser = ref(null)
+
+// Mention functionality
+const mentionDropdownVisible = ref(false)
+const mentionPosition = ref({ top: 0, left: 0 })
+const mentionQuery = ref('')
+const mentionStartIndex = ref(-1)
+const selectedMentionIndex = ref(-1)
+const commentTextarea = ref(null)
 
 // Attachment related data
 const selectedAttachments = ref([])
@@ -920,6 +974,20 @@ const canEditDateRelated = computed(() => {
     return false
 })
 
+// Filtered members for mentions
+const filteredMentionMembers = computed(() => {
+    if (!mentionQuery.value.trim()) {
+        return projectMembers.value.slice(0, 5) // Show first 5 members when no query
+    }
+
+    const query = mentionQuery.value.toLowerCase()
+    return projectMembers.value.filter(member => {
+        const name = (member.user_name || '').toLowerCase()
+        const email = (member.user_email || '').toLowerCase()
+        return name.includes(query) || email.includes(query)
+    }).slice(0, 5) // Limit to 5 results
+})
+
 // Comments Methods
 const fetchComments = async () => {
     if (!props.task?.id || !projectId.value) return
@@ -942,12 +1010,56 @@ const addComment = async () => {
     try {
         addingComment.value = true
         commentErrors.value = {}
-        // Use FormData for file uploads
+
+        // Detect mentions in comment for future backend processing
+        const commentText = newComment.value.trim() || ''
+        const mentionRegex = /@([\w\s\.]+?)(?=\s|$|@|[^\w\s\.])/g
+        const mentions = []
+        const processedUsers = new Set() // Prevent duplicate mentions
+        let match
+
+        while ((match = mentionRegex.exec(commentText)) !== null) {
+            const mentionedName = match[1].trim()
+            // Find the mentioned member by exact name match first, then partial
+            const mentionedMember = projectMembers.value.find(member => {
+                const userName = (member.user_name || '').toLowerCase()
+                const userEmail = (member.user_email || '').toLowerCase()
+                const searchName = mentionedName.toLowerCase()
+
+                return userName === searchName ||
+                    userEmail === searchName ||
+                    userName.includes(searchName) ||
+                    userEmail.includes(searchName)
+            })
+
+            if (mentionedMember && !processedUsers.has(mentionedMember.user)) {
+                processedUsers.add(mentionedMember.user)
+                mentions.push({
+                    email: mentionedMember.user_email,
+                    userId: mentionedMember.user
+                })
+            }
+        }
+
+        // Log mentions for debugging (remove this in production)
+        if (mentions.length > 0) {
+            console.log('📧 Mentions detected:', mentions)
+            mentions.forEach(mention => {
+                console.log(`   • ${mention.email} (ID: ${mention.userId})`)
+            })
+        }
+
+        // Create FormData for file uploads
         const formData = new FormData()
-        formData.append('content', newComment.value.trim() || '')
+        formData.append('content', commentText)
+
+        // Add mentions data for backend processing (future feature)
+        if (mentions.length > 0) {
+            formData.append('mentions', JSON.stringify(mentions))
+        }
 
         // Add multiple attachments
-        selectedAttachments.value.forEach((file, index) => {
+        selectedAttachments.value.forEach((file) => {
             formData.append('attachment', file)
         })
 
@@ -960,14 +1072,16 @@ const addComment = async () => {
                 },
             }
         )
+
         const comment = response.data.data || response.data
 
         // Add comment to the beginning of the list
         comments.value.unshift(comment)
-        newComment.value = ''
 
-        // Clear attachments
+        // Reset form
+        newComment.value = ''
         selectedAttachments.value = []
+        hideMentionDropdown() // Clear any open mention dropdown
 
         $toast.success('Comment added successfully')
     } catch (err) {
@@ -1206,10 +1320,142 @@ const handleCancelConfirm = () => {
 
 // Comment keyboard shortcuts
 const handleCommentKeydown = (event) => {
-    if (event.ctrlKey && event.key === 'Enter') {
-        event.preventDefault()
-        addComment()
+    // Handle mention navigation
+    if (mentionDropdownVisible.value) {
+        if (event.key === 'ArrowDown') {
+            event.preventDefault()
+            selectedMentionIndex.value = Math.min(
+                selectedMentionIndex.value + 1,
+                filteredMentionMembers.value.length - 1
+            )
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault()
+            selectedMentionIndex.value = Math.max(
+                selectedMentionIndex.value - 1,
+                0
+            )
+        } else if (event.key === 'Enter' || event.key === 'Tab') {
+            event.preventDefault()
+            if (filteredMentionMembers.value[selectedMentionIndex.value]) {
+                insertMention(filteredMentionMembers.value[selectedMentionIndex.value])
+            }
+        } else if (event.key === 'Escape') {
+            hideMentionDropdown()
+        }
+    } else {
+        // Submit comment with Ctrl+Enter
+        if (event.ctrlKey && event.key === 'Enter') {
+            event.preventDefault()
+            addComment()
+        }
     }
+}
+
+// Mention functionality methods
+const handleCommentInput = (event) => {
+    const textarea = event.target
+    const value = textarea.value
+    const cursorPosition = textarea.selectionStart
+
+    // Find @ symbol before cursor
+    const textBeforeCursor = value.substring(0, cursorPosition)
+    const lastAtIndex = textBeforeCursor.lastIndexOf('@')
+
+    if (lastAtIndex !== -1) {
+        // Check if @ is at start or preceded by whitespace
+        const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : ' '
+        if (charBeforeAt === ' ' || charBeforeAt === '\n' || lastAtIndex === 0) {
+            const mentionText = textBeforeCursor.substring(lastAtIndex + 1)
+
+            // Check if mention text contains spaces or newlines (invalid mention)
+            if (!mentionText.includes(' ') && !mentionText.includes('\n')) {
+                mentionQuery.value = mentionText
+                mentionStartIndex.value = lastAtIndex
+                selectedMentionIndex.value = 0
+                showMentionDropdown(textarea)
+                return
+            }
+        }
+    }
+
+    // Hide dropdown if @ not found or invalid
+    hideMentionDropdown()
+}
+
+const showMentionDropdown = (textarea) => {
+    const rect = textarea.getBoundingClientRect()
+    const lines = textarea.value.substring(0, mentionStartIndex.value).split('\n')
+    const currentLineLength = lines[lines.length - 1].length
+
+    // Approximate position (this is a simplified calculation)
+    const charWidth = 8 // Approximate character width
+    const lineHeight = 20 // Approximate line height
+
+    mentionPosition.value = {
+        top: rect.top + (lines.length - 1) * lineHeight + lineHeight + window.scrollY,
+        left: rect.left + currentLineLength * charWidth + window.scrollX
+    }
+
+    mentionDropdownVisible.value = true
+}
+
+const hideMentionDropdown = () => {
+    mentionDropdownVisible.value = false
+    mentionQuery.value = ''
+    mentionStartIndex.value = -1
+    selectedMentionIndex.value = -1
+}
+
+const insertMention = (member) => {
+    const memberName = member.user_name || member.user_email
+    const mentionText = `@${memberName} ` // Add space after mention
+
+    const textareaComponent = commentTextarea.value
+    if (!textareaComponent) return
+
+    const value = newComment.value
+    const beforeMention = value.substring(0, mentionStartIndex.value)
+    const afterCursor = value.substring(mentionStartIndex.value + mentionQuery.value.length + 1) // +1 for the @ symbol
+
+    newComment.value = beforeMention + mentionText + afterCursor
+
+    // Set cursor position after mention (including the space)
+    nextTick(() => {
+        const newPosition = mentionStartIndex.value + mentionText.length
+
+        // More reliable way to access the textarea element
+        let textareaElement = null
+
+        // Try multiple methods to get the textarea
+        if (textareaComponent.$el) {
+            textareaElement = textareaComponent.$el.querySelector('textarea')
+            if (!textareaElement) {
+                textareaElement = textareaComponent.$el.querySelector('input')
+            }
+            if (!textareaElement && textareaComponent.$el.tagName === 'TEXTAREA') {
+                textareaElement = textareaComponent.$el
+            }
+        }
+
+        // Alternative approach for Vue components
+        if (!textareaElement && textareaComponent.$refs && textareaComponent.$refs.input) {
+            textareaElement = textareaComponent.$refs.input
+        }
+
+        if (textareaElement && typeof textareaElement.setSelectionRange === 'function') {
+            textareaElement.focus()
+            textareaElement.setSelectionRange(newPosition, newPosition)
+        } else if (textareaElement && typeof textareaElement.selectionStart !== 'undefined') {
+            textareaElement.focus()
+            textareaElement.selectionStart = textareaElement.selectionEnd = newPosition
+        }
+    })
+
+    hideMentionDropdown()
+}
+
+const selectMentionMember = (member) => {
+    insertMention(member)
 }
 
 // Attachment functions
@@ -1458,6 +1704,11 @@ const fetchProjectMembers = async (searchQuery = '') => {
         return
     }
 
+    // If we already have members and no search query, don't refetch
+    if (!searchQuery.trim() && projectMembers.value.length > 0) {
+        return
+    }
+
     try {
         let url = `projects/${projectIdentifier}/members/`
         if (searchQuery.trim()) {
@@ -1468,7 +1719,10 @@ const fetchProjectMembers = async (searchQuery = '') => {
         projectMembers.value = response.data.data || response.data || []
     } catch (err) {
         console.error('Failed to fetch project members:', err)
-        projectMembers.value = []
+        if (!searchQuery.trim()) {
+            // Only clear members if it's the initial fetch that failed
+            projectMembers.value = []
+        }
     }
 }
 
@@ -1556,22 +1810,6 @@ const removeMember = (memberId) => {
     }
 }
 
-// // Fetch current user information
-// const fetchCurrentUser = async () => {
-//     try {
-//         const response = await axios.get('/users/my-info/')
-//         currentUser.value = response.data.data || response.data
-//     } catch (err) {
-//         console.warn('Failed to fetch current user:', err)
-//         // Set a fallback user object
-//         currentUser.value = {
-//             id: 1,
-//             email: 'current@user.com',
-//             first_name: 'User'
-//         }
-//     }
-// }
-
 // Watch for task changes to populate form
 watch(() => props.task, (newTask) => {
     if (newTask) {
@@ -1593,19 +1831,11 @@ watch(() => props.isOpen, (isOpen) => {
             }
         } else {
             document.body.style.overflow = ''
+            // Cleanup mention state
+            hideMentionDropdown()
         }
     })
 })
-
-// // Initialize on mount
-// onMounted(() => {
-//     fetchCurrentUser()
-//     if (props.isOpen && props.task) {
-//         populateForm(props.task)
-//         fetchProjectMembers()
-//         fetchComments()
-//     }
-// })
 
 // Helper functions for attachment handling
 const isImageFile = (fileOrUrl) => {
@@ -1935,6 +2165,116 @@ const openAttachment = (url) => {
         background: linear-gradient(to right, #1f2937, #374151);
         border-color: #4b5563;
         color: #f9fafb;
+    }
+}
+
+/* Mention dropdown styling */
+.mention-dropdown {
+    z-index: 1000;
+    animation: fadeInScale 0.15s ease-out;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.mention-member-item {
+    transition: all 0.15s ease-out;
+    cursor: pointer;
+    min-height: 40px;
+}
+
+.mention-member-item:hover {
+    transform: translateX(1px);
+    background-color: #dbeafe !important;
+    /* Light blue-50 */
+}
+
+.mention-member-selected {
+    background: linear-gradient(90deg, #dbeafe, #bfdbfe) !important;
+    /* Light blue gradient for light theme */
+    color: black !important;
+}
+
+/* Dark theme selected styling */
+.dark .mention-member-selected {
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8) !important;
+    color: white !important;
+}
+
+.mention-member-selected .text-gray-500,
+.mention-member-selected .text-gray-800,
+.mention-member-selected .text-gray-400,
+.mention-member-selected .text-blue-600,
+.mention-member-selected .text-gray-700 {
+    color: rgba(0, 0, 0, 0.8) !important;
+    /* Dark text for light theme */
+}
+
+/* Dark theme text colors */
+.dark .mention-member-selected .text-gray-500,
+.dark .mention-member-selected .text-gray-800,
+.dark .mention-member-selected .text-gray-400,
+.dark .mention-member-selected .text-blue-600,
+.dark .mention-member-selected .text-gray-700 {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Mention selected text styling */
+.mention-selected-text {
+    color: black !important;
+    font-weight: 700 !important;
+}
+
+.dark .mention-selected-text {
+    color: white !important;
+}
+
+.mention-selected-email {
+    color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark .mention-selected-email {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Ensure bold text is visible in selected state with highest specificity */
+.mention-member-selected .font-bold,
+.mention-member-item.mention-member-selected .font-bold {
+    color: black !important;
+    /* Black for light theme */
+    font-weight: 700 !important;
+}
+
+/* Dark theme bold text */
+.dark .mention-member-selected .font-bold,
+.dark .mention-member-item.mention-member-selected .font-bold {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+.mention-member-selected .text-gray-200,
+.mention-member-selected .text-white {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dark .mention-member-item:hover {
+    background-color: #374151 !important;
+}
+
+.dark .mention-member-selected {
+    background: linear-gradient(90deg, #4f46e5, #3730a3) !important;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
     }
 }
 
