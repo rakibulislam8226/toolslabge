@@ -10,6 +10,8 @@ from ..serializers.tasks import (
 )
 from ...permissions import IsProjectMemberOrManager, IsProjectManager
 
+from apps.tasks.permissions import IsTaskCreator
+
 
 class TaskListCreateView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
@@ -43,7 +45,7 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 class TaskExtendDeadlineListView(generics.ListCreateAPIView):
     serializer_class = TaskDeadlineExtensionListSerializer
-    permission_classes = [IsProjectManager]
+    permission_classes = [IsProjectManager | IsTaskCreator]
 
     def get_queryset(self):
         task_id = self.kwargs.get("task_id")

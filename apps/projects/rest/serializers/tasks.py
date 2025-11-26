@@ -367,6 +367,16 @@ class TaskDeadlineExtensionListSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate(self, data):
+        task = self.context["task"]
+        if not task:
+            raise serializers.ValidationError("Invalid task.")
+        if not task.due_date:
+            raise serializers.ValidationError(
+                "Task does not have a due date to extend."
+            )
+        return data
+
     def create(self, validated_data):
         user = self.context["request"].user
         task = self.context["task"]
