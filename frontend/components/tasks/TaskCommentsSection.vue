@@ -19,150 +19,91 @@
         <!-- Add Comment Form -->
         <div class="mb-4 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 lg:p-4 shrink-0">
             <div class="flex-1">
-                <!-- Comment Box with Attachment Section -->
-                <div class="relative border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-900 transition-all duration-200"
-                    @dragenter="handleDragEnter" @dragleave="handleDragLeave" @dragover="handleDragOver"
-                    @drop="handleDrop"
+                <!-- TipTap Editor with drag & drop -->
+                <div class="relative" @dragenter="handleDragEnter" @dragleave="handleDragLeave"
+                    @dragover="handleDragOver" @drop="handleDrop"
                     :class="{ 'ring-2 ring-blue-300 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500': isDragOver }">
-                    <!-- Textarea Container -->
-                    <div class="relative">
-                        <BaseTextarea ref="commentTextarea" v-model="newComment"
-                            :placeholder="isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Type @ to mention members, Ctrl+Enter to submit)'"
-                            :rows="4"
-                            class="comment-textarea border-0 rounded-none resize-none pr-16 transition-colors duration-200"
-                            :error="commentErrors.content" @keydown="handleCommentKeydown"
-                            @input="handleCommentInput" />
 
-                        <!-- Attach Button Inside Textarea -->
-                        <button v-if="!showAttachmentInput" @click="$refs.fileInput.click()"
-                            class="absolute bottom-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
-                            title="Add attachment">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                            </svg>
-                        </button>
-                    </div>
+                    <TipTapEditor ref="commentEditor" v-model="newComment"
+                        :placeholder="isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Type @ to mention members, Ctrl+Enter to submit)'"
+                        :mention-items="projectMembers" :max-length="1000" :error="commentErrors.content"
+                        @keydown="handleEditorKeydown" class="relative">
+                        <template #actions>
+                            <!-- Attach Button -->
+                            <button @click="$refs.fileInput.click()"
+                                class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+                                title="Add attachment">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                            </button>
 
-                    <!-- Mention Dropdown -->
-                    <div v-if="mentionDropdownVisible"
-                        class="fixed mention-dropdown bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto z-50"
-                        :style="{ top: mentionPosition.top + 'px', left: mentionPosition.left + 'px' }">
-                        <div v-if="filteredMentionMembers.length === 0"
-                            class="px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400">
-                            No members found
-                        </div>
-                        <button v-for="(member, index) in filteredMentionMembers" :key="member.id"
-                            @click="selectMentionMember(member)" :class="[
-                                'mention-member-item w-full text-left px-3 py-1.5 text-sm flex items-center space-x-2',
-                                selectedMentionIndex === index
-                                    ? 'mention-member-selected'
-                                    : 'hover:bg-blue-50 dark:hover:bg-gray-700'
-                            ]">
-                            <div
-                                class="w-5 h-5 rounded-full bg-blue-100 dark:bg-gray-600 flex items-center justify-center shrink-0">
-                                <span class="text-xs font-medium text-blue-600 dark:text-gray-300">
-                                    {{ getInitials(member) }}
-                                </span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div :class="[
-                                    'truncate text-sm',
-                                    selectedMentionIndex === index
-                                        ? 'font-bold mention-selected-text'
-                                        : 'font-medium text-gray-800 dark:text-gray-100'
-                                ]">
-                                    {{ member.user_name || member.user_email }}
-                                </div>
-                                <div v-if="member.user_name && member.user_email" :class="[
-                                    'text-xs truncate',
-                                    selectedMentionIndex === index
-                                        ? 'mention-selected-email'
-                                        : 'text-gray-500 dark:text-gray-400'
-                                ]">
-                                    {{ member.user_email }}
-                                </div>
-                            </div>
-                        </button>
-                    </div>
+                            <!-- Submit Button -->
+                            <BaseButton variant="primary" size="sm" @click="addComment"
+                                :disabled="(!commentPlainText && selectedAttachments.length === 0) || addingComment"
+                                :loading="addingComment" loadingText="Adding..." class="ml-2">
+                                <template v-if="!addingComment" #icon>
+                                    <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                </template>
+                                Comment
+                            </BaseButton>
+                        </template>
+                    </TipTapEditor>
 
                     <!-- Hidden File Input -->
                     <input type="file" ref="fileInput" @change="handleFileSelect" multiple
                         accept="image/*,.pdf,.doc,.docx,.txt,.zip" class="hidden" />
-
-                    <!-- Attachments Section Inside Comment Box -->
-                    <div v-if="selectedAttachments.length > 0"
-                        class="border-t border-gray-200 dark:border-gray-600 p-2 lg:p-3 bg-gray-50 dark:bg-gray-800">
-                        <div class="space-y-1 lg:space-y-2 max-h-32 overflow-y-auto">
-                            <div v-for="(attachment, index) in selectedAttachments" :key="`attachment-${index}`"
-                                class="flex items-center space-x-2 lg:space-x-3 p-1.5 lg:p-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 attachment-item">
-                                <!-- File Icon/Preview -->
-                                <div class="shrink-0">
-                                    <div v-if="isImageFile(attachment)" class="relative cursor-pointer">
-                                        <img :src="getFilePreviewUrl(attachment)" :alt="attachment.name"
-                                            class="w-8 h-8 rounded object-cover border border-gray-200 dark:border-gray-600 hover:opacity-80 transition-opacity cursor-pointer"
-                                            @click="previewAttachment(attachment)" />
-                                    </div>
-                                    <div v-else
-                                        class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
-                                        @click="previewAttachment(attachment)">
-                                        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <!-- File Name Only -->
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs lg:text-sm text-gray-700 dark:text-gray-300 truncate">
-                                        {{ attachment.name }}
-                                    </p>
-                                </div>
-
-                                <!-- Remove Button -->
-                                <button @click="removeAttachment(index)"
-                                    class="text-red-400 hover:text-red-600 transition-colors cursor-pointer p-1"
-                                    :title="`Remove ${attachment.name}`">
-                                    <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Bottom Actions Bar Inside Comment Box -->
-                <div class="border-t border-gray-200 dark:border-gray-600 px-3 py-1 bg-gray-50 dark:bg-gray-800">
-                    <div
-                        class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 p-1 lg:p-2">
-                        <div class="flex items-center space-x-2">
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                <div class="flex items-center space-x-1">
-                                    <span :class="newComment.length > 1000 ? 'text-red-500' : ''">
-                                        {{ newComment.length }}
-                                    </span>
-                                    <span class="text-gray-400">/1000</span>
+                <!-- Attachments Section -->
+                <div v-if="selectedAttachments.length > 0"
+                    class="mt-3 p-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-lg">
+                    <h6 class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Attachments ({{
+                        selectedAttachments.length }})
+                    </h6>
+                    <div class="space-y-2 max-h-32 overflow-y-auto">
+                        <div v-for="(attachment, index) in selectedAttachments" :key="`attachment-${index}`"
+                            class="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 attachment-item">
+                            <!-- File Icon/Preview -->
+                            <div class="shrink-0">
+                                <div v-if="isImageFile(attachment)" class="relative cursor-pointer">
+                                    <img :src="getFilePreviewUrl(attachment)" :alt="attachment.name"
+                                        class="w-8 h-8 rounded object-cover border border-gray-200 dark:border-gray-600 hover:opacity-80 transition-opacity cursor-pointer"
+                                        @click="previewAttachment(attachment)" />
+                                </div>
+                                <div v-else
+                                    class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                                    @click="previewAttachment(attachment)">
+                                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
                                 </div>
                             </div>
-                        </div>
 
-                        <BaseButton variant="primary" size="sm" @click="addComment"
-                            :disabled="(!newComment.trim() && selectedAttachments.length === 0) || addingComment || newComment.length > 1000"
-                            :loading="addingComment" loadingText="Adding..." class="w-full sm:w-auto">
-                            <template v-if="!addingComment" #icon>
-                                <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                            <!-- File Name -->
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-gray-700 dark:text-gray-300 truncate">
+                                    {{ attachment.name }}
+                                </p>
+                            </div>
+
+                            <!-- Remove Button -->
+                            <button @click="removeAttachment(index)"
+                                class="text-red-400 hover:text-red-600 transition-colors cursor-pointer p-1"
+                                :title="`Remove ${attachment.name}`">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        d="M6 18L18 6M6 6l12 12" />
                                 </svg>
-                            </template>
-                            Comment
-                        </BaseButton>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -440,8 +381,9 @@
 import { ref, computed, nextTick, watch, inject } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
 import { useAuth } from '@/composables/useAuth.js'
-import { BaseTextarea, BaseButton } from '@/components/forms'
+import { BaseButton, BaseTextarea } from '@/components/forms'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
+import TipTapEditor from '@/components/forms/TipTapEditor.vue'
 
 const props = defineProps({
     taskId: {
@@ -474,13 +416,8 @@ const editingComment = ref(null)
 const editingAttachments = ref([])
 const commentErrors = ref({})
 
-// Mention functionality
-const mentionDropdownVisible = ref(false)
-const mentionPosition = ref({ top: 0, left: 0 })
-const mentionQuery = ref('')
-const mentionStartIndex = ref(-1)
-const selectedMentionIndex = ref(-1)
-const commentTextarea = ref(null)
+// Editor reference
+const commentEditor = ref(null)
 
 // Attachment related data
 const selectedAttachments = ref([])
@@ -498,17 +435,8 @@ const confirmModalData = ref({
 })
 
 // Computed
-const filteredMentionMembers = computed(() => {
-    if (!mentionQuery.value.trim()) {
-        return props.projectMembers.slice(0, 5)
-    }
-
-    const query = mentionQuery.value.toLowerCase()
-    return props.projectMembers.filter(member => {
-        const name = (member.user_name || '').toLowerCase()
-        const email = (member.user_email || '').toLowerCase()
-        return name.includes(query) || email.includes(query)
-    }).slice(0, 5)
+const commentPlainText = computed(() => {
+    return commentEditor.value?.getPlainText() || ''
 })
 
 // Methods
@@ -529,31 +457,45 @@ const fetchComments = async () => {
 }
 
 const addComment = async () => {
-    if ((!newComment.value.trim() && selectedAttachments.value.length === 0) || !props.taskId || !props.projectId) return
+    const plainText = commentPlainText.value.trim()
+    if ((!plainText && selectedAttachments.value.length === 0) || !props.taskId || !props.projectId) return
 
     try {
         addingComment.value = true
         commentErrors.value = {}
 
-        // Detect mentions in comment for future backend processing
-        const commentText = newComment.value.trim() || ''
-        const mentionRegex = /@([\w\s\.]+?)(?=\s|$|@|[^\w\s\.])/g
+        // Get HTML content from TipTap editor
+        const commentHtml = newComment.value.trim() || ''
+
+        // Extract mentions from TipTap editor content
+        const tempDiv = document.createElement('div')
+        tempDiv.innerHTML = commentHtml
+        const mentionElements = tempDiv.querySelectorAll('.mention')
         const mentions = []
         const processedUsers = new Set()
-        let match
 
-        while ((match = mentionRegex.exec(commentText)) !== null) {
-            const mentionedName = match[1].trim()
-            const mentionedMember = props.projectMembers.find(member => {
-                const userName = (member.user_name || '').toLowerCase()
-                const userEmail = (member.user_email || '').toLowerCase()
-                const searchName = mentionedName.toLowerCase()
+        mentionElements.forEach(mentionEl => {
+            const mentionText = mentionEl.textContent || mentionEl.innerText
+            const dataId = mentionEl.getAttribute('data-id')
 
-                return userName === searchName ||
-                    userEmail === searchName ||
-                    userName.includes(searchName) ||
-                    userEmail.includes(searchName)
-            })
+            // Try to find the member by data-id first, then by text
+            let mentionedMember = null
+            if (dataId) {
+                mentionedMember = props.projectMembers.find(member =>
+                    member.user == dataId || member.id == dataId
+                )
+            }
+
+            if (!mentionedMember) {
+                const cleanMentionText = mentionText.replace('@', '').trim()
+                mentionedMember = props.projectMembers.find(member => {
+                    const userName = (member.user_name || '').toLowerCase()
+                    const userEmail = (member.user_email || '').toLowerCase()
+                    const searchName = cleanMentionText.toLowerCase()
+
+                    return userName === searchName || userEmail === searchName
+                })
+            }
 
             if (mentionedMember && !processedUsers.has(mentionedMember.user)) {
                 processedUsers.add(mentionedMember.user)
@@ -562,11 +504,12 @@ const addComment = async () => {
                     userId: mentionedMember.user
                 })
             }
-        }
+        })
 
         // Create FormData for file uploads
         const formData = new FormData()
-        formData.append('content', commentText)
+        // Send plain text to backend, mentions are handled separately
+        formData.append('content', plainText)
 
         if (mentions.length > 0) {
             formData.append('mentions', JSON.stringify(mentions))
@@ -592,7 +535,7 @@ const addComment = async () => {
         // Reset form
         newComment.value = ''
         selectedAttachments.value = []
-        hideMentionDropdown()
+        commentEditor.value?.clear()
 
         $toast.success('Comment added successfully')
         emit('commentsUpdated', comments.value)
@@ -804,133 +747,12 @@ const handleCancelConfirm = () => {
     }
 }
 
-// Comment keyboard shortcuts
-const handleCommentKeydown = (event) => {
-    if (mentionDropdownVisible.value) {
-        if (event.key === 'ArrowDown') {
-            event.preventDefault()
-            selectedMentionIndex.value = Math.min(
-                selectedMentionIndex.value + 1,
-                filteredMentionMembers.value.length - 1
-            )
-        } else if (event.key === 'ArrowUp') {
-            event.preventDefault()
-            selectedMentionIndex.value = Math.max(
-                selectedMentionIndex.value - 1,
-                0
-            )
-        } else if (event.key === 'Enter' || event.key === 'Tab') {
-            event.preventDefault()
-            if (filteredMentionMembers.value[selectedMentionIndex.value]) {
-                insertMention(filteredMentionMembers.value[selectedMentionIndex.value])
-            }
-        } else if (event.key === 'Escape') {
-            hideMentionDropdown()
-        }
-    } else {
-        if (event.ctrlKey && event.key === 'Enter') {
-            event.preventDefault()
-            addComment()
-        }
+// Editor keyboard shortcuts
+const handleEditorKeydown = (event) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault()
+        addComment()
     }
-}
-
-// Mention functionality methods
-const handleCommentInput = (event) => {
-    const textarea = event.target
-    const value = textarea.value
-    const cursorPosition = textarea.selectionStart
-
-    const textBeforeCursor = value.substring(0, cursorPosition)
-    const lastAtIndex = textBeforeCursor.lastIndexOf('@')
-
-    if (lastAtIndex !== -1) {
-        const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : ' '
-        if (charBeforeAt === ' ' || charBeforeAt === '\n' || lastAtIndex === 0) {
-            const mentionText = textBeforeCursor.substring(lastAtIndex + 1)
-
-            if (!mentionText.includes(' ') && !mentionText.includes('\n')) {
-                mentionQuery.value = mentionText
-                mentionStartIndex.value = lastAtIndex
-                selectedMentionIndex.value = 0
-                showMentionDropdown(textarea)
-                return
-            }
-        }
-    }
-
-    hideMentionDropdown()
-}
-
-const showMentionDropdown = (textarea) => {
-    const rect = textarea.getBoundingClientRect()
-    const lines = textarea.value.substring(0, mentionStartIndex.value).split('\n')
-    const currentLineLength = lines[lines.length - 1].length
-
-    const charWidth = 8
-    const lineHeight = 20
-
-    mentionPosition.value = {
-        top: rect.top + (lines.length - 1) * lineHeight + lineHeight + window.scrollY,
-        left: rect.left + currentLineLength * charWidth + window.scrollX
-    }
-
-    mentionDropdownVisible.value = true
-}
-
-const hideMentionDropdown = () => {
-    mentionDropdownVisible.value = false
-    mentionQuery.value = ''
-    mentionStartIndex.value = -1
-    selectedMentionIndex.value = -1
-}
-
-const insertMention = (member) => {
-    const memberName = member.user_name || member.user_email
-    const mentionText = `@${memberName} `
-
-    const textareaComponent = commentTextarea.value
-    if (!textareaComponent) return
-
-    const value = newComment.value
-    const beforeMention = value.substring(0, mentionStartIndex.value)
-    const afterCursor = value.substring(mentionStartIndex.value + mentionQuery.value.length + 1)
-
-    newComment.value = beforeMention + mentionText + afterCursor
-
-    nextTick(() => {
-        const newPosition = mentionStartIndex.value + mentionText.length
-
-        let textareaElement = null
-
-        if (textareaComponent.$el) {
-            textareaElement = textareaComponent.$el.querySelector('textarea')
-            if (!textareaElement) {
-                textareaElement = textareaComponent.$el.querySelector('input')
-            }
-            if (!textareaElement && textareaComponent.$el.tagName === 'TEXTAREA') {
-                textareaElement = textareaComponent.$el
-            }
-        }
-
-        if (!textareaElement && textareaComponent.$refs && textareaComponent.$refs.input) {
-            textareaElement = textareaComponent.$refs.input
-        }
-
-        if (textareaElement && typeof textareaElement.setSelectionRange === 'function') {
-            textareaElement.focus()
-            textareaElement.setSelectionRange(newPosition, newPosition)
-        } else if (textareaElement && typeof textareaElement.selectionStart !== 'undefined') {
-            textareaElement.focus()
-            textareaElement.selectionStart = textareaElement.selectionEnd = newPosition
-        }
-    })
-
-    hideMentionDropdown()
-}
-
-const selectMentionMember = (member) => {
-    insertMention(member)
 }
 
 // Attachment functions
@@ -1095,8 +917,7 @@ const getInitials = (member) => {
 
 // Expose methods for parent component
 defineExpose({
-    fetchComments,
-    hideMentionDropdown
+    fetchComments
 })
 
 // Watch for prop changes to refetch comments
@@ -1138,37 +959,6 @@ watch(() => [props.taskId, props.projectId], ([newTaskId, newProjectId]) => {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(156, 163, 175, 0.8);
-}
-
-/* Comment textarea styling */
-.comment-textarea :deep(textarea) {
-    border: 0 !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-.comment-textarea :deep(textarea:focus) {
-    border: 0 !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* Mention dropdown styling */
-.mention-dropdown {
-    z-index: 9999;
-}
-
-.mention-member-selected {
-    background: linear-gradient(90deg, #3b82f6, #6366f1);
-    color: white;
-}
-
-.mention-selected-text {
-    color: white !important;
-}
-
-.mention-selected-email {
-    color: rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Attachment preview styling */

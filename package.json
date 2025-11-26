@@ -10,11 +10,16 @@
   "author": "rakibulislam8226@gmail.com",
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "@tiptap/extension-mention": "^3.11.0",
+    "@tiptap/extension-placeholder": "^3.11.0",
+    "@tiptap/starter-kit": "^3.11.0",
+    "@tiptap/vue-3": "^3.11.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "axios": "^1.8.1",
     "flatpickr": "^4.6.13",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.13",
+    "tippy.js": "^6.3.7",
     "vue": "^3.5.10",
     "vue-flatpickr-component": "^12.0.0",
     "vue-router": "^4.4.5"
