@@ -200,7 +200,8 @@
                             </div>
 
                             <!-- Add Attachments Button -->
-                            <div class="flex items-center justify-between">
+                             <!-- NOTE: uncommit after implementing attachment addition in edit mode  -->
+                            <!-- <div class="flex items-center justify-between">
                                 <label
                                     class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 cursor-pointer transition-colors">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,7 +211,7 @@
                                     Add Attachments
                                     <input type="file" @change="handleEditFileSelect" multiple class="hidden">
                                 </label>
-                            </div>
+                            </div> -->
 
                             <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-3">
                                 <button @click="cancelEditComment"

@@ -29,8 +29,6 @@ import {
     computed,
     watch,
     nextTick,
-    defineProps,
-    defineEmits,
 } from "vue";
 
 /* Props */
