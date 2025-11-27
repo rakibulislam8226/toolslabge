@@ -19,122 +19,10 @@
         <!-- Add Comment Form -->
         <div class="mb-4 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 lg:p-4 shrink-0">
             <div class="flex-1">
+
                 <!-- Comment Box with Attachment Section -->
-                <div class="relative border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-900 transition-all duration-200"
-                    @dragenter="handleDragEnter" @dragleave="handleDragLeave" @dragover="handleDragOver"
-                    @drop="handleDrop"
-                    :class="{ 'ring-2 ring-blue-300 border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500': isDragOver }">
-                    <!-- Textarea Container -->
-                    <div class="relative">
-                        <BaseTextarea ref="commentTextarea" v-model="newComment"
-                            :placeholder="isDragOver ? 'Drop file here or type your comment...' : 'Add a comment... (Type @ to mention members, Ctrl+Enter to submit)'"
-                            :rows="4"
-                            class="comment-textarea border-0 rounded-none resize-none pr-16 transition-colors duration-200"
-                            :error="commentErrors.content" @keydown="handleCommentKeydown"
-                            @input="handleCommentInput" />
-
-                        <!-- Attach Button Inside Textarea -->
-                        <button v-if="!showAttachmentInput" @click="$refs.fileInput.click()"
-                            class="absolute bottom-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
-                            title="Add attachment">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Mention Dropdown -->
-                    <div v-if="mentionDropdownVisible"
-                        class="fixed mention-dropdown bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto z-50"
-                        :style="{ top: mentionPosition.top + 'px', left: mentionPosition.left + 'px' }">
-                        <div v-if="filteredMentionMembers.length === 0"
-                            class="px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400">
-                            No members found
-                        </div>
-                        <button v-for="(member, index) in filteredMentionMembers" :key="member.id"
-                            @click="selectMentionMember(member)" :class="[
-                                'mention-member-item w-full text-left px-3 py-1.5 text-sm flex items-center space-x-2',
-                                selectedMentionIndex === index
-                                    ? 'mention-member-selected'
-                                    : 'hover:bg-blue-50 dark:hover:bg-gray-700'
-                            ]">
-                            <div
-                                class="w-5 h-5 rounded-full bg-blue-100 dark:bg-gray-600 flex items-center justify-center shrink-0">
-                                <span class="text-xs font-medium text-blue-600 dark:text-gray-300">
-                                    {{ getInitials(member) }}
-                                </span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div :class="[
-                                    'truncate text-sm',
-                                    selectedMentionIndex === index
-                                        ? 'font-bold mention-selected-text'
-                                        : 'font-medium text-gray-800 dark:text-gray-100'
-                                ]">
-                                    {{ member.user_name || member.user_email }}
-                                </div>
-                                <div v-if="member.user_name && member.user_email" :class="[
-                                    'text-xs truncate',
-                                    selectedMentionIndex === index
-                                        ? 'mention-selected-email'
-                                        : 'text-gray-500 dark:text-gray-400'
-                                ]">
-                                    {{ member.user_email }}
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-
-                    <!-- Hidden File Input -->
-                    <input type="file" ref="fileInput" @change="handleFileSelect" multiple
-                        accept="image/*,.pdf,.doc,.docx,.txt,.zip" class="hidden" />
-
-                    <!-- Attachments Section Inside Comment Box -->
-                    <div v-if="selectedAttachments.length > 0"
-                        class="border-t border-gray-200 dark:border-gray-600 p-2 lg:p-3 bg-gray-50 dark:bg-gray-800">
-                        <div class="space-y-1 lg:space-y-2 max-h-32 overflow-y-auto">
-                            <div v-for="(attachment, index) in selectedAttachments" :key="`attachment-${index}`"
-                                class="flex items-center space-x-2 lg:space-x-3 p-1.5 lg:p-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 attachment-item">
-                                <!-- File Icon/Preview -->
-                                <div class="shrink-0">
-                                    <div v-if="isImageFile(attachment)" class="relative cursor-pointer">
-                                        <img :src="getFilePreviewUrl(attachment)" :alt="attachment.name"
-                                            class="w-8 h-8 rounded object-cover border border-gray-200 dark:border-gray-600 hover:opacity-80 transition-opacity cursor-pointer"
-                                            @click="previewAttachment(attachment)" />
-                                    </div>
-                                    <div v-else
-                                        class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
-                                        @click="previewAttachment(attachment)">
-                                        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <!-- File Name Only -->
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs lg:text-sm text-gray-700 dark:text-gray-300 truncate">
-                                        {{ attachment.name }}
-                                    </p>
-                                </div>
-
-                                <!-- Remove Button -->
-                                <button @click="removeAttachment(index)"
-                                    class="text-red-400 hover:text-red-600 transition-colors cursor-pointer p-1"
-                                    :title="`Remove ${attachment.name}`">
-                                    <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <MentionEditor v-model="newComment" :options="projectMembers" label-key="user_name" value-key="user"
+                    ref="commentTextarea" />
 
                 <!-- Bottom Actions Bar Inside Comment Box -->
                 <div class="border-t border-gray-200 dark:border-gray-600 px-3 py-1 bg-gray-50 dark:bg-gray-800">
@@ -152,7 +40,7 @@
                         </div>
 
                         <BaseButton variant="primary" size="sm" @click="addComment"
-                            :disabled="(!newComment.trim() && selectedAttachments.length === 0) || addingComment || newComment.length > 1000"
+                            :disabled="(!newComment.text?.trim() && selectedAttachments.length === 0) || addingComment || newComment.text?.length > 1000"
                             :loading="addingComment" loadingText="Adding..." class="w-full sm:w-auto">
                             <template v-if="!addingComment" #icon>
                                 <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor"
@@ -243,8 +131,8 @@
                     <div v-if="editingComment?.id === comment.id">
                         <!-- Edit Form -->
                         <div class="mt-2 space-y-3">
-                            <BaseTextarea v-model="editingComment.content" :rows="3" class="comment-textarea"
-                                :error="commentErrors.content" />
+                            <MentionEditor v-model="editingComment.content" :options="projectMembers"
+                                label-key="user_name" value-key="user" :auto-focus="true" />
 
                             <!-- Existing Attachments -->
                             <div v-if="editingComment.attachments && editingComment.attachments.length > 0"
@@ -329,8 +217,7 @@
                                     class="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 transition-colors">
                                     Cancel
                                 </button>
-                                <button @click="saveEditComment"
-                                    :disabled="!editingComment.content.trim() || updatingComment"
+                                <button @click="saveEditComment" :disabled="!editingComment.content || updatingComment"
                                     class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                                     <svg v-if="updatingComment" class="animate-spin -ml-1 mr-1 h-3 w-3" fill="none"
                                         viewBox="0 0 24 24">
@@ -347,7 +234,8 @@
                     <div v-else class="mt-2">
                         <p
                             class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap wrap-break-words overflow-wrap-anywhere">
-                            {{ comment.content }}</p>
+                            <MentionText v-bind="comment.content" label-key="user_name" value-key="user" />
+                        </p>
 
                         <!-- Comment Attachments -->
                         <div v-if="comment.attachment && comment.attachment.length > 0" class="mt-3">
@@ -437,11 +325,13 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, watch, inject } from 'vue'
+import { ref, computed, watch, inject } from 'vue'
 import axios from "@/plugins/axiosConfig.js"
 import { useAuth } from '@/composables/useAuth.js'
 import { BaseTextarea, BaseButton } from '@/components/forms'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
+import MentionEditor from '@/components/mention/MentionEditor.vue'
+import MentionText from '@/components/mention/MentionText.vue'
 
 const props = defineProps({
     taskId: {
@@ -465,7 +355,7 @@ const { user } = useAuth()
 
 // Comments related data
 const comments = ref([])
-const newComment = ref('')
+const newComment = ref({ text: '', mentions: [] })
 const loadingComments = ref(false)
 const addingComment = ref(false)
 const deletingComment = ref(null)
@@ -473,13 +363,6 @@ const updatingComment = ref(false)
 const editingComment = ref(null)
 const editingAttachments = ref([])
 const commentErrors = ref({})
-
-// Mention functionality
-const mentionDropdownVisible = ref(false)
-const mentionPosition = ref({ top: 0, left: 0 })
-const mentionQuery = ref('')
-const mentionStartIndex = ref(-1)
-const selectedMentionIndex = ref(-1)
 const commentTextarea = ref(null)
 
 // Attachment related data
@@ -497,19 +380,7 @@ const confirmModalData = ref({
     action: null
 })
 
-// Computed
-const filteredMentionMembers = computed(() => {
-    if (!mentionQuery.value.trim()) {
-        return props.projectMembers.slice(0, 5)
-    }
-
-    const query = mentionQuery.value.toLowerCase()
-    return props.projectMembers.filter(member => {
-        const name = (member.user_name || '').toLowerCase()
-        const email = (member.user_email || '').toLowerCase()
-        return name.includes(query) || email.includes(query)
-    }).slice(0, 5)
-})
+// Computed - removed filteredMentionMembers since MentionEditor handles this internally
 
 // Methods
 const fetchComments = async () => {
@@ -528,40 +399,38 @@ const fetchComments = async () => {
     }
 }
 
+const getMentionedUsers = (mentions) => {
+    if (!mentions || mentions.length === 0) return []
+    const _mentions = []
+    mentions.forEach(mention => {
+        _mentions.push({
+            email: mention.user_email,
+            user: mention.user,
+            user_name: mention.user_name
+        })
+    })
+    return _mentions
+}
+
 const addComment = async () => {
-    if ((!newComment.value.trim() && selectedAttachments.value.length === 0) || !props.taskId || !props.projectId) return
+    if ((!newComment.value.text?.trim() && selectedAttachments.value.length === 0) || !props.taskId || !props.projectId) return
 
     try {
         addingComment.value = true
         commentErrors.value = {}
 
-        // Detect mentions in comment for future backend processing
-        const commentText = newComment.value.trim() || ''
-        const mentionRegex = /@([\w\s\.]+?)(?=\s|$|@|[^\w\s\.])/g
+        // Get mentions from MentionEditor
+        const commentText = newComment.value.text?.trim() || ''
         const mentions = []
-        const processedUsers = new Set()
-        let match
 
-        while ((match = mentionRegex.exec(commentText)) !== null) {
-            const mentionedName = match[1].trim()
-            const mentionedMember = props.projectMembers.find(member => {
-                const userName = (member.user_name || '').toLowerCase()
-                const userEmail = (member.user_email || '').toLowerCase()
-                const searchName = mentionedName.toLowerCase()
-
-                return userName === searchName ||
-                    userEmail === searchName ||
-                    userName.includes(searchName) ||
-                    userEmail.includes(searchName)
-            })
-
-            if (mentionedMember && !processedUsers.has(mentionedMember.user)) {
-                processedUsers.add(mentionedMember.user)
+        if (newComment.value.mentions && newComment.value.mentions.length > 0) {
+            newComment.value.mentions.forEach(mention => {
                 mentions.push({
-                    email: mentionedMember.user_email,
-                    userId: mentionedMember.user
+                    email: mention.user_email,
+                    user: mention.user,
+                    user_name: mention.user_name
                 })
-            }
+            })
         }
 
         // Create FormData for file uploads
@@ -585,14 +454,11 @@ const addComment = async () => {
                 },
             }
         )
-
-        const comment = response.data.data || response.data
-        comments.value.unshift(comment)
+        fetchComments()
 
         // Reset form
-        newComment.value = ''
+        newComment.value = { text: '', mentions: [] }
         selectedAttachments.value = []
-        hideMentionDropdown()
 
         $toast.success('Comment added successfully')
         emit('commentsUpdated', comments.value)
@@ -631,14 +497,15 @@ const cancelEditComment = () => {
 }
 
 const saveEditComment = async () => {
-    if (!editingComment.value?.content.trim() || !props.projectId) return
+    if (!editingComment.value?.content || !props.projectId) return
 
     try {
         updatingComment.value = true
         commentErrors.value = {}
 
         const formData = new FormData()
-        formData.append('content', editingComment.value.content.trim())
+        formData.append('content', editingComment.value.content.text || '')
+        formData.append('mentions', JSON.stringify(getMentionedUsers(editingComment.value.content.mentions || [])))
         formData.append('process_attachments', 'true')
 
         editingAttachments.value.forEach((file) => {
@@ -661,12 +528,7 @@ const saveEditComment = async () => {
                 }
             }
         )
-        const updatedComment = response.data.data || response.data
-
-        const index = comments.value.findIndex(c => c.id === editingComment.value.id)
-        if (index !== -1) {
-            comments.value[index] = updatedComment
-        }
+        fetchComments()
 
         editingComment.value = null
         editingAttachments.value = []
@@ -804,133 +666,12 @@ const handleCancelConfirm = () => {
     }
 }
 
-// Comment keyboard shortcuts
+// Comment keyboard shortcuts - simplified since MentionEditor handles mentions
 const handleCommentKeydown = (event) => {
-    if (mentionDropdownVisible.value) {
-        if (event.key === 'ArrowDown') {
-            event.preventDefault()
-            selectedMentionIndex.value = Math.min(
-                selectedMentionIndex.value + 1,
-                filteredMentionMembers.value.length - 1
-            )
-        } else if (event.key === 'ArrowUp') {
-            event.preventDefault()
-            selectedMentionIndex.value = Math.max(
-                selectedMentionIndex.value - 1,
-                0
-            )
-        } else if (event.key === 'Enter' || event.key === 'Tab') {
-            event.preventDefault()
-            if (filteredMentionMembers.value[selectedMentionIndex.value]) {
-                insertMention(filteredMentionMembers.value[selectedMentionIndex.value])
-            }
-        } else if (event.key === 'Escape') {
-            hideMentionDropdown()
-        }
-    } else {
-        if (event.ctrlKey && event.key === 'Enter') {
-            event.preventDefault()
-            addComment()
-        }
+    if (event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault()
+        addComment()
     }
-}
-
-// Mention functionality methods
-const handleCommentInput = (event) => {
-    const textarea = event.target
-    const value = textarea.value
-    const cursorPosition = textarea.selectionStart
-
-    const textBeforeCursor = value.substring(0, cursorPosition)
-    const lastAtIndex = textBeforeCursor.lastIndexOf('@')
-
-    if (lastAtIndex !== -1) {
-        const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : ' '
-        if (charBeforeAt === ' ' || charBeforeAt === '\n' || lastAtIndex === 0) {
-            const mentionText = textBeforeCursor.substring(lastAtIndex + 1)
-
-            if (!mentionText.includes(' ') && !mentionText.includes('\n')) {
-                mentionQuery.value = mentionText
-                mentionStartIndex.value = lastAtIndex
-                selectedMentionIndex.value = 0
-                showMentionDropdown(textarea)
-                return
-            }
-        }
-    }
-
-    hideMentionDropdown()
-}
-
-const showMentionDropdown = (textarea) => {
-    const rect = textarea.getBoundingClientRect()
-    const lines = textarea.value.substring(0, mentionStartIndex.value).split('\n')
-    const currentLineLength = lines[lines.length - 1].length
-
-    const charWidth = 8
-    const lineHeight = 20
-
-    mentionPosition.value = {
-        top: rect.top + (lines.length - 1) * lineHeight + lineHeight + window.scrollY,
-        left: rect.left + currentLineLength * charWidth + window.scrollX
-    }
-
-    mentionDropdownVisible.value = true
-}
-
-const hideMentionDropdown = () => {
-    mentionDropdownVisible.value = false
-    mentionQuery.value = ''
-    mentionStartIndex.value = -1
-    selectedMentionIndex.value = -1
-}
-
-const insertMention = (member) => {
-    const memberName = member.user_name || member.user_email
-    const mentionText = `@${memberName} `
-
-    const textareaComponent = commentTextarea.value
-    if (!textareaComponent) return
-
-    const value = newComment.value
-    const beforeMention = value.substring(0, mentionStartIndex.value)
-    const afterCursor = value.substring(mentionStartIndex.value + mentionQuery.value.length + 1)
-
-    newComment.value = beforeMention + mentionText + afterCursor
-
-    nextTick(() => {
-        const newPosition = mentionStartIndex.value + mentionText.length
-
-        let textareaElement = null
-
-        if (textareaComponent.$el) {
-            textareaElement = textareaComponent.$el.querySelector('textarea')
-            if (!textareaElement) {
-                textareaElement = textareaComponent.$el.querySelector('input')
-            }
-            if (!textareaElement && textareaComponent.$el.tagName === 'TEXTAREA') {
-                textareaElement = textareaComponent.$el
-            }
-        }
-
-        if (!textareaElement && textareaComponent.$refs && textareaComponent.$refs.input) {
-            textareaElement = textareaComponent.$refs.input
-        }
-
-        if (textareaElement && typeof textareaElement.setSelectionRange === 'function') {
-            textareaElement.focus()
-            textareaElement.setSelectionRange(newPosition, newPosition)
-        } else if (textareaElement && typeof textareaElement.selectionStart !== 'undefined') {
-            textareaElement.focus()
-            textareaElement.selectionStart = textareaElement.selectionEnd = newPosition
-        }
-    })
-
-    hideMentionDropdown()
-}
-
-const selectMentionMember = (member) => {
-    insertMention(member)
 }
 
 // Attachment functions
@@ -1012,12 +753,6 @@ const markAttachmentForDeletion = (attachment) => {
     }
 }
 
-const getFilePreviewUrl = (file) => {
-    if (file instanceof File) {
-        return URL.createObjectURL(file)
-    }
-    return file
-}
 
 const isImageFile = (fileOrUrl) => {
     if (!fileOrUrl) return false
@@ -1083,20 +818,9 @@ const openAttachment = (url) => {
     window.open(url, '_blank', 'noopener,noreferrer')
 }
 
-const getInitials = (member) => {
-    const name = member.user_name || member.user_email
-    if (!name) return '?'
-
-    const parts = name.trim().split(' ')
-    return parts.length > 1
-        ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
-        : parts[0][0].toUpperCase()
-}
-
 // Expose methods for parent component
 defineExpose({
-    fetchComments,
-    hideMentionDropdown
+    fetchComments
 })
 
 // Watch for prop changes to refetch comments

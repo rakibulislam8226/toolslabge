@@ -46,6 +46,19 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+
+        request = self.context.get("request")
+        if request and request.method == "GET":
+            rep["content"] = {
+                "text": rep.get("content"),
+                "mentions": rep.get("mentions"),
+            }
+            rep.pop("mentions", None)
+
+        return rep
+
     def create(self, validated_data):
         request = self.context.get("request")
         task_id = self.context.get("task_id")
@@ -81,37 +94,47 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
                     file=attachment_file,
                 )
 
+        comment.content = {
+            "text": comment.content,
+            "mentions": comment.mentions,
+        }
+
         return comment
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
-        attachments_data = request.FILES.getlist("attachment")
-        keep_attachment_ids = request.data.getlist("keep_attachment_ids[]")
-        process_attachments = request.data.get("process_attachments") == "true"
 
-        # Convert string IDs to integers if they exist
-        if keep_attachment_ids:
+        # Handle mentions data
+        mentions_data = request.data.get("mentions")
+        if mentions_data and isinstance(mentions_data, str):
             try:
-                keep_attachment_ids = [
-                    int(id_str) for id_str in keep_attachment_ids if id_str.strip()
-                ]
-            except ValueError:
-                keep_attachment_ids = []
+                mentions_data = json.loads(mentions_data)
+            except json.JSONDecodeError:
+                mentions_data = []
+        elif not mentions_data:
+            mentions_data = []
 
-        if attachments_data or keep_attachment_ids or process_attachments:
-            TasksCommentAttachments.objects.filter(comment=instance).exclude(
-                id__in=keep_attachment_ids
-            ).delete()
+        instance.content = validated_data.get("content", instance.content)
+        instance.mentions = mentions_data
+        instance.save()
 
-            # Create new attachments from uploaded files
+        # Process mentions for notifications
+        if mentions_data:
+            self.process_mentions(instance, mentions_data)
+
+        attachments_data = request.FILES.getlist("attachment")
+        if attachments_data:
             for attachment_file in attachments_data:
                 TasksCommentAttachments.objects.create(
                     comment=instance,
                     file=attachment_file,
                 )
 
-        instance.content = validated_data.get("content", instance.content)
-        instance.save()
+        instance.content = {
+            "text": instance.content,
+            "mentions": instance.mentions,
+        }
+
         return instance
 
     def process_mentions(self, comment, mentions_data):
@@ -119,14 +142,17 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
         Process mentions and send notifications
         """
         for mention in mentions_data:
-            user_id = mention.get("userId")
+            user_id = mention.get("user")
             user_email = mention.get("email")
+            user_name = mention.get("user_name")
 
             try:
                 if user_id:
                     mentioned_user = User.objects.get(id=user_id)
                 elif user_email:
                     mentioned_user = User.objects.get(email=user_email)
+                elif user_name:
+                    mentioned_user = User.objects.get(username=user_name)
                 else:
                     continue
 
