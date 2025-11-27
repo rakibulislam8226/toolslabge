@@ -174,6 +174,8 @@ class TaskSerializer(serializers.ModelSerializer):
         )
         # Send assignment emails
         for member in members:
+            if user.id == member.user.id:
+                continue  # don't send email to self
             task_url = self.context["request"].build_absolute_uri(
                 f"/projects/{project.slug}/tasks/"
             )
@@ -358,6 +360,8 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             # send to new members
             for member in members:
                 if member.id in to_add:
+                    if user.id == member.user.id:
+                        continue  # don't send email to self
                     task_url = self.context["request"].build_absolute_uri(
                         f"/projects/{instance.project.slug}/tasks/"
                     )
@@ -377,6 +381,8 @@ class TaskDetailSerializer(serializers.ModelSerializer):
 
             # send to removed members
             for member_id in to_remove:
+                if user.id == current_members[member_id].member.user.id:
+                    continue  # don't send email to self
                 member = current_members[member_id]
                 task_url = self.context["request"].build_absolute_uri(
                     f"/projects/{instance.project.slug}/tasks/"
