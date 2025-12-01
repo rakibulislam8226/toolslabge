@@ -177,7 +177,7 @@ class TaskSerializer(serializers.ModelSerializer):
             if user.id == member.user.id:
                 continue  # don't send email to self
             task_url = self.context["request"].build_absolute_uri(
-                f"/projects/{project.slug}/tasks/"
+                f"/projects/{project.slug}/tasks/?task_id={task.id}"
             )
             created_by = (
                 user.first_name + " " + user.last_name
@@ -363,7 +363,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
                     if user.id == member.user.id:
                         continue  # don't send email to self
                     task_url = self.context["request"].build_absolute_uri(
-                        f"/projects/{instance.project.slug}/tasks/"
+                        f"/projects/{instance.project.slug}/tasks/?task_id={instance.id}"
                     )
                     created_by = (
                         user.first_name + " " + user.last_name

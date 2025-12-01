@@ -1,9 +1,14 @@
-from rest_framework import serializers
 import json
+
+from django.conf import settings
+
+from rest_framework import serializers
 
 from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
 from apps.tasks.models import TaskComment, Task, TasksCommentAttachments
 from apps.users.models import User
+
+from ...tasks import send_task_comment_mentioned_email
 
 
 class TasksCommentAttachmentsSlimSerializer(serializers.ModelSerializer):
@@ -161,8 +166,17 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
                 print(f"   Mentioned user: {mentioned_user.email}")
                 print(f"   User ID: {mentioned_user.id}")
                 print(f"   Comment content: {comment.content[:50]}...")
-                print(
-                    f"   Task URL: /projects/{comment.task.project.slug}/tasks/{comment.task.id}"
+                task_url = self.context["request"].build_absolute_uri(
+                    f"/projects/{comment.task.project.slug}/tasks/?task_id={comment.task.id}"
+                )
+                send_task_comment_mentioned_email.delay(
+                    first_name=mentioned_user.first_name,
+                    email=mentioned_user.email,
+                    task_title=comment.task.title,
+                    task_url=task_url,
+                    mentioned_by=comment.author.get_full_name()
+                    or comment.author.username,
+                    project_name=comment.task.project.name,
                 )
 
                 # TODO: Uncomment these lines to enable notifications

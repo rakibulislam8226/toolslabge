@@ -240,7 +240,7 @@
                                                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                                         </svg>
                                                                         <span>{{ extension.created_by || 'Unknown'
-                                                                        }}</span>
+                                                                            }}</span>
                                                                     </span>
                                                                     <span class="flex items-center space-x-1">
                                                                         <svg class="w-3 h-3" fill="none"
@@ -250,7 +250,7 @@
                                                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
                                                                         <span>{{ formatDateTime(extension.created_at)
-                                                                        }}</span>
+                                                                            }}</span>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -377,6 +377,7 @@ import BaseModal from './BaseModal.vue'
 import ConfirmModal from './ConfirmModal.vue'
 import TaskCommentsSection from '@/components/tasks/TaskCommentsSection.vue'
 import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker, BaseButton } from '@/components/forms'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
     isOpen: {
@@ -402,6 +403,7 @@ const emit = defineEmits(['close', 'updated'])
 
 const $toast = inject("toast")
 const { user } = useAuth()
+const route = useRoute()
 
 // Priority options
 const priorityOptions = [
@@ -798,6 +800,7 @@ watch(() => props.isOpen, (isOpen) => {
         }
     })
 })
+
 
 </script>
 

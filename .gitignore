@@ -194,3 +194,5 @@ jsconfig.json
 
 celerybeat-schedule-shm
 celerybeat-schedule-wal
+
+.vscode/

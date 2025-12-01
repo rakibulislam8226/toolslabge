@@ -50,7 +50,7 @@
                                     Project Tasks</h1>
                                 <p class="mt-0.5 text-gray-600 text-sm" v-if="project">
                                     Manage and track tasks for <span class="font-semibold text-blue-600">{{ project.name
-                                    }}</span>
+                                        }}</span>
                                 </p>
                             </div>
                         </div>
@@ -214,7 +214,7 @@
                                     'text-gray-500': !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))
                                 }">
                                     {{ draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask) ?
-                                    'Drop task here' : 'No tasks in this status' }}
+                                        'Drop task here' : 'No tasks in this status' }}
                                 </p>
                                 <button
                                     v-if="!(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))"
@@ -609,8 +609,18 @@ const onDrop = async (event, statusId) => {
 }
 
 // Initialize on mount
-onMounted(() => {
-    initializeData()
+onMounted(async () => {
+    await initializeData();
+    const { task_id = null } = route.query;
+    const taskId = isNaN(parseInt(task_id)) ? null : parseInt(task_id);
+    if (taskId) {
+        const task = tasks.value.find(({ id }) => taskId === id);
+        if (task) {
+            selectedTask.value = task;
+            showEditModal.value = true;
+            router.replace({ query: { ...route.query, task_id: undefined } });
+        }
+    }
 })
 </script>
 
