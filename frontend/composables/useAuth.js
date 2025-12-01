@@ -15,6 +15,9 @@ export function useAuth() {
   // Computed property to check if user is authenticated
   const isAuthenticated = computed(() => !!accessToken.value);
 
+  // Computed property to check if user email is verified
+  const isEmailVerified = computed(() => user.value?.is_verified || false);
+
   // Login function - sets tokens and fetches user data
   const login = async (tokens, userData = null) => {
     if (tokens.access) {
@@ -68,13 +71,21 @@ export function useAuth() {
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get("users/my-info/");
+      let userData;
+
       if (response.data.status && response.data.data) {
-        setUser(response.data.data);
-        return response.data.data;
+        userData = response.data.data;
       } else {
-        setUser(response.data);
-        return response.data;
+        userData = response.data;
       }
+
+      // Ensure is_verified is included and stored
+      if (userData && typeof userData.is_verified === "undefined") {
+        userData.is_verified = false; // Default to false if not provided
+      }
+
+      setUser(userData);
+      return userData;
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
       return null;
@@ -97,6 +108,7 @@ export function useAuth() {
     refreshToken: computed(() => refreshToken.value),
     user: computed(() => user.value),
     isAuthenticated,
+    isEmailVerified,
 
     // Methods
     login,

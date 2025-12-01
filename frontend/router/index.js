@@ -25,6 +25,19 @@ const routes = [
     meta: { requiresGuest: true },
   },
   {
+    path: "/verify-email/:token",
+    name: "auth.verify-email",
+    component: () => import("@/views/auth/EmailVerification.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/email-verification-required",
+    name: "auth.email-verification-required",
+    component: () => import("@/views/auth/EmailVerificationRequired.vue"),
+    meta: { requiresGuest: true },
+    props: (route) => ({ email: route.query.email }),
+  },
+  {
     path: "/dashboard",
     name: "dashboard.index",
     component: () => import("@/views/dashboard/Dashboard.vue"),
@@ -91,15 +104,44 @@ const router = createRouter({
 });
 
 // Route guards
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const isAuthenticated = !!localStorage.getItem("access");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isEmailVerified = user?.is_verified || false;
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
+  // Allow access to auth routes for non-authenticated users
+  if (to.meta.requiresGuest && isAuthenticated) {
+    // If already authenticated, redirect based on verification status
+    if (isEmailVerified) {
+      next({ name: "dashboard.index" });
+    } else {
+      // Allow access to verification-related pages
+      if (
+        to.name?.includes("verify") ||
+        to.name?.includes("email-verification")
+      ) {
+        next();
+      } else {
+        // Redirect unverified users to verification required page
+        next({
+          name: "auth.email-verification-required",
+          query: { email: user?.email },
+        });
+      }
+    }
+  } else if (to.meta.requiresAuth && !isAuthenticated) {
     // Redirect to home if trying to access protected route without auth
     next({ name: "home.index" });
-  } else if (to.meta.requiresGuest && isAuthenticated) {
-    // Redirect to dashboard if trying to access guest-only route while authenticated
-    next({ name: "dashboard.index" });
+  } else if (to.meta.requiresAuth && isAuthenticated) {
+    // Block unverified users from accessing protected routes except dashboard
+    if (!isEmailVerified && to.name !== "dashboard.index") {
+      next({
+        name: "auth.email-verification-required",
+        query: { email: user?.email },
+      });
+    } else {
+      next();
+    }
   } else {
     next();
   }

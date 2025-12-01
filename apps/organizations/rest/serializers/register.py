@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from ...choices import OrganizationMemberRoleChoices
 from ...models import Organization, OrganizationMember
+from apps.users.tasks import send_verification_email
 
 
 User = get_user_model()
@@ -27,13 +28,29 @@ class OrganizationRegistrationSerializer(serializers.Serializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        request = self.context.get("request")
         org_name = validated_data.pop("organization_name")
-        print(validated_data)
-        user = User.objects.create(**validated_data)
+
+        # Extract user data
+        user_data = {
+            "email": validated_data["email"],
+            "password": validated_data["password"],
+            "first_name": validated_data["first_name"],
+            "last_name": validated_data["last_name"],
+        }
+
+        user = User.objects.create_user(**user_data)
         org = Organization.objects.create(name=org_name, created_by=user)
         OrganizationMember.objects.create(
             user=user,
             organization=org,
             role=OrganizationMemberRoleChoices.OWNER,
         )
+
+        # Send verification email with base URL from request
+        if request:
+            scheme = "https" if request.is_secure() else "http"
+            base_url = f"{scheme}://{request.get_host()}"
+            send_verification_email.delay(user.id, base_url)
+
         return user

@@ -19,6 +19,7 @@ class CustomUserManager(BaseUserManager):
             is_superuser=is_superuser,
             last_login=now,
             date_joined=now,
+            **kwargs  # Include additional fields like first_name, last_name
         )
         user.set_password(password)
         user.save(using=self._db)

@@ -18,3 +18,11 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 app.conf.broker_connection_retry_on_startup = True  # This is to ensure that the worker retries to connect to the broker on startup.
+
+# Periodic tasks
+app.conf.beat_schedule = {
+    "cleanup-expired-tokens": {
+        "task": "apps.users.tasks.cleanup_expired_tokens",
+        "schedule": crontab(hour=2, minute=0),  # Run daily at 2 AM
+    },
+}

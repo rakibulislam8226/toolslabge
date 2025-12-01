@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils import timezone
+import uuid
 
 from versatileimagefield.fields import VersatileImageField
 
@@ -39,3 +40,28 @@ class User(AbstractUser, TimeStampedModel, PermissionsMixin):
             self.date_joined = timezone.now()
         self.username = self.email
         super().save(*args, **kwargs)
+
+
+class EmailVerificationToken(TimeStampedModel):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="verification_tokens"
+    )
+    token = models.UUIDField(default=uuid.uuid4, unique=True)
+    is_used = models.BooleanField(default=False)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["token"]),
+            models.Index(fields=["user", "is_used"]),
+        ]
+
+    def __str__(self):
+        return f"Verification token for {self.user.email}"
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    def is_valid(self):
+        return not self.is_used and not self.is_expired()

@@ -177,23 +177,16 @@ const handleSubmit = async () => {
   try {
     const response = await axios.post('organizations/register/', form)
 
-    toast.success('Organization created successfully! Welcome to TrackTools.')
+    toast.success('Organization created successfully!')
 
-    // Handle authentication
-    const authData = response.data.access ? response.data : response.data.data
-
-    if (authData?.access && authData?.refresh) {
-      login({
-        access: authData.access,
-        refresh: authData.refresh
-      }, authData.user || null)
-
-      setTimeout(() => router.push('/dashboard'), 1000)
-    } else {
-      // Reset form on success
-      Object.keys(form).forEach(key => form[key] = '')
-      toast.info('Registration successful! Please check your email for verification.')
-    }
+    // Always redirect to email verification page after registration
+    // The user needs to verify their email before accessing the dashboard
+    setTimeout(() => {
+      router.push({
+        name: 'auth.email-verification-required',
+        query: { email: form.email }
+      })
+    }, 1000)
 
   } catch (error) {
     console.error('Registration error:', error)

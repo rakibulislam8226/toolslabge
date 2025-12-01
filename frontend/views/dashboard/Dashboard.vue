@@ -128,7 +128,7 @@
           'rounded-lg shadow p-6 transition-all duration-300 block'
         ] ">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <div :class=" [
                 isDark ? 'bg-cyan-600' : 'bg-blue-500',
                 'w-8 h-8 rounded-md flex items-center justify-center transition-all duration-300'
@@ -160,7 +160,7 @@
           'rounded-lg shadow p-6 transition-all duration-300 block'
         ] ">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <div :class=" [
                 isDark ? 'bg-emerald-600' : 'bg-green-500',
                 'w-8 h-8 rounded-md flex items-center justify-center transition-all duration-300'
@@ -192,7 +192,7 @@
           'rounded-lg shadow p-6 transition-all duration-300 block'
         ] ">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <div :class=" [
                 isDark ? 'bg-violet-600' : 'bg-purple-500',
                 'w-8 h-8 rounded-md flex items-center justify-center transition-all duration-300'
@@ -221,7 +221,7 @@
           'rounded-lg shadow p-6 transition-all duration-300'
         ] ">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <div :class=" [
                 isDark ? 'bg-amber-600' : 'bg-yellow-500',
                 'w-8 h-8 rounded-md flex items-center justify-center transition-all duration-300'
@@ -250,13 +250,19 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useAuth } from "@/composables/useAuth.js";
 import { useLogoutModal } from "@/composables/useLogoutModal.js";
 import { useTheme } from '@/composables/useTheme.js'
 
-const { user, hasRole } = useAuth();
+const { user, hasRole, fetchUserProfile } = useAuth();
 const { openLogoutModal } = useLogoutModal();
 const { isDark } = useTheme()
+
+// Refresh user data when component mounts
+onMounted(async () => {
+  await fetchUserProfile()
+})
 
 const handleLogout = () => {
   openLogoutModal();
