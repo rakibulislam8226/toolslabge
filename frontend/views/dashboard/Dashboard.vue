@@ -14,13 +14,7 @@
           isDark ? 'text-slate-100' : 'text-gray-900',
           'text-2xl font-bold mb-4 transition-colors duration-300'
         ] ">Welcome to TrackTools!</h2>
-        <p :class=" [
-          isDark ? 'text-slate-300' : 'text-gray-600',
-          'mb-4 transition-colors duration-300'
-        ] ">
-          Your organization has been successfully created and you're now logged in.
-          Here's what you can do next:
-        </p>
+        
 
         <div class="grid md:grid-cols-3 gap-6 mt-6">
           <div v-if="hasRole('owner', 'admin')">
