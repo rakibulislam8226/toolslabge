@@ -6,6 +6,7 @@ from django.db import transaction
 
 from rest_framework import generics, status, permissions
 from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
 
 from apps.users.models import User
 from ..serializers.password_reset import (
@@ -18,12 +19,12 @@ from ...models import Otp, PasswordResetToken
 from ...tasks import send_forgot_password_otp_email
 
 
-class PasswordResetView(generics.CreateAPIView):
+class PasswordResetView(generics.GenericAPIView):
     serializer_class = PasswordResetSerializer
-    # permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     @transaction.atomic
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -50,15 +51,17 @@ class PasswordResetView(generics.CreateAPIView):
         Otp.objects.filter(user=user).delete()
         token_obj.delete()
 
-        return success_response(
-            message="Password reset successful", code=status.HTTP_200_OK
+        return Response(
+            {"message": "Password reset successful"},
+            status=status.HTTP_200_OK,
         )
 
 
-class RequestOTPView(generics.CreateAPIView):
+class RequestOTPView(generics.GenericAPIView):
     serializer_class = RequestOTPSerializer
+    permission_classes = [permissions.AllowAny]
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
@@ -83,15 +86,17 @@ class RequestOTPView(generics.CreateAPIView):
         message = f"Your OTP code is {otp_code}. It will expire in 5 minutes."
         send_forgot_password_otp_email.delay(subject, message, [user.email])
 
-        return success_response(
-            message="OTP sent successfully", code=status.HTTP_200_OK
+        return Response(
+            {"message": "OTP sent successfully"},
+            status=status.HTTP_200_OK,
         )
 
 
-class VerifyOTPView(generics.CreateAPIView):
+class VerifyOTPView(generics.GenericAPIView):
     serializer_class = VerifyOTPSerializer
+    permission_classes = [permissions.AllowAny]
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -117,12 +122,9 @@ class VerifyOTPView(generics.CreateAPIView):
         # Create and return a reset token
         reset_token = PasswordResetToken.objects.create(user=user)
 
-        return success_response(
-            message="OTP verified successfully",
-            code=status.HTTP_200_OK,
-            data={
-                "password_reset_token": reset_token.uid,
-            },
+        return Response(
+            {"password_reset_token": reset_token.uid},
+            status=status.HTTP_200_OK,
         )
 
 
@@ -145,6 +147,7 @@ class UpdatePasswordView(generics.UpdateAPIView):
         user.set_password(new_password)
         user.save()
 
-        return success_response(
-            message="Password updated successfully", code=status.HTTP_200_OK
+        return Response(
+            {"message": "Password updated successfully"},
+            status=status.HTTP_200_OK,
         )
