@@ -87,3 +87,14 @@ def cleanup_expired_tokens():
     count = expired_tokens.count()
     expired_tokens.delete()
     return f"Cleaned up {count} expired verification tokens"
+
+
+@shared_task
+def send_forgot_password_otp_email(subject, message, recipient_list):
+    send_mail(
+        subject,
+        message,
+        None,
+        recipient_list,
+        fail_silently=False,
+    )

@@ -3,4 +3,5 @@ from django.urls import path, include
 urlpatterns = [
     path("my-info/", include("apps.users.rest.urls.my_info")),
     path("email/", include("apps.users.rest.urls.verification")),
+    path("password-reset/", include("apps.users.rest.urls.password_reset")),
 ]

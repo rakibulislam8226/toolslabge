@@ -1,8 +1,10 @@
+import uuid
+from datetime import timedelta
+
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils import timezone
-import uuid
 
 from versatileimagefield.fields import VersatileImageField
 
@@ -65,3 +67,35 @@ class EmailVerificationToken(TimeStampedModel):
 
     def is_valid(self):
         return not self.is_used and not self.is_expired()
+
+
+class Otp(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="otps")
+    code = models.CharField(max_length=4)
+    expires_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"OTP for {self.user.email} - {self.code}"
+
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(minutes=5)
+        super().save(*args, **kwargs)
+
+
+class PasswordResetToken(TimeStampedModel):
+    uid = models.UUIDField(
+        db_index=True, unique=True, default=uuid.uuid4, editable=False
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="reset_tokens"
+    )
+    expires_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"Password Reset Token for {self.user.email} - {self.uid}"
+
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=1)
+        super().save(*args, **kwargs)
