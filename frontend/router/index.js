@@ -19,6 +19,24 @@ const routes = [
     meta: { requiresGuest: true },
   },
   {
+    path: "/forgot-password",
+    name: "auth.forgot-password",
+    component: () => import("@/views/auth/ForgotPassword.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/verify-otp",
+    name: "auth.verify-otp",
+    component: () => import("@/views/auth/VerifyOTP.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/reset-password",
+    name: "auth.reset-password",
+    component: () => import("@/views/auth/ResetPassword.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
     path: "/accept-invite",
     name: "auth.accept-invite",
     component: () => import("@/views/auth/AcceptInvite.vue"),
