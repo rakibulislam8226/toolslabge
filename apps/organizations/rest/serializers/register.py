@@ -15,6 +15,7 @@ class OrganizationRegistrationSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=50)
     last_name = serializers.CharField(max_length=50)
     email = serializers.EmailField()
+    photo = serializers.ImageField(required=False, allow_null=True)
     password = serializers.CharField(write_only=True)
     organization_name = serializers.CharField(max_length=255)
 
@@ -37,6 +38,7 @@ class OrganizationRegistrationSerializer(serializers.Serializer):
             "password": validated_data["password"],
             "first_name": validated_data["first_name"],
             "last_name": validated_data["last_name"],
+            "photo": validated_data.get("photo"),
         }
 
         user = User.objects.create_user(**user_data)

@@ -195,8 +195,20 @@ const handleLogin = async () => {
   } catch (error) {
     console.error('Login failed:', error)
 
+    // Check if error is due to email not being verified
+    if (error.response?.data?.email_not_verified) {
+      const userEmail = error.response.data.email || form.email.trim()
+      toast.error('Please verify your email address before logging in')
+      setTimeout(() => {
+        router.push(`/email-verification-required?email=${encodeURIComponent(userEmail)}`)
+      }, 2000)
+      return
+    }
+
     if (error.response?.status === 401) {
       errors.value.general = 'Invalid email or password'
+    } else if (error.response?.data?.detail) {
+      errors.value.general = error.response.data.detail
     } else if (error.response?.data?.message) {
       errors.value.general = error.response.data.message
     } else {

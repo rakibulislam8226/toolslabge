@@ -6,10 +6,10 @@ from django.conf.urls.static import static
 
 from rest_framework import permissions
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
     TokenRefreshView,
     TokenVerifyView,
 )
+from apps.users.rest.views.auth import CustomTokenObtainPairView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -40,7 +40,11 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     # JWT Authentication URLs
-    path(f"{API_V1}/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path(
+        f"{API_V1}/token/",
+        CustomTokenObtainPairView.as_view(),
+        name="token_obtain_pair",
+    ),
     path(f"{API_V1}/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path(f"{API_V1}/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     # organizations
