@@ -4,6 +4,7 @@ import router from "./router";
 import iziToastPlugin from "@/plugins/izitoast.js";
 import themePlugin from "@/plugins/theme.js";
 import { createPinia } from "pinia";
+import "./main.css";
 
 const app = createApp(App);
 const pinia = createPinia();
