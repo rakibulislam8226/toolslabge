@@ -57,7 +57,7 @@
                             <!-- Photo Controls -->
                             <div class="flex-1" v-if="(form.photo || user?.photo) && !shouldRemovePhoto">
                                 <Button class="mt-2 px-3 py-1 text-xs rounded" type="button" variant="secondary"
-                                    size="small" @click=" removePhoto ">
+                                    size="sm" @click=" removePhoto ">
                                     Remove Photo
                                 </Button>
                             </div>

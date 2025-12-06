@@ -178,9 +178,13 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
               <div class="flex items-center min-w-0 flex-1">
                 <!-- Avatar -->
-                <div
-                  class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3 flex-shrink-0">
-                  {{ getInitials(member.user) }}
+                <div class="w-10 h-10 rounded-full mr-3 flex-shrink-0 overflow-hidden">
+                  <img v-if="member.photo" :src=" member.photo " :alt=" member.user_name || member.user_email "
+                    class="w-full h-full object-cover" />
+                  <div v-else
+                    class="w-full h-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                    {{ getInitials(member) }}
+                  </div>
                 </div>
 
                 <!-- User Info -->
@@ -333,11 +337,16 @@ const fetchMembers = async () => {
 }
 
 // Helper functions
-const getInitials = (user) => {
-  if (user.first_name && user.last_name) {
-    return `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase()
-  } else if (user.email) {
-    return user.email.charAt(0).toUpperCase()
+const getInitials = (member) => {
+  if (member.user_name) {
+    const names = member.user_name.split(' ')
+    if (names.length >= 2) {
+      return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase()
+    } else {
+      return names[0].charAt(0).toUpperCase()
+    }
+  } else if (member.user_email) {
+    return member.user_email.charAt(0).toUpperCase()
   }
   return 'U'
 }

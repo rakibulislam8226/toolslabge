@@ -13,6 +13,7 @@ from ...models import Project, ProjectMember
 class ProjectMemberSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source="user.email", read_only=True)
     user_name = serializers.CharField(source="user.get_full_name", read_only=True)
+    photo = serializers.ImageField(source="user.photo", read_only=True)
 
     class Meta:
         model = ProjectMember
@@ -22,6 +23,7 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
             "user_name",
             "user_email",
             "role",
+            "photo",
             "created_at",
         ]
         read_only_fields = ["id", "user_name", "user_email", "created_at"]
