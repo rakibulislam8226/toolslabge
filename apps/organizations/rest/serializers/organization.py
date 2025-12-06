@@ -59,11 +59,33 @@ class OrganizationRegistrationSerializer(serializers.Serializer):
 
 
 class OrganizationDetailSerializer(serializers.ModelSerializer):
+    # These fields are for future implementation - currently ignored
+    website = serializers.URLField(required=False, allow_blank=True, write_only=True)
+    description = serializers.CharField(
+        required=False, allow_blank=True, write_only=True
+    )
+    industry = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    size = serializers.CharField(required=False, allow_blank=True, write_only=True)
+
     class Meta:
         model = Organization
         fields = [
             "id",
             "name",
+            "website",
+            "description",
+            "industry",
+            "size",
             "created_at",
             "updated_at",
         ]
+
+    def update(self, instance, validated_data):
+        # For now, only update the name field
+        # Remove future fields that don't exist in the model yet
+        validated_data.pop("website", None)
+        validated_data.pop("description", None)
+        validated_data.pop("industry", None)
+        validated_data.pop("size", None)
+
+        return super().update(instance, validated_data)

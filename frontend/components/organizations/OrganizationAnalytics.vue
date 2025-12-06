@@ -1,5 +1,22 @@
 <template>
     <div class="space-y-6">
+        <!-- Show an warning that this action is under development -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        Warning: This section is under development and may not function as expected.
+                    </p>
+                </div>
+            </div>
+        </div>
         <!-- Analytics Overview -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">

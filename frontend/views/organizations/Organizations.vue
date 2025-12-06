@@ -27,7 +27,7 @@
             </div>
             <nav class="p-4 space-y-2">
               <button v-for="item in menuItems" :key=" item.key " @click="currentView = item.key" :class=" [
-                'w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3',
+                'w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3 cursor-pointer',
                 currentView === item.key
                   ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -44,51 +44,9 @@
 
         <!-- Content Area -->
         <div class="flex-1">
-          <!-- Overview -->
-          <div v-if="currentView === 'overview'" class="space-y-6">
-            <!-- Organizations Grid -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-              <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-6">Your Organizations</h3>
-
-                <!-- Loading State -->
-                <div v-if="loading" class="flex justify-center items-center py-12">
-                  <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-                  <span class="ml-3 text-gray-600">Loading organizations...</span>
-                </div>
-
-                <!-- Organizations Grid -->
-                <div v-else-if="organizations.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  <div v-for="org in organizations" :key=" org.id "
-                    class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200 group cursor-pointer"
-                    @click="selectOrganization(org)">
-                    <div class="flex items-center space-x-4 mb-4">
-                      <div
-                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">{{ getOrgInitials(org.name) }}</span>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <h4
-                          class="text-lg font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                          {{ org.name }}
-                        </h4>
-                        <p class="text-sm text-gray-500">{{ formatDate(org.created_at) }}</p>
-                      </div>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ org.description || 'No description available'
-                    }}</p>
-                    <div class="flex items-center justify-between text-sm text-gray-500">
-                      <span>{{ org.members_count || 0 }} members</span>
-                      <span class="px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs">Active</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- Tasks -->
-          <div v-else-if="currentView === 'tasks'">
+          <div v-if="currentView === 'tasks'" class="cursor-disabled">
             <OrganizationTasks />
           </div>
 
@@ -126,7 +84,7 @@ import Button from '@/components/Button.vue'
 const router = useRouter()
 
 // Reactive data
-const currentView = ref('overview')
+const currentView = ref('members')
 const organizations = ref([])
 const loading = ref(true)
 const selectedOrganization = ref(null)
@@ -135,10 +93,10 @@ const selectedOrganization = ref(null)
 // Menu items with icons
 const menuItems = computed(() => [
   {
-    key: 'overview',
-    label: 'Overview',
+    key: 'members',
+    label: 'Members',
     icon: () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' })
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239' })
     ])
   },
   {
@@ -151,13 +109,6 @@ const menuItems = computed(() => [
       if (!Array.isArray(organizations.value)) return 0
       return organizations.value.reduce((total, org) => total + (org.tasks_count || 0), 0)
     })
-  },
-  {
-    key: 'members',
-    label: 'Members',
-    icon: () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239' })
-    ])
   },
   {
     key: 'analytics',
@@ -178,7 +129,6 @@ const menuItems = computed(() => [
 // Computed properties
 const getPageTitle = () => {
   const titles = {
-    overview: 'Organizations',
     tasks: 'Organization Tasks',
     members: 'Organization Members',
     analytics: 'Organization Analytics',
@@ -189,7 +139,6 @@ const getPageTitle = () => {
 
 const getPageDescription = () => {
   const descriptions = {
-    overview: 'Manage and overview your organizations',
     tasks: 'View and manage tasks across all organizations',
     members: 'Manage organization members and invitations',
     analytics: 'View organization performance and statistics',

@@ -1,41 +1,52 @@
 <template>
     <div class="space-y-6">
+        <!-- Show an warning that this action is under development -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        Warning: This section is under development and may not function as expected.
+                    </p>
+                </div>
+            </div>
+        </div>
         <!-- Organization Information -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900">Organization Information</h3>
-                <button @click="editing = !editing"
+                <button @click="editing ? editing = false : startEditing()"
                     class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
                     {{ editing ? 'Cancel' : 'Edit' }}
                 </button>
             </div>
 
-            <form @submit.prevent="updateOrganization" v-if="editing">
+            <form @submit.prevent=" updateOrganization " v-if="editing">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
-                        <input v-model="organizationForm.name" type="text" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Enter organization name" />
+                        <BaseInput v-model=" organizationForm.name " label="Organization Name" type="text"
+                            placeholder="Enter organization name" required />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
-                        <input v-model="organizationForm.website" type="url"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        <BaseInput v-model=" organizationForm.website " label="Website" type="url"
                             placeholder="https://example.com" />
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                        <textarea v-model="organizationForm.description" rows="4"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Enter organization description"></textarea>
+                        <BaseTextarea v-model=" organizationForm.description " label="Description"
+                            placeholder="Enter organization description" rows="4" />
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-                        <select v-model="organizationForm.industry"
+                        <select v-model=" organizationForm.industry "
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select Industry</option>
                             <option value="technology">Technology</option>
@@ -50,7 +61,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Company Size</label>
-                        <select v-model="organizationForm.size"
+                        <select v-model=" organizationForm.size "
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select Size</option>
                             <option value="1-10">1-10 employees</option>
@@ -64,7 +75,7 @@
 
                 <div class="flex justify-end space-x-3 mt-6">
                     <Button variant="secondary" size="md" label="Cancel" @click="editing = false" />
-                    <Button type="submit" variant="primary" size="md" :loading="updating" loadingText="Updating..."
+                    <Button type="submit" variant="primary" size="md" :loading=" updating " loadingText="Updating..."
                         label="Update Organization" />
                 </div>
             </form>
@@ -79,7 +90,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
                     <p class="text-gray-900">
-                        <a v-if="organization?.website" :href="organization.website" target="_blank"
+                        <a v-if="organization?.website" :href=" organization.website " target="_blank"
                             class="text-blue-600 hover:text-blue-800">
                             {{ organization.website }}
                         </a>
@@ -119,7 +130,7 @@
                                 <p class="text-sm text-gray-500">Allow others to find and request to join your
                                     organization</p>
                             </div>
-                            <toggle-switch v-model="preferences.isPublic" @change="updatePreferences" />
+                            <toggle-switch v-model=" preferences.isPublic " @change=" updatePreferences " />
                         </div>
 
                         <div class="flex items-center justify-between">
@@ -127,7 +138,7 @@
                                 <label class="text-sm font-medium text-gray-700">Member Directory</label>
                                 <p class="text-sm text-gray-500">Show member list to all organization members</p>
                             </div>
-                            <toggle-switch v-model="preferences.showMemberDirectory" @change="updatePreferences" />
+                            <toggle-switch v-model=" preferences.showMemberDirectory " @change=" updatePreferences " />
                         </div>
                     </div>
                 </div>
@@ -141,7 +152,7 @@
                                 <label class="text-sm font-medium text-gray-700">Email Notifications</label>
                                 <p class="text-sm text-gray-500">Send email notifications for important updates</p>
                             </div>
-                            <toggle-switch v-model="preferences.emailNotifications" @change="updatePreferences" />
+                            <toggle-switch v-model=" preferences.emailNotifications " @change=" updatePreferences " />
                         </div>
 
                         <div class="flex items-center justify-between">
@@ -149,7 +160,7 @@
                                 <label class="text-sm font-medium text-gray-700">Task Notifications</label>
                                 <p class="text-sm text-gray-500">Notify when tasks are assigned or completed</p>
                             </div>
-                            <toggle-switch v-model="preferences.taskNotifications" @change="updatePreferences" />
+                            <toggle-switch v-model=" preferences.taskNotifications " @change=" updatePreferences " />
                         </div>
                     </div>
                 </div>
@@ -163,13 +174,13 @@
                                 <label class="text-sm font-medium text-gray-700">Auto-archive Completed Projects</label>
                                 <p class="text-sm text-gray-500">Automatically archive projects after completion</p>
                             </div>
-                            <toggle-switch v-model="preferences.autoArchiveProjects" @change="updatePreferences" />
+                            <toggle-switch v-model=" preferences.autoArchiveProjects " @change=" updatePreferences " />
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Default Project
                                 Visibility</label>
-                            <select v-model="preferences.defaultProjectVisibility" @change="updatePreferences"
+                            <select v-model=" preferences.defaultProjectVisibility " @change=" updatePreferences "
                                 class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="private">Private</option>
                                 <option value="organization">Organization</option>
@@ -191,7 +202,7 @@
                         <h4 class="text-md font-medium text-red-900">Archive Organization</h4>
                         <p class="text-sm text-red-600">Archive this organization and hide it from members</p>
                     </div>
-                    <button @click="archiveOrganization"
+                    <button @click=" archiveOrganization "
                         class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
                         Archive
                     </button>
@@ -234,7 +245,7 @@
                         <p class="text-sm text-gray-600 mb-4">
                             Please type <strong>{{ organization?.name }}</strong> to confirm deletion.
                         </p>
-                        <input v-model="deleteConfirmation" type="text"
+                        <input v-model=" deleteConfirmation " type="text"
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                             placeholder="Enter organization name" />
                     </div>
@@ -244,8 +255,8 @@
                             class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300">
                             Cancel
                         </button>
-                        <button @click="deleteOrganization"
-                            :disabled="deleteConfirmation !== organization?.name || deleting"
+                        <button @click=" deleteOrganization "
+                            :disabled=" deleteConfirmation !== organization?.name || deleting "
                             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 disabled:opacity-50">
                             {{ deleting ? 'Deleting...' : 'Delete Organization' }}
                         </button>
@@ -257,13 +268,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
-import axiosInstance from '@/plugins/axiosConfig.js'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import Button from '@/components/Button.vue'
+import axios from "@/plugins/axiosConfig.js"
+import { BaseInput, BaseTextarea, BaseSelect, BaseDatePicker } from '@/components/forms'
 
 const router = useRouter()
+const $toast = inject('toast')
 
 // Reactive data
 const organization = ref(null)
@@ -275,8 +288,8 @@ const deleteConfirmation = ref('')
 
 const organizationForm = reactive({
     name: '',
-    description: '',
     website: '',
+    description: '',
     industry: '',
     size: ''
 })
@@ -293,45 +306,34 @@ const preferences = reactive({
 // Methods
 const fetchOrganization = async () => {
     try {
-        // For now, we'll use a mock organization since the API might not be implemented
-        const mockOrganization = {
-            id: 1,
-            name: 'My Organization',
-            description: 'This is a sample organization description.',
-            website: 'https://example.com',
-            industry: 'technology',
-            size: '11-50',
-            created_at: '2024-01-01T00:00:00Z'
-        }
-
-        organization.value = mockOrganization
-
-        // Populate form with current data
-        Object.assign(organizationForm, mockOrganization)
-
-        // Try to fetch real data
-        try {
-            const response = await axiosInstance.get('organizations/current/')
-            organization.value = response.data
-            Object.assign(organizationForm, response.data)
-        } catch (error) {
-            console.log('Using mock data - API not available:', error)
-        }
+        const response = await axios.get('organizations/')
+        organization.value = response.data?.data
     } catch (error) {
         console.error('Error fetching organization:', error)
     }
 }
 
+// Initialize form when editing starts
+const startEditing = () => {
+    if (organization.value) {
+        organizationForm.name = organization.value.name || ''
+        organizationForm.website = organization.value.website || ''
+        organizationForm.description = organization.value.description || ''
+        organizationForm.industry = organization.value.industry || ''
+        organizationForm.size = organization.value.size || ''
+    }
+    editing.value = true
+}
+
 const updateOrganization = async () => {
     try {
         updating.value = true
-        const response = await axiosInstance.patch('organizations/current/', organizationForm)
-        organization.value = response.data
+        const response = await axios.patch('organizations/', organizationForm)
+        organization.value = response.data.data
+        $toast.success(response.data.message || 'Organization updated successfully')
         editing.value = false
-        // Show success message
     } catch (error) {
         console.error('Error updating organization:', error)
-        // Handle error with toast notification
     } finally {
         updating.value = false
     }
@@ -339,23 +341,19 @@ const updateOrganization = async () => {
 
 const updatePreferences = async () => {
     try {
-        await axiosInstance.patch('organizations/preferences/', preferences)
-        // Show success message
+        await axios.patch('organizations/preferences/', preferences)
     } catch (error) {
         console.error('Error updating preferences:', error)
-        // Handle error with toast notification
     }
 }
 
 const archiveOrganization = async () => {
     if (confirm('Are you sure you want to archive this organization?')) {
         try {
-            await axiosInstance.patch('organizations/current/', { is_archived: true })
-            // Redirect to organizations list
-            router.push({ name: 'dashboard.index' })
+            await axios.patch('organizations/', { is_archived: true })
+            router.push('/dashboard')
         } catch (error) {
             console.error('Error archiving organization:', error)
-            // Handle error with toast notification
         }
     }
 }
@@ -363,12 +361,10 @@ const archiveOrganization = async () => {
 const deleteOrganization = async () => {
     try {
         deleting.value = true
-        await axiosInstance.delete('organizations/current/')
-        // Redirect to organizations list
-        router.push({ name: 'dashboard.index' })
+        await axios.delete('organizations/')
+        router.push('/dashboard')
     } catch (error) {
         console.error('Error deleting organization:', error)
-        // Handle error with toast notification
     } finally {
         deleting.value = false
     }
