@@ -56,3 +56,14 @@ class OrganizationRegistrationSerializer(serializers.Serializer):
             send_verification_email.delay(user.id, base_url)
 
         return user
+
+
+class OrganizationDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = [
+            "id",
+            "name",
+            "created_at",
+            "updated_at",
+        ]

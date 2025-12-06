@@ -1,9 +1,14 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
+from ...permissions import IsOrgOwnerAdmin
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from ..serializers.register import OrganizationRegistrationSerializer
+from apps.organizations.models import Organization
+from apps.organizations.rest.serializers.organization import (
+    OrganizationRegistrationSerializer,
+    OrganizationDetailSerializer,
+)
 
 
 class RegisterOrganizationView(generics.CreateAPIView):
@@ -23,3 +28,15 @@ class RegisterOrganizationView(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+class OrganizationDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = OrganizationDetailSerializer
+    permission_classes = [IsOrgOwnerAdmin]
+
+    def get_object(self):
+        user = self.request.user
+        membership = user.organization_memberships.filter(is_active=True).first()
+        if not membership:
+            return None
+        return membership.organization
