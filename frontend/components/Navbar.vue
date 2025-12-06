@@ -54,7 +54,7 @@
                             </router-link> <!-- Profile Dropdown -->
                             <div class="relative ml-4" @click.stop>
                                 <button @click="dropdownOpen = !dropdownOpen"
-                                    class="flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 hover:scale-105"
+                                    class="flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 hover:scale-105 cursor-pointer"
                                     :class=" isDark ? 'hover:bg-slate-800' : 'hover:bg-gray-100 hover:shadow-md' ">
                                     <!-- Avatar -->
                                     <div class="relative">
@@ -100,61 +100,38 @@
                                         :class=" isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200' "
                                         @click.stop>
                                         <!-- User Info Header -->
-                                        <div class="px-4 py-3 border-b"
-                                            :class=" isDark ? 'border-slate-700' : 'border-gray-200' ">
-                                            <div class="flex items-center space-x-3">
-                                                <div class="relative">
-                                                    <img v-if="user?.photo" :src=" user.photo "
-                                                        :alt=" user?.first_name || user?.email "
-                                                        class="w-10 h-10 rounded-full object-cover"
-                                                        :class=" isDark ? 'ring-2 ring-slate-600' : 'ring-2 ring-slate-600' " />
-                                                    <div v-else
-                                                        class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                                                        :class=" getAvatarColor(user?.email || '') ">
-                                                        {{ getInitial() }}
-                                                    </div>
-                                                    <div
-                                                        class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full">
-                                                    </div>
+                                        <router-link to="/profile" @click="dropdownOpen = false"
+                                            class="flex items-center px-4 py-3 border-b"
+                                            :class=" isDark ? 'border-slate-700 hover:bg-slate-700' : 'border-gray-200 hover:bg-gray-100' ">
+                                            <div class="relative">
+                                                <img v-if="user?.photo" :src=" user.photo "
+                                                    :alt=" user?.first_name || user?.email "
+                                                    class="w-10 h-10 rounded-full object-cover shadow-md"
+                                                    :class=" isDark ? 'ring-2 ring-slate-600' : 'ring-2 ring-gray-500' " />
+                                                <div v-else
+                                                    class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md"
+                                                    :class=" getAvatarColor(user?.email || '') ">
+                                                    {{ getInitial() }}
                                                 </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium truncate"
-                                                        :class=" isDark ? 'text-slate-100' : 'text-slate-900' ">
-                                                        {{ user?.first_name || 'User' }}
-                                                    </p>
-                                                    <p class="text-xs truncate"
-                                                        :class=" isDark ? 'text-slate-400' : 'text-slate-600' ">
-                                                        {{ user?.email }}
-                                                    </p>
+                                                <div
+                                                    class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full shadow-sm">
                                                 </div>
                                             </div>
-                                        </div>
+                                            <div class="ml-3 text-left">
+                                                <div class="text-sm font-semibold"
+                                                    :class=" isDark ? 'text-slate-100' : 'text-gray-900' ">
+                                                    {{ user?.first_name || 'User' }}
+                                                </div>
+                                                <div class="text-xs"
+                                                    :class=" isDark ? 'text-slate-400' : 'text-gray-600' ">
+                                                    {{ user?.email }}
+                                                </div>
+                                            </div>
+                                        </router-link>
 
                                         <!-- Menu Items -->
                                         <div class="py-1">
-                                            <router-link to="/profile" @click="dropdownOpen = false"
-                                                class="flex items-center px-4 py-2 text-sm transition-colors duration-200"
-                                                :class=" isDark ? 'text-slate-300 hover:bg-slate-700 hover:text-slate-100' : 'text-gray-900 hover:bg-gray-100 hover:text-black' ">
-                                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                                    </path>
-                                                </svg>
-                                                View Profile
-                                            </router-link>
-                                            <router-link to="/change-password" @click="dropdownOpen = false"
-                                                class="flex items-center px-4 py-2 text-sm transition-colors duration-200"
-                                                :class=" isDark ? 'text-slate-300 hover:bg-slate-700 hover:text-slate-100' : 'text-gray-900 hover:bg-gray-100 hover:text-black' ">
-                                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                </svg>
-                                                Change Password
-                                            </router-link>
+
                                             <div v-if="hasRole('owner', 'admin')">
                                                 <router-link to="/organizations" @click="dropdownOpen = false"
                                                     class="flex items-center px-4 py-2 text-sm transition-colors duration-200"
@@ -183,8 +160,19 @@
                                             </div>
                                             <div class="my-1 border-t"
                                                 :class=" isDark ? 'border-slate-700' : 'border-gray-200' "></div>
+                                                <router-link to="/change-password" @click="dropdownOpen = false"
+                                                class="flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                                                :class=" isDark ? 'text-slate-300 hover:bg-slate-700 hover:text-slate-100' : 'text-gray-900 hover:bg-gray-100 hover:text-black' ">
+                                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                                Change Password
+                                            </router-link>
                                             <button @click=" handleLogout "
-                                                class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">
+                                                class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer">
                                                 <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
