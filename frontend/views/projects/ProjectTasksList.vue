@@ -1,17 +1,28 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div :class=" [
+        isDark ? 'bg-slate-900' : 'bg-gray-50',
+        'min-h-screen transition-colors duration-300'
+    ] ">
         <!-- Header Section -->
-        <div class="bg-white shadow-lg border-b border-gray-200">
+        <div :class=" [
+            isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200',
+            'shadow-lg border-b transition-colors duration-300'
+        ] ">
             <div class="max-w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
                 <div
                     class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-3 lg:space-y-0">
                     <div class="flex-1">
                         <!-- Breadcrumb -->
                         <nav class="mb-2 sm:mb-3">
-                            <ol class="flex items-center space-x-2 text-sm text-gray-500">
+                            <ol :class=" [
+                                isDark ? 'text-slate-400' : 'text-gray-500',
+                                'flex items-center space-x-2 text-sm transition-colors duration-300'
+                            ] ">
                                 <li>
-                                    <router-link to="/projects"
-                                        class="hover:text-blue-600 transition-all duration-300 font-medium hover:underline">
+                                    <router-link to="/projects" :class=" [
+                                        isDark ? 'hover:text-cyan-400' : 'hover:text-blue-600',
+                                        'transition-all duration-300 font-medium hover:underline'
+                                    ] ">
                                         Projects
                                     </router-link>
                                 </li>
@@ -22,8 +33,10 @@
                                     </svg>
                                 </li>
                                 <li>
-                                    <button @click="goToProject"
-                                        class="hover:text-blue-600 transition-all duration-300 truncate max-w-[200px] font-medium hover:underline">
+                                    <button @click=" goToProject " :class=" [
+                                        isDark ? 'hover:text-cyan-400' : 'hover:text-blue-600',
+                                        'transition-all duration-300 truncate max-w-[200px] font-medium hover:underline'
+                                    ] ">
                                         {{ project?.name || 'Project' }}
                                     </button>
                                 </li>
@@ -33,24 +46,37 @@
                                             d="M9 5l7 7-7 7"></path>
                                     </svg>
                                 </li>
-                                <li class="text-gray-900 font-semibold">Tasks</li>
+                                <li :class=" [
+                                    isDark ? 'text-slate-100' : 'text-gray-900',
+                                    'font-semibold transition-colors duration-300'
+                                ] ">Tasks</li>
                             </ol>
                         </nav>
 
                         <div class="flex items-center mb-2">
-                            <div
-                                class="w-8 h-8 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                            <div :class=" [
+                                isDark ? 'bg-cyan-600' : 'bg-linear-to-br from-blue-500 to-indigo-600',
+                                'w-8 h-8 rounded-xl flex items-center justify-center mr-3 shadow-lg transition-colors duration-300'
+                            ] ">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
+                                <h1 :class=" [
+                                    isDark ? 'text-slate-100' : 'text-gray-900',
+                                    'text-xl sm:text-2xl lg:text-3xl font-bold leading-tight transition-colors duration-300'
+                                ] ">
                                     Project Tasks</h1>
-                                <p class="mt-0.5 text-gray-600 text-sm" v-if="project">
-                                    Manage and track tasks for <span class="font-semibold text-blue-600">{{ project.name
-                                        }}</span>
+                                <p :class=" [
+                                    isDark ? 'text-slate-300' : 'text-gray-600',
+                                    'mt-0.5 text-sm transition-colors duration-300'
+                                ] " v-if="project">
+                                    Manage and track tasks for <span :class=" [
+                                        isDark ? 'text-cyan-400' : 'text-blue-600',
+                                        'font-semibold transition-colors duration-300'
+                                    ] ">{{ project.name }}</span>
                                 </p>
                             </div>
                         </div>
@@ -58,10 +84,12 @@
 
                     <div
                         class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
-                        <button @click="refreshTasks" :disabled="loading"
-                            class="bg-white text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-md border border-gray-200 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
-                            :class="{ 'opacity-50 cursor-not-allowed': loading }">
-                            <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" fill="none"
+                        <button @click=" refreshTasks " :disabled=" loading " :class=" [
+                            isDark ? 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50',
+                            'px-4 py-2 rounded-xl transition-all duration-300 flex items-center justify-center shadow-md font-medium hover:shadow-lg transform hover:-translate-y-0.5',
+                            { 'opacity-50 cursor-not-allowed': loading }
+                        ] ">
+                            <svg class="w-4 h-4 mr-2" :class=" { 'animate-spin': loading } " fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
@@ -70,14 +98,15 @@
                             Refresh
                         </button>
 
-                        <button @click="openCreateModal()"
-                            class="bg-blue-600 px-6 py-2 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
-                            style="color: white !important;">
+                        <button @click="openCreateModal()" :class=" [
+                            isDark ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-blue-600 hover:bg-blue-700',
+                            'px-6 py-2 rounded-xl transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium text-white'
+                        ] ">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4v16m8-8H4"></path>
                             </svg>
-                            <span style="color: white !important;">Create Task</span>
+                            <span class="text-white">Create Task</span>
                         </button>
                     </div>
                 </div>
@@ -86,24 +115,46 @@
 
         <!-- Loading State -->
         <div v-if="loading && !tasks.length" class="flex flex-col justify-center items-center py-24">
-            <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mb-4"></div>
-            <p class="text-gray-600 font-medium">Loading tasks...</p>
+            <div :class=" [
+                isDark ? 'border-slate-700 border-t-cyan-400' : 'border-blue-200 border-t-blue-600',
+                'animate-spin rounded-full h-16 w-16 border-4 mb-4 transition-colors duration-300'
+            ] "></div>
+            <p :class=" [
+                isDark ? 'text-slate-300' : 'text-gray-600',
+                'font-medium transition-colors duration-300'
+            ] ">Loading tasks...</p>
         </div>
 
         <!-- Error State -->
         <div v-else-if="error" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center shadow-lg">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div :class=" [
+                isDark ? 'bg-red-900/20 border-red-800/30' : 'bg-red-50 border-red-200',
+                'border-2 rounded-2xl p-8 text-center shadow-lg transition-colors duration-300'
+            ] ">
+                <div :class=" [
+                    isDark ? 'bg-red-900/50' : 'bg-red-100',
+                    'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors duration-300'
+                ] ">
+                    <svg :class=" [
+                        isDark ? 'text-red-400' : 'text-red-500',
+                        'w-8 h-8 transition-colors duration-300'
+                    ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-red-900 mb-3">Error Loading Tasks</h3>
-                <p class="text-red-700 mb-6 max-w-md mx-auto">{{ error }}</p>
-                <button @click="fetchTasks"
-                    class="bg-red-600 px-6 py-3 rounded-xl hover:bg-red-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                    style="color: white !important;">
+                <h3 :class=" [
+                    isDark ? 'text-red-300' : 'text-red-900',
+                    'text-xl font-bold mb-3 transition-colors duration-300'
+                ] ">Error Loading Tasks</h3>
+                <p :class=" [
+                    isDark ? 'text-red-400' : 'text-red-700',
+                    'mb-6 max-w-md mx-auto transition-colors duration-300'
+                ] ">{{ error }}</p>
+                <button @click=" fetchTasks " :class=" [
+                    isDark ? 'bg-red-600 hover:bg-red-700' : 'bg-red-600 hover:bg-red-700',
+                    'px-6 py-3 rounded-xl transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-white'
+                ] ">
                     Try Again
                 </button>
             </div>
@@ -111,59 +162,65 @@
 
         <!-- Tasks Kanban Board -->
         <div v-else class="max-w-full px-2 sm:px-4 lg:px-4 py-6 sm:py-8">
-            <!-- Status Statistics -->
-            <div
-                class="bg-white rounded-lg shadow-sm border border-gray-200 px-3 py-2 mb-4 hover:shadow-md transition-all duration-300">
+            <!-- FIXME: tasks filtering as like others filtering -->
+            <!-- <div :class=" [
+                isDark ? 'bg-slate-800 border-slate-700 hover:bg-slate-700/50' : 'bg-white border-gray-200 hover:shadow-md',
+                'rounded-lg shadow-sm border px-3 py-2 mb-4 transition-all duration-300'
+            ] ">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <div
-                            class="w-4 h-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded flex items-center justify-center mr-2">
+                        <div :class=" [
+                            isDark ? 'bg-violet-600' : 'bg-gradient-to-br from-indigo-500 to-purple-600',
+                            'w-4 h-4 rounded flex items-center justify-center mr-2 transition-colors duration-300'
+                        ] ">
                             <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                                 </path>
                             </svg>
                         </div>
-                        <h2 class="text-sm font-semibold text-gray-900">Tasks Overview</h2>
+                        <h2 :class=" [
+                            isDark ? 'text-slate-100' : 'text-gray-900',
+                            'text-sm font-semibold transition-colors duration-300'
+                        ] ">Tasks Overview</h2>
                     </div>
 
-                    <!-- Status indicators on the right -->
                     <div class="flex items-center space-x-3 overflow-x-auto">
-                        <div v-for="status in taskStatuses" :key="status.id"
-                            class="flex items-center space-x-1.5 px-2 py-1 rounded-md border transition-all duration-200 hover:shadow-sm flex-shrink-0"
-                            :class="getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'border')">
-                            <div class="w-5 h-5 rounded flex items-center justify-center"
-                                :class="getStatusColor(status.id, 'bg')">
-                                <span class="text-xs font-bold" :class="getStatusColor(status.id, 'text')">
-                                    {{ getTasksInStatus(status.id).length }}
-                                </span>
-                            </div>
-                            <span class="text-xs font-medium text-gray-700 whitespace-nowrap">{{ status.name }}</span>
-                        </div>
+                        <p>Filtering will be later</p>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Kanban Board -->
             <div class="overflow-x-auto scrollbar-modern">
                 <div class="flex space-x-4 pb-8" style="min-width: max-content;">
-                    <div v-for="status in taskStatuses" :key="status.id" class="flex-shrink-0 w-80 sm:w-96">
+                    <div v-for="status in taskStatuses" :key=" status.id " class="flex-shrink-0 w-80 sm:w-96">
                         <!-- Sticky Header -->
-                        <div
-                            class="bg-white rounded-t-md shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 sticky top-0 z-20">
-                            <div class="px-4 sm:px-6 py-1.5 border-b border-gray-200">
+                        <div :class=" [
+                            isDark ? 'bg-slate-800 border-slate-700 hover:bg-slate-700/50' : 'bg-white border-gray-200 hover:shadow-xl',
+                            'rounded-t-md shadow-lg border transition-all duration-300 sticky top-0 z-20'
+                        ] ">
+                            <div :class=" [
+                                isDark ? 'border-slate-700' : 'border-gray-200',
+                                'px-4 sm:px-6 py-1.5 border-b transition-colors duration-300'
+                            ] ">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
                                         <div class="w-4 h-4 rounded-full mr-3 shadow-sm"
-                                            :class="getStatusColor(status.id, 'bg')"></div>
-                                        <h3 class="font-bold text-gray-900 text-lg">{{ status.name }}</h3>
+                                            :class=" getStatusColor(status.id, 'bg') "></div>
+                                        <h3 :class=" [
+                                            isDark ? 'text-slate-100' : 'text-gray-900',
+                                            'font-bold text-lg transition-colors duration-300'
+                                        ] ">{{ status.name }}</h3>
                                         <span class="ml-3 px-3 py-1 text-xs font-semibold rounded-full shadow-sm"
-                                            :class="getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'text')">
+                                            :class=" getStatusColor(status.id, 'bg') + ' ' + getStatusColor(status.id, 'text') ">
                                             {{ getTasksInStatus(status.id).length }}
                                         </span>
                                     </div>
-                                    <button @click="openCreateModal(status.id)"
-                                        class="text-gray-400 hover:text-blue-600 transition-all duration-300 p-2 rounded-lg hover:bg-blue-50">
+                                    <button @click="openCreateModal(status.id)" :class=" [
+                                        isDark ? 'text-slate-400 hover:text-cyan-400 hover:bg-slate-600' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50',
+                                        'transition-all duration-300 p-2 rounded-lg'
+                                    ] ">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 4v16m8-8H4" />
@@ -174,52 +231,69 @@
                         </div>
 
                         <!-- Independent Scrollable Tasks -->
-                        <div class="space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 bg-gray-50 rounded-b-xl status-column transition-all duration-200"
-                            :class="{
-                                'bg-blue-50 border border-blue-300 border-dashed': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
-                                'bg-gray-50': draggedOverStatus !== status.id || !draggedTask || !canStatusChange(draggedTask)
-                            }" @dragover="onDragOver($event, status.id)" @dragleave="onDragLeave"
+                        <div :class=" [
+                            isDark ? 'bg-slate-700/30' : 'bg-gray-50',
+                            'space-y-4 min-h-[400px] max-h-[calc(100vh-220px)] overflow-y-auto p-2 rounded-b-xl status-column transition-all duration-200',
+                            {
+                                'bg-cyan-900/20 border border-cyan-600/50 border-dashed': isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                'bg-blue-50 border border-blue-300 border-dashed': !isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)
+                            }
+                        ] " @dragover="onDragOver($event, status.id)" @dragleave=" onDragLeave "
                             @drop="onDrop($event, status.id)">
-                            <TaskCard v-for="task in getTasksInStatus(status.id)" :key="task.id" :task="task"
-                                :statuses="taskStatuses" :allow-status-change="canStatusChange(task)"
-                                @edit="openEditModal" @delete="deleteTask" @status-change="updateTaskStatus"
-                                @dragstart="onDragStart($event, task)" @dragend="onDragEnd"
-                                :draggable="canStatusChange(task)"
+                            <TaskCard v-for="task in getTasksInStatus(status.id)" :key=" task.id " :task=" task "
+                                :statuses=" taskStatuses " :allow-status-change=" canStatusChange(task) "
+                                @edit=" openEditModal " @delete=" deleteTask " @status-change=" updateTaskStatus "
+                                @dragstart="onDragStart($event, task)" @dragend=" onDragEnd "
+                                :draggable=" canStatusChange(task) "
                                 class="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                                :class="{
+                                :class=" {
                                     'opacity-50 transform rotate-1 scale-95': draggedTask && draggedTask.id === task.id,
                                     'cursor-grab': canStatusChange(task),
                                     'cursor-not-allowed': !canStatusChange(task)
-                                }" />
+                                } " />
 
                             <!-- Empty State -->
-                            <div v-if="getTasksInStatus(status.id).length === 0"
-                                class="text-center py-12 text-gray-400 transition-all duration-200" :class="{
-                                    'text-blue-600': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)
-                                }">
-                                <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm transition-all duration-200"
-                                    :class="{
-                                        'bg-blue-100 border-2 border-blue-300 border-dashed': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)
-                                    }">
-                                    <svg class="w-8 h-8" :class="{
-                                        'text-blue-500': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
-                                        'text-gray-400': !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))
-                                    }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div v-if="getTasksInStatus(status.id).length === 0" :class=" [
+                                isDark ? 'text-slate-500' : 'text-gray-400',
+                                'text-center py-12 transition-all duration-200',
+                                {
+                                    'text-cyan-400': isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                    'text-blue-600': !isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)
+                                }
+                            ] ">
+                                <div :class=" [
+                                    isDark ? 'bg-slate-600/50' : 'bg-gray-100',
+                                    'w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm transition-all duration-200',
+                                    {
+                                        'bg-cyan-900/50 border-2 border-cyan-600/50 border-dashed': isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                        'bg-blue-100 border-2 border-blue-300 border-dashed': !isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)
+                                    }
+                                ] ">
+                                    <svg class="w-8 h-8" :class=" {
+                                        'text-cyan-400': isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                        'text-blue-500': !isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                        'text-slate-500': isDark && !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)),
+                                        'text-gray-400': !isDark && !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))
+                                    } " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
-                                <p class="text-sm font-medium" :class="{
-                                    'text-blue-600': draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
-                                    'text-gray-500': !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))
-                                }">
+                                <p class="text-sm font-medium" :class=" {
+                                    'text-cyan-400': isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                    'text-blue-600': !isDark && draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask),
+                                    'text-slate-400': isDark && !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask)),
+                                    'text-gray-500': !isDark && !(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))
+                                } ">
                                     {{ draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask) ?
                                         'Drop task here' : 'No tasks in this status' }}
                                 </p>
                                 <button
                                     v-if="!(draggedOverStatus === status.id && draggedTask && canStatusChange(draggedTask))"
-                                    @click="openCreateModal(status.id)"
-                                    class="mt-3 text-blue-600 hover:text-blue-800 text-sm font-semibold transition-colors duration-200 hover:underline">
+                                    @click="openCreateModal(status.id)" :class=" [
+                                        isDark ? 'text-cyan-400 hover:text-cyan-300' : 'text-blue-600 hover:text-blue-800',
+                                        'mt-3 text-sm font-semibold transition-colors duration-200 hover:underline'
+                                    ] ">
                                     Add a task
                                 </button>
                             </div>
@@ -231,20 +305,33 @@
 
             <!-- Empty State - No Statuses -->
             <div v-if="!loading && taskStatuses.length === 0" class="text-center py-24">
-                <div class="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div :class=" [
+                    isDark ? 'bg-slate-700/50' : 'bg-gray-100',
+                    'w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm transition-colors duration-300'
+                ] ">
+                    <svg :class=" [
+                        isDark ? 'text-slate-500' : 'text-gray-400',
+                        'w-10 h-10 transition-colors duration-300'
+                    ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">No task statuses found</h3>
-                <p class="text-gray-600 mb-8 max-w-md mx-auto">Contact your organization admin to set up task statuses
+                <h3 :class=" [
+                    isDark ? 'text-slate-100' : 'text-gray-900',
+                    'text-2xl font-bold mb-3 transition-colors duration-300'
+                ] ">No task statuses found</h3>
+                <p :class=" [
+                    isDark ? 'text-slate-400' : 'text-gray-600',
+                    'mb-8 max-w-md mx-auto transition-colors duration-300'
+                ] ">Contact your organization admin to set up task statuses
                     before you can start managing tasks</p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                    <button @click="fetchTaskStatuses"
-                        class="bg-gray-600 px-6 py-3 rounded-xl hover:bg-gray-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                        style="color: white !important;">
+                    <button @click=" fetchTaskStatuses " :class=" [
+                        isDark ? 'bg-slate-600 hover:bg-slate-700' : 'bg-gray-600 hover:bg-gray-700',
+                        'px-6 py-3 rounded-xl transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-white'
+                    ] ">
                         Refresh Statuses
                     </button>
                 </div>
@@ -252,13 +339,13 @@
         </div>
 
         <!-- Create Task Modal -->
-        <CreateTaskModal :is-open="showCreateModal" :project-id="projectId" :project-slug="projectSlug"
-            :initial-status-id="selectedStatusId" :statuses="taskStatuses" @close="closeCreateModal"
-            @created="onTaskCreated" />
+        <CreateTaskModal :is-open=" showCreateModal " :project-id=" projectId " :project-slug=" projectSlug "
+            :initial-status-id=" selectedStatusId " :statuses=" taskStatuses " @close=" closeCreateModal "
+            @created=" onTaskCreated " />
 
         <!-- Edit Task Modal -->
-        <EditTaskModal :is-open="showEditModal" :task="selectedTask" :project-slug="projectSlug"
-            :statuses="taskStatuses" @close="closeEditModal" @updated="onTaskUpdated" />
+        <EditTaskModal :is-open=" showEditModal " :task=" selectedTask " :project-slug=" projectSlug "
+            :statuses=" taskStatuses " @close=" closeEditModal " @updated=" onTaskUpdated " />
     </div>
 </template>
 
@@ -270,11 +357,13 @@ import { useAuthStore } from '@/stores/auth.js'
 import TaskCard from '@/components/tasks/TaskCard.vue'
 import CreateTaskModal from '@/components/modals/CreateTaskModal.vue'
 import EditTaskModal from '@/components/modals/EditTaskModal.vue'
+import { useTheme } from '@/composables/useTheme.js'
 
 const router = useRouter()
 const route = useRoute()
 const $toast = inject("toast")
 const authStore = useAuthStore()
+const { isDark } = useTheme()
 
 // Reactive data
 const project = ref(null)
@@ -306,7 +395,6 @@ const projectId = computed(() => {
 
 // Status color mapping based on status names
 const statusColorMapping = {
-    // Fixed status colors
     'todo': { bg: 'bg-gray-100', text: 'text-gray-700', gradient: 'from-gray-50 to-gray-100', border: 'border-gray-200' },
     'in progress': { bg: 'bg-blue-100', text: 'text-blue-700', gradient: 'from-blue-50 to-blue-100', border: 'border-blue-200' },
     'review': { bg: 'bg-yellow-100', text: 'text-yellow-700', gradient: 'from-yellow-50 to-yellow-100', border: 'border-yellow-200' },
@@ -625,6 +713,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Keep only essential animations and styles that can't be done with Tailwind */
 .animate-spin {
     animation: spin 1s linear infinite;
 }
@@ -659,213 +748,7 @@ onMounted(async () => {
     background: linear-gradient(90deg, #94a3b8, #64748b);
 }
 
-/* Enhanced animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.slide-in-left {
-    animation: slideInLeft 0.8s ease-out;
-}
-
-.slide-in-right {
-    animation: slideInRight 0.8s ease-out;
-}
-
-/* Card hover effects */
-.hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hover-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-}
-
-/* Button improvements */
-.btn-gradient {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    box-shadow: 0 4px 15px 0 rgba(59, 130, 246, 0.3);
-    transition: all 0.3s ease;
-}
-
-.btn-gradient:hover {
-    box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.4);
-    transform: translateY(-2px);
-}
-
-/* Glass morphism effects */
-.glass-effect {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.glass-effect-light {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Kanban column styling */
-.kanban-column {
-    background: linear-gradient(145deg, #ffffff, #f8fafc);
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-}
-
-.kanban-column:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transform: translateY(-2px);
-}
-
-/* Status indicator animations */
-.status-indicator {
-    position: relative;
-    overflow: hidden;
-}
-
-.status-indicator::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.5s ease;
-}
-
-.status-indicator:hover::before {
-    left: 100%;
-}
-
-/* Loading skeleton animations */
-.skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% {
-        background-position: 200% 0;
-    }
-
-    100% {
-        background-position: -200% 0;
-    }
-}
-
-/* Pulse effect for loading states */
-.pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: .5;
-    }
-}
-
-/* Mobile-specific improvements */
-@media (max-width: 640px) {
-    .mobile-stack {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .mobile-full-width {
-        width: 100%;
-    }
-
-    .kanban-column {
-        min-width: 280px;
-    }
-}
-
-@media (max-width: 480px) {
-    .kanban-column {
-        min-width: 260px;
-    }
-}
-
-/* Improved focus states for accessibility */
-button:focus,
-.focusable:focus {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-}
-
-/* Enhanced transitions */
-.transition-all-smooth {
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Gradient text effects */
-.text-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Custom shadows */
-.shadow-soft {
-    box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.08);
-}
-
-.shadow-medium {
-    box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.12);
-}
-
-.shadow-strong {
-    box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.16);
-}
-
+/* Status column scrollbars */
 .status-column::-webkit-scrollbar {
     width: 8px;
 }
@@ -877,65 +760,5 @@ button:focus,
 
 .status-column::-webkit-scrollbar-thumb:hover {
     background-color: rgba(100, 116, 139, 0.5);
-}
-
-/* Drag and Drop Styles */
-.drag-ghost {
-    opacity: 0.5;
-    transform: rotate(2deg) scale(0.95);
-    z-index: 1000;
-}
-
-.drag-over {
-    background-color: rgba(59, 130, 246, 0.1) !important;
-    border-color: rgba(59, 130, 246, 0.3) !important;
-    transform: scale(1.02);
-}
-
-.drop-zone {
-    transition: all 0.3s ease;
-    border: 2px dashed transparent;
-}
-
-.drop-zone-active {
-    border-color: #3b82f6;
-    background-color: rgba(59, 130, 246, 0.05);
-    transform: scale(1.01);
-}
-
-.task-draggable {
-    cursor: grab;
-    transition: all 0.2s ease;
-}
-
-.task-draggable:active {
-    cursor: grabbing;
-}
-
-.task-being-dragged {
-    opacity: 0.5;
-    transform: rotate(1deg) scale(0.95);
-    cursor: grabbing;
-}
-
-.task-not-draggable {
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-@keyframes dropZonePulse {
-
-    0%,
-    100% {
-        background-color: rgba(59, 130, 246, 0.05);
-    }
-
-    50% {
-        background-color: rgba(59, 130, 246, 0.1);
-    }
-}
-
-.drop-zone-pulse {
-    animation: dropZonePulse 1.5s ease-in-out infinite;
 }
 </style>

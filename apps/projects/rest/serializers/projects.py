@@ -110,6 +110,9 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
 class ProjectListSerializer(serializers.ModelSerializer):
     manager_id = serializers.IntegerField(write_only=True, required=False)
     my_project_role = serializers.SerializerMethodField(read_only=True)
+    total_tasks = serializers.SerializerMethodField(read_only=True)
+    completed_tasks = serializers.SerializerMethodField(read_only=True)
+    total_members = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
@@ -123,8 +126,24 @@ class ProjectListSerializer(serializers.ModelSerializer):
             "status",
             "manager_id",
             "my_project_role",
+            "total_tasks",
+            "completed_tasks",
+            "total_members",
         ]
         read_only_fields = ["status", "slug"]
+
+    def get_total_tasks(self, obj):
+        return obj.tasks.count()
+
+    def get_completed_tasks(self, obj):
+        completed_status_names = ["Done", "Closed"]
+        completed_tasks_count = Task.objects.filter(
+            project=obj, status__name__in=completed_status_names
+        ).count()
+        return completed_tasks_count
+
+    def get_total_members(self, obj):
+        return obj.memberships.count()
 
     def get_my_project_role(self, obj):
         """Get the role of the requesting user in this project."""

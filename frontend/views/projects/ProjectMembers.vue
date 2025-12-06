@@ -1,28 +1,47 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div :class=" [
+    isDark ? 'bg-slate-900' : 'bg-gray-50',
+    'min-h-screen transition-colors duration-300'
+  ] ">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-24">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      <span class="ml-3 text-gray-600">Loading project members...</span>
+      <span :class=" [
+        isDark ? 'text-slate-300' : 'text-gray-600',
+        'ml-3 transition-colors duration-300'
+      ] ">Loading project members...</span>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <div class="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 text-center">
-        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor"
-          viewBox="0 0 24 24">
+      <div :class=" [
+        isDark ? 'bg-red-900/20 border border-red-800/30' : 'bg-red-50 border border-red-200',
+        'rounded-lg p-4 sm:p-6 text-center transition-colors duration-300'
+      ] ">
+        <svg :class=" [
+          isDark ? 'text-red-400' : 'text-red-400',
+          'w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4'
+        ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        <h3 class="text-base sm:text-lg font-semibold text-red-800 mb-2">Failed to load project members</h3>
-        <p class="text-sm sm:text-base text-red-600 mb-4">{{ error }}</p>
+        <h3 :class=" [
+          isDark ? 'text-red-300' : 'text-red-800',
+          'text-base sm:text-lg font-semibold mb-2 transition-colors duration-300'
+        ] ">Failed to load project members</h3>
+        <p :class=" [
+          isDark ? 'text-red-400' : 'text-red-600',
+          'text-sm sm:text-base mb-4 transition-colors duration-300'
+        ] ">{{ error }}</p>
         <div class="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3">
           <button @click=" fetchMembers "
             class="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 text-sm sm:text-base cursor-pointer">
             Try Again
           </button>
-          <button @click=" goBack "
-            class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 text-sm sm:text-base cursor-pointer">
+          <button @click=" goBack " :class=" [
+            isDark ? 'bg-slate-600 hover:bg-slate-700 focus:bg-slate-700 focus:ring-slate-500' : 'bg-gray-600 hover:bg-gray-700 focus:bg-gray-700 focus:ring-gray-500',
+            'w-full sm:w-auto text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-sm sm:text-base cursor-pointer'
+          ] ">
             Back to Project
           </button>
         </div>
@@ -32,15 +51,27 @@
     <!-- Project Members Content -->
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <!-- Header Section -->
-      <div class="bg-white rounded-lg shadow-sm border mb-6 md:mb-8">
-        <div class="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-200">
+      <div :class=" [
+        isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200',
+        'rounded-lg shadow-sm border mb-6 md:mb-8 transition-colors duration-300'
+      ] ">
+        <div :class=" [
+          isDark ? 'border-slate-700' : 'border-gray-200',
+          'px-4 sm:px-6 py-4 sm:py-6 border-b transition-colors duration-300'
+        ] ">
           <div class="space-y-4 lg:space-y-0 lg:flex lg:items-start lg:justify-between">
             <div class="flex-1">
               <!-- Breadcrumb -->
               <nav class="mb-4">
-                <ol class="flex flex-wrap items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-500">
+                <ol :class=" [
+                  isDark ? 'text-slate-400' : 'text-gray-500',
+                  'flex flex-wrap items-center space-x-1 sm:space-x-2 text-xs sm:text-sm transition-colors duration-300'
+                ] ">
                   <li>
-                    <router-link to="/projects" class="hover:text-blue-600 transition duration-300">
+                    <router-link to="/projects" :class=" [
+                      isDark ? 'hover:text-cyan-400' : 'hover:text-blue-600',
+                      'transition duration-300'
+                    ] ">
                       Projects
                     </router-link>
                   </li>
@@ -50,8 +81,10 @@
                     </svg>
                   </li>
                   <li>
-                    <button @click=" goBack "
-                      class="hover:text-blue-600 transition duration-300 truncate max-w-[120px] sm:max-w-none cursor-pointer focus:outline-none focus:text-blue-600">
+                    <button @click=" goBack " :class=" [
+                      isDark ? 'hover:text-cyan-400 focus:text-cyan-400' : 'hover:text-blue-600 focus:text-blue-600',
+                      'transition duration-300 truncate max-w-[120px] sm:max-w-none cursor-pointer focus:outline-none'
+                    ] ">
                       {{ projectName }}
                     </button>
                   </li>
@@ -60,25 +93,39 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                   </li>
-                  <li class="text-gray-900 font-medium">Members</li>
+                  <li :class=" [
+                    isDark ? 'text-slate-100' : 'text-gray-900',
+                    'font-medium transition-colors duration-300'
+                  ] ">Members</li>
                 </ol>
               </nav>
 
               <!-- Page Title -->
               <div class="mb-4">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 lg:mb-0">Project Members</h1>
-                <span class="text-sm sm:text-lg text-gray-600 block lg:inline">{{ projectName }}</span>
+                <h1 :class=" [
+                  isDark ? 'text-slate-100' : 'text-gray-900',
+                  'text-2xl sm:text-3xl font-bold mb-2 lg:mb-0 transition-colors duration-300'
+                ] ">Project Members</h1>
+                <span :class=" [
+                  isDark ? 'text-slate-300' : 'text-gray-600',
+                  'text-sm sm:text-lg block lg:inline transition-colors duration-300'
+                ] ">{{ projectName }}</span>
               </div>
 
-              <p class="text-sm sm:text-base text-gray-600">
+              <p :class=" [
+                isDark ? 'text-slate-400' : 'text-gray-600',
+                'text-sm sm:text-base transition-colors duration-300'
+              ] ">
                 Manage project team members and their roles
               </p>
             </div>
 
             <!-- Action Buttons -->
             <div v-if="hasRole('owner', 'admin')" class="flex items-center justify-end lg:ml-6">
-              <button @click="showAddMemberModal = true"
-                class="bg-blue-600 text-white font-bold px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md">
+              <button @click="showAddMemberModal = true" :class=" [
+                isDark ? 'bg-cyan-600 hover:bg-cyan-700 focus:bg-cyan-700 focus:ring-cyan-500' : 'bg-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:ring-blue-500',
+                'text-white font-bold px-3 sm:px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md'
+              ] ">
                 <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -90,50 +137,89 @@
         </div>
 
         <!-- Members Stats -->
-        <div class="px-4 sm:px-6 py-4 sm:py-6">
+        <div :class=" [
+          isDark ? 'border-slate-700' : 'border-gray-200',
+          'px-4 sm:px-6 py-4 sm:py-6'
+        ] ">
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div class="text-center">
-              <div
-                class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div :class=" [
+                isDark ? 'bg-blue-900/50' : 'bg-blue-100',
+                'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors duration-300'
+              ] ">
+                <svg :class=" [
+                  isDark ? 'text-blue-400' : 'text-blue-600',
+                  'w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300'
+                ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
                 </svg>
               </div>
-              <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ members.length }}</p>
-              <p class="text-xs sm:text-sm text-gray-600">Total Members</p>
+              <p :class=" [
+                isDark ? 'text-slate-100' : 'text-gray-900',
+                'text-xl sm:text-2xl font-bold transition-colors duration-300'
+              ] ">{{ members.length }}</p>
+              <p :class=" [
+                isDark ? 'text-slate-400' : 'text-gray-600',
+                'text-xs sm:text-sm transition-colors duration-300'
+              ] ">Total Members</p>
             </div>
 
             <div class="text-center">
-              <div
-                class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div :class=" [
+                isDark ? 'bg-green-900/50' : 'bg-green-100',
+                'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors duration-300'
+              ] ">
+                <svg :class=" [
+                  isDark ? 'text-green-400' : 'text-green-600',
+                  'w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300'
+                ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m5.25-4.5v16.5h-16.5V7.5"></path>
                 </svg>
               </div>
-              <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ getManagersCount() }}</p>
-              <p class="text-xs sm:text-sm text-gray-600">Managers</p>
+              <p :class=" [
+                isDark ? 'text-slate-100' : 'text-gray-900',
+                'text-xl sm:text-2xl font-bold transition-colors duration-300'
+              ] ">{{ getManagersCount() }}</p>
+              <p :class=" [
+                isDark ? 'text-slate-400' : 'text-gray-600',
+                'text-xs sm:text-sm transition-colors duration-300'
+              ] ">Managers</p>
             </div>
 
             <div class="text-center">
-              <div
-                class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
+              <div :class=" [
+                isDark ? 'bg-purple-900/50' : 'bg-purple-100',
+                'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors duration-300'
+              ] ">
+                <svg :class=" [
+                  isDark ? 'text-purple-400' : 'text-purple-600',
+                  'w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300'
+                ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
               </div>
-              <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ getContributorsCount() }}</p>
-              <p class="text-xs sm:text-sm text-gray-600">Contributors</p>
+              <p :class=" [
+                isDark ? 'text-slate-100' : 'text-gray-900',
+                'text-xl sm:text-2xl font-bold transition-colors duration-300'
+              ] ">{{ getContributorsCount() }}</p>
+              <p :class=" [
+                isDark ? 'text-slate-400' : 'text-gray-600',
+                'text-xs sm:text-sm transition-colors duration-300'
+              ] ">Contributors</p>
             </div>
 
             <div class="text-center">
-              <div
-                class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
+              <div :class=" [
+                isDark ? 'bg-yellow-900/50' : 'bg-yellow-100',
+                'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors duration-300'
+              ] ">
+                <svg :class=" [
+                  isDark ? 'text-yellow-400' : 'text-yellow-600',
+                  'w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300'
+                ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -141,30 +227,54 @@
                   </path>
                 </svg>
               </div>
-              <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ getViewersCount() }}</p>
-              <p class="text-xs sm:text-sm text-gray-600">Viewers</p>
+              <p :class=" [
+                isDark ? 'text-slate-100' : 'text-gray-900',
+                'text-xl sm:text-2xl font-bold transition-colors duration-300'
+              ] ">{{ getViewersCount() }}</p>
+              <p :class=" [
+                isDark ? 'text-slate-400' : 'text-gray-600',
+                'text-xs sm:text-sm transition-colors duration-300'
+              ] ">Viewers</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Members List -->
-      <div class="bg-white rounded-lg shadow-sm border">
-        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
-          <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Team Members</h2>
+      <div :class=" [
+        isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200',
+        'rounded-lg shadow-sm border transition-colors duration-300'
+      ] ">
+        <div :class=" [
+          isDark ? 'border-slate-700' : 'border-gray-200',
+          'px-4 sm:px-6 py-4 border-b transition-colors duration-300'
+        ] ">
+          <h2 :class=" [
+            isDark ? 'text-slate-100' : 'text-gray-900',
+            'text-lg sm:text-xl font-semibold transition-colors duration-300'
+          ] ">Team Members</h2>
         </div>
 
         <div v-if="members.length === 0" class="text-center py-8 sm:py-12 px-4">
-          <svg class="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24">
+          <svg :class=" [
+            isDark ? 'text-slate-500' : 'text-gray-400',
+            'w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 transition-colors duration-300'
+          ] " fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
           </svg>
-          <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No members yet</h3>
-          <p class="text-sm sm:text-base text-gray-600 mb-6 max-w-sm mx-auto">Add team members to start collaborating on
-            this project</p>
-          <button @click="showAddMemberModal = true"
-            class="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 focus:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 inline-flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md">
+          <h3 :class=" [
+            isDark ? 'text-slate-100' : 'text-gray-900',
+            'text-lg sm:text-xl font-semibold mb-2 transition-colors duration-300'
+          ] ">No members yet</h3>
+          <p :class=" [
+            isDark ? 'text-slate-400' : 'text-gray-600',
+            'text-sm sm:text-base mb-6 max-w-sm mx-auto transition-colors duration-300'
+          ] ">Add team members to start collaborating on this project</p>
+          <button @click="showAddMemberModal = true" :class=" [
+            isDark ? 'bg-cyan-600 hover:bg-cyan-700 focus:bg-cyan-700 focus:ring-cyan-500' : 'bg-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:ring-blue-500',
+            'text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold focus:outline-none focus:ring-2 transition-all duration-300 inline-flex items-center text-sm sm:text-base cursor-pointer shadow-sm hover:shadow-md'
+          ] ">
             <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -172,9 +282,14 @@
           </button>
         </div>
 
-        <div v-else class="divide-y divide-gray-200">
-          <div v-for="member in members" :key=" member.id "
-            class="px-4 sm:px-6 py-4 hover:bg-gray-50 transition duration-300">
+        <div v-else :class=" [
+          isDark ? 'divide-slate-700' : 'divide-gray-200',
+          'divide-y'
+        ] ">
+          <div v-for="member in members" :key=" member.id " :class=" [
+            isDark ? 'hover:bg-slate-700/50' : 'hover:bg-gray-50',
+            'px-4 sm:px-6 py-4 transition duration-300'
+          ] ">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
               <div class="flex items-center min-w-0 flex-1">
                 <!-- Avatar -->
@@ -189,14 +304,23 @@
 
                 <!-- User Info -->
                 <div class="min-w-0 flex-1">
-                  <div class="font-medium text-gray-900 text-sm sm:text-base truncate">
+                  <div :class=" [
+                    isDark ? 'text-slate-100' : 'text-gray-900',
+                    'font-medium text-sm sm:text-base truncate transition-colors duration-300'
+                  ] ">
                     <span v-if="member.user_name">
                       {{ member.user_name }}
                     </span>
                     <span v-else>{{ member.user_email }}</span>
                   </div>
-                  <div class="text-xs sm:text-sm text-gray-500 truncate">{{ member.user_email }}</div>
-                  <div class="text-xs text-gray-400">
+                  <div :class=" [
+                    isDark ? 'text-slate-400' : 'text-gray-500',
+                    'text-xs sm:text-sm truncate transition-colors duration-300'
+                  ] ">{{ member.user_email }}</div>
+                  <div :class=" [
+                    isDark ? 'text-slate-500' : 'text-gray-400',
+                    'text-xs transition-colors duration-300'
+                  ] ">
                     Joined {{ formatDate(member.created_at) }}
                   </div>
                 </div>
@@ -209,18 +333,20 @@
                 </span>
 
                 <div v-if="hasRole('owner', 'admin')" class="flex items-center space-x-1">
-                  <button @click="editMember(member)"
-                    class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded-lg cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    title="Edit role">
+                  <button @click="editMember(member)" :class=" [
+                    isDark ? 'text-cyan-400 hover:text-cyan-300 hover:bg-slate-600 focus:ring-cyan-400' : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50 focus:ring-blue-500',
+                    'p-2 rounded-lg cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2'
+                  ] " title="Edit role">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                       </path>
                     </svg>
                   </button>
-                  <button @click="removeMember(member)"
-                    class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    title="Remove member">
+                  <button @click="removeMember(member)" :class=" [
+                    isDark ? 'text-red-400 hover:text-red-300 hover:bg-slate-600 focus:ring-red-400' : 'text-red-600 hover:text-red-800 hover:bg-red-50 focus:ring-red-500',
+                    'p-2 rounded-lg cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2'
+                  ] " title="Remove member">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
@@ -259,8 +385,10 @@ import AddProjectMemberModal from '@/components/modals/AddProjectMemberModal.vue
 import EditProjectMemberModal from '@/components/modals/EditProjectMemberModal.vue'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
 import { useAuth } from '@/composables/useAuth.js'
+import { useTheme } from '@/composables/useTheme.js'
 
 const { hasRole } = useAuth()
+const { isDark } = useTheme()
 const router = useRouter()
 const route = useRoute()
 
@@ -361,13 +489,21 @@ const getRoleBadgeClass = (role) => {
 
   switch (roleLower) {
     case 'manager':
-      return 'bg-purple-100 text-purple-800'
+      return isDark.value
+        ? 'bg-purple-900/50 text-purple-300 border border-purple-700/50'
+        : 'bg-purple-100 text-purple-800'
     case 'contributor':
-      return 'bg-blue-100 text-blue-800'
+      return isDark.value
+        ? 'bg-blue-900/50 text-blue-300 border border-blue-700/50'
+        : 'bg-blue-100 text-blue-800'
     case 'viewer':
-      return 'bg-gray-100 text-gray-800'
+      return isDark.value
+        ? 'bg-gray-800/50 text-gray-300 border border-gray-600/50'
+        : 'bg-gray-100 text-gray-800'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return isDark.value
+        ? 'bg-gray-800/50 text-gray-300 border border-gray-600/50'
+        : 'bg-gray-100 text-gray-800'
   }
 }
 
