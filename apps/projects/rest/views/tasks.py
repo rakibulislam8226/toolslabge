@@ -15,9 +15,7 @@ from apps.tasks.permissions import IsTaskCreator
 
 class TaskListCreateView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [
-        IsAuthenticated
-    ]  # FIXME: permission should be from project level and organization level
+    permission_classes = [IsProjectMemberOrManager]
 
     def get_queryset(self):
         user = self.request.user
@@ -31,9 +29,7 @@ class TaskListCreateView(generics.ListCreateAPIView):
 
 class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskDetailSerializer
-    permission_classes = [
-        IsProjectMemberOrManager
-    ]  # FIXME: permission should be from project level and organization level
+    permission_classes = [IsProjectMemberOrManager]
 
     def get_queryset(self):
         user = self.request.user

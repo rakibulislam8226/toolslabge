@@ -14,9 +14,7 @@ from ....organizations.permissions import IsOrgOwnerAdminOrManager
 
 class ProjectListCreateView(generics.ListCreateAPIView):
     serializer_class = ProjectListSerializer
-    permission_classes = [
-        IsOrgOwnerAdminOrManager
-    ]  # FIXME: permission should be from project level and organization level
+    permission_classes = [IsOrgOwnerAdminOrManager]
 
     def get_queryset(self):
         user = self.request.user
@@ -31,9 +29,7 @@ class ProjectListCreateView(generics.ListCreateAPIView):
 
 class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProjectDetailSerializer
-    permission_classes = [
-        IsOrgOwnerAdminOrManager
-    ]  # FIXME: permission should be from project level and organization level
+    permission_classes = [IsOrgOwnerAdminOrManager]
     lookup_field = "slug"
 
     def get_queryset(self):
@@ -47,9 +43,7 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class ProjectMemberListCreateView(generics.ListCreateAPIView):
     serializer_class = ProjectMemberSerializer
-    permission_classes = [
-        IsOrgOwnerAdminOrManager
-    ]  # FIXME: permission should be from project level and organization level
+    permission_classes = [IsOrgOwnerAdminOrManager]
 
     def get_queryset(self):
         user = self.request.user
@@ -76,9 +70,7 @@ class ProjectMemberListCreateView(generics.ListCreateAPIView):
 
 class ProjectMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProjectMemberSerializer
-    permission_classes = [
-        IsOrgOwnerAdminOrManager
-    ]  # FIXME: permission should be from project level and organization level
+    permission_classes = [IsOrgOwnerAdminOrManager]
     lookup_field = "id"
 
     def get_queryset(self):
