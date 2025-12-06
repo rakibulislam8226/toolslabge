@@ -26,10 +26,15 @@ class SendInvitationSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         org = self.context["organization"]
-        if OrganizationInvitation.objects.filter(
-            email=value, organization=org, accepted=False
-        ).exists():
+        invitations = OrganizationInvitation.objects.filter(
+            email=value, organization=org
+        )
+        if invitations.filter(accepted=False).exists():
             raise serializers.ValidationError("This user has already been invited.")
+        elif invitations.filter(accepted=True).exists():
+            raise serializers.ValidationError(
+                "This user is already a member of the organization."
+            )
         return value
 
     @transaction.atomic
@@ -87,6 +92,7 @@ class AcceptInvitationSerializer(serializers.Serializer):
             defaults={
                 "first_name": validated_data["first_name"],
                 "last_name": validated_data["last_name"],
+                "is_verified": True,
             },
         )
         user.set_password(validated_data["password"])

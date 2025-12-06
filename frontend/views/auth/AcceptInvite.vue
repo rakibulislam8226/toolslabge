@@ -1,14 +1,14 @@
 <template>
     <div
-        class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <div
-            class="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/20 w-full max-w-md relative overflow-hidden">
+            class="p-8 rounded-2xl shadow-xl border w-full max-w-md relative overflow-hidden backdrop-blur-sm transition-all duration-300 bg-white/80 border-white/20 dark:bg-slate-800/90 dark:border-slate-700/50">
             <!-- Background decoration -->
             <div
-                class="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20">
+                class="absolute -top-10 -right-10 w-20 h-20 rounded-full transition-all duration-300 bg-gradient-to-br from-blue-400 to-purple-500 opacity-20 dark:from-cyan-400 dark:to-purple-500 dark:opacity-10">
             </div>
             <div
-                class="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-tr from-indigo-400 to-blue-500 rounded-full opacity-20">
+                class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full transition-all duration-300 bg-gradient-to-tr from-indigo-400 to-blue-500 opacity-20 dark:opacity-10">
             </div>
 
             <!-- Header -->
@@ -22,29 +22,33 @@
                     </svg>
                 </div>
                 <h1
-                    class="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                    class="text-3xl font-bold mb-2 transition-colors duration-300 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
                     Accept Invitation
                 </h1>
-                <p class="text-gray-600">Complete your account setup to join the organization</p>
+                <p class="transition-colors duration-300 text-gray-600 dark:text-slate-400">Complete your account setup
+                    to join the organization</p>
             </div>
 
             <!-- Loading State -->
             <div v-if="checkingToken" class="text-center py-8 relative z-10">
                 <div class="inline-flex items-center space-x-2">
-                    <svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin h-6 w-6 transition-colors duration-300 text-blue-600 dark:text-cyan-400"
+                        fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                         </circle>
                         <path class="opacity-75" fill="currentColor"
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                         </path>
                     </svg>
-                    <span class="text-gray-600">Verifying invitation...</span>
+                    <span class="transition-colors duration-300 text-gray-600 dark:text-slate-300">Verifying
+                        invitation...</span>
                 </div>
             </div>
 
             <!-- Invalid Token State -->
             <div v-else-if="!tokenValid" class="text-center py-8 relative z-10">
-                <div class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <div
+                    class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center transition-colors duration-300 bg-red-100 dark:bg-red-900/50">
                     <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
@@ -52,9 +56,10 @@
                     </svg>
                 </div>
                 <h2 class="text-xl font-semibold text-red-600 mb-2">Invalid Invitation</h2>
-                <p class="text-gray-600 mb-6">This invitation link is invalid or has already been used.</p>
+                <p class="mb-6 transition-colors duration-300 text-gray-600 dark:text-slate-400">This invitation link is
+                    invalid or has already been used.</p>
                 <router-link to="/login"
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                    class="inline-flex items-center px-4 py-2 text-white rounded-lg transition duration-200 bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-700">
                     Go to Login
                 </router-link>
             </div>
@@ -82,26 +87,26 @@
 
                 <Button type="submit" variant="primary" size="lg" fullWidth :disabled=" !isFormValid || loading "
                     :loading=" loading " loadingText="Accepting Invitation..." label="Accept Invitation"
-                    class="mt-8 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg" />
+                    :class=" submitButtonClasses " />
             </form>
 
             <div class="mt-8 text-center space-y-3 relative z-10">
                 <div class="flex items-center justify-center space-x-2">
-                    <div class="h-px bg-gray-300 flex-1"></div>
-                    <span class="text-gray-500 text-sm">or</span>
-                    <div class="h-px bg-gray-300 flex-1"></div>
+                    <div class="h-px flex-1 transition-colors duration-300 bg-gray-300 dark:bg-slate-600"></div>
+                    <span class="text-sm transition-colors duration-300 text-gray-500 dark:text-slate-400">or</span>
+                    <div class="h-px flex-1 transition-colors duration-300 bg-gray-300 dark:bg-slate-600"></div>
                 </div>
 
-                <p class="text-gray-600 text-sm">
+                <p class="text-sm transition-colors duration-300 text-gray-600 dark:text-slate-300">
                     Already have an account?
                     <router-link to="/login"
-                        class="text-blue-600 hover:text-blue-800 text-sm font-semibold transition duration-300 hover:underline">
+                        class="text-sm font-semibold transition duration-300 hover:underline text-blue-600 hover:text-blue-800 dark:text-cyan-400 dark:hover:text-cyan-300">
                         Sign in here
                     </router-link>
                 </p>
 
                 <router-link to="/"
-                    class="inline-flex items-center text-gray-500 hover:text-gray-700 text-sm transition duration-300 hover:underline">
+                    class="inline-flex items-center text-sm transition duration-300 hover:underline text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-300">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18">
@@ -151,6 +156,11 @@ const fieldLabels = {
     password: 'Password',
     confirm_password: 'Confirm password'
 }
+
+// Computed properties for dynamic classes
+const submitButtonClasses = computed(() => {
+    return 'mt-8 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 dark:from-cyan-600 dark:to-purple-600 dark:hover:from-cyan-700 dark:hover:to-purple-700'
+})
 
 // Computed property to check if form is valid
 const isFormValid = computed(() => {
@@ -352,119 +362,5 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-/* Custom animations and enhanced styles */
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-    transition: all 0.3s ease;
-}
-
-.slide-fade-enter-from {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-.slide-fade-leave-to {
-    opacity: 0;
-    transform: translateY(10px);
-}
-
-/* Enhanced button hover effects */
-.group:hover .group-hover\:scale-105 {
-    transform: scale(1.05);
-}
-
-/* Glassmorphism effect enhancement */
-.backdrop-blur-sm {
-    backdrop-filter: blur(8px);
-}
-
-/* Custom focus states for better accessibility */
-.focus-within\:ring-2:focus-within {
-    box-shadow: 0 0 0 2px rgb(59 130 246 / 0.5);
-}
-
-/* Loading spinner animation */
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.animate-spin {
-    animation: spin 1s linear infinite;
-}
-
-/* Gradient text animation */
-@keyframes gradient-shift {
-
-    0%,
-    100% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-}
-
-.animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
-}
-
-/* Form validation styling */
-.error-shake {
-    animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-5px);
-    }
-
-    75% {
-        transform: translateX(5px);
-    }
-}
-
-/* Enhanced shadow effects */
-.shadow-glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-}
-
-/* Responsive improvements */
-@media (max-width: 640px) {
-    .grid-cols-1.sm\:grid-cols-2 {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Custom scrollbar for better UX */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.3);
-    border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.5);
-}
+/* Only essential custom styles that can't be achieved with Tailwind */
 </style>

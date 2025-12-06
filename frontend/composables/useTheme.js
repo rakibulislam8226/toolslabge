@@ -35,12 +35,18 @@ export function useTheme() {
   // Watch for system theme changes
   const watchSystemTheme = () => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    mediaQuery.addEventListener('change', (e) => {
+    const handler = (e) => {
       if (!localStorage.getItem('theme')) {
         isDark.value = e.matches
         applyTheme()
       }
-    })
+    }
+    mediaQuery.addEventListener('change', handler)
+    
+    // Return cleanup function
+    return () => {
+      mediaQuery.removeEventListener('change', handler)
+    }
   }
 
   // Computed theme icon

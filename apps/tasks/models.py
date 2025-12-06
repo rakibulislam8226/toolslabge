@@ -175,4 +175,4 @@ class TaskActivity(TimeStampedModel):
         indexes = [models.Index(fields=["task", "created_at"])]
 
     def __str__(self):
-        return f"History for {self.task} by {self.changed_by}"
+        return f"History for {self.task} by {self.created_by}"

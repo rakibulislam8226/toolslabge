@@ -1,45 +1,52 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-100">
+  <div
+    class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800">
+    <div
+      class="p-8 rounded-2xl shadow-xl w-full max-w-md border backdrop-blur-sm transition-all duration-300 bg-white/90 border-gray-200 dark:bg-gray-800/90 dark:border-gray-700">
       <!-- Header -->
       <div class="text-center mb-8">
-        <div class="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+        <div
+          class="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-cyan-500 dark:to-blue-500">
           <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-        <p class="text-gray-600">Sign in to your TrackTools account</p>
+        <h1
+          class="text-3xl font-bold mb-2 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:from-gray-100 dark:to-gray-300">
+          Welcome Back</h1>
+        <p class="text-gray-600 dark:text-gray-400">Sign in to your TrackTools account</p>
       </div>
 
       <!-- General Error Alert -->
-      <div v-if="errors.general" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div v-if="errors.general"
+        class="mb-6 p-4 rounded-lg border bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-700">
         <div class="flex items-center">
-          <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-red-500 mr-2 dark:text-red-400" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p class="text-sm text-red-800">{{ errors.general }}</p>
+          <p class="text-sm text-red-800 dark:text-red-200">{{ errors.general }}</p>
         </div>
       </div>
 
       <!-- Login Form -->
-      <form @submit.prevent="handleLogin" class="space-y-6" novalidate>
+      <form @submit.prevent=" handleLogin " class="space-y-6" novalidate>
         <!-- Email Field -->
-        <BaseInput v-model="form.email" label="Email Address" type="email" placeholder="Enter your email address"
-          :error="errors.email" :disabled="loading" required size="lg" autocomplete="email"
+        <BaseInput v-model=" form.email " label="Email Address" type="email" placeholder="Enter your email address"
+          :error=" errors.email " :disabled=" loading " required size="lg" autocomplete="email"
           @blur="validateField('email')" @input="clearError('email')" />
 
         <!-- Password Field -->
         <div class="relative">
-          <BaseInput v-model="form.password" label="Password" :type="showPassword ? 'text' : 'password'"
-            placeholder="Enter your password" :error="errors.password" :disabled="loading" required size="lg"
+          <BaseInput v-model=" form.password " label="Password" :type=" showPassword ? 'text' : 'password' "
+            placeholder="Enter your password" :error=" errors.password " :disabled=" loading " required size="lg"
             autocomplete="current-password" @blur="validateField('password')" @input="clearError('password')" />
           <!-- Password Toggle -->
-          <button type="button" @click="togglePasswordVisibility"
-            class="absolute right-3 top-9 text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 transition-colors"
-            :disabled="loading" tabindex="-1">
+          <button type="button" @click=" togglePasswordVisibility "
+            class="absolute right-3 top-9 transition-colors text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 dark:focus:text-gray-300"
+            :disabled=" loading " tabindex="-1">
             <svg v-if="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.464 8.464a10.007 10.007 0 00-1.563 3.029M9.878 9.878l.742-.742M21.535 12a10.05 10.05 0 01-2.985 4.825" />
@@ -57,38 +64,39 @@
         <!-- Remember Me & Forgot Password -->
         <div class="flex items-center justify-between">
           <div class="flex items-center">
-            <input id="remember-me" v-model="form.rememberMe" type="checkbox"
-              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" :disabled="loading" />
-            <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+            <input id="remember-me" v-model=" form.rememberMe " type="checkbox"
+              class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-blue-400"
+              :disabled=" loading " />
+            <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
               Remember me
             </label>
           </div>
           <router-link to="/forgot-password"
-            class="text-sm text-blue-600 hover:text-blue-800 font-medium transition duration-300">
+            class="text-sm font-medium transition duration-300 text-blue-600 hover:text-blue-800 dark:text-cyan-400 dark:hover:text-cyan-300">
             Forgot password?
           </router-link>
         </div>
 
         <!-- Submit Button -->
-        <Button type="submit" variant="primary" size="lg" fullWidth :loading="loading" loadingText="Signing in..."
-          label="Sign In" :disabled="!isFormValid"
-          class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" />
+        <Button type="submit" variant="primary" size="lg" fullWidth :loading=" loading " loadingText="Signing in..."
+          label="Sign In" :disabled=" !isFormValid "
+          class="shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-cyan-500 dark:to-blue-600 dark:hover:from-cyan-600 dark:hover:to-blue-700" />
       </form>
 
       <!-- Links -->
       <div class="mt-8 text-center space-y-3">
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
+            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">New to TrackTools?</span>
+            <span class="px-2 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">New to TrackTools?</span>
           </div>
         </div>
 
-        <p class="text-gray-600 text-sm">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
           <router-link to="/register"
-            class="text-blue-600 hover:text-blue-800 font-medium transition duration-300 inline-flex items-center">
+            class="font-medium transition duration-300 inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-cyan-400 dark:hover:text-cyan-300">
             Create your organization
             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -97,7 +105,7 @@
         </p>
 
         <router-link to="/"
-          class="inline-flex items-center text-gray-500 hover:text-gray-700 text-sm font-medium transition duration-300">
+          class="inline-flex items-center text-sm font-medium transition duration-300 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -230,147 +238,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Gradient background animation */
-.min-h-screen {
-  background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #cbd5e1, #f1f5f9);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Enhanced focus states */
-.form-input:focus {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
-}
-
-/* Button hover effects */
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-}
-
-/* Loading spinner */
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Error shake animation */
-.error-shake {
-  animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  25% {
-    transform: translateX(-5px);
-  }
-
-  75% {
-    transform: translateX(5px);
-  }
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Custom checkbox styling */
-input[type="checkbox"]:checked {
-  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-7.5 7.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6 10.293l7.146-7.147a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
-}
-
-/* Enhanced card styling */
-.card-shadow {
-  box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
-}
-
-/* Link hover effects */
-a {
-  position: relative;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  transform: translateY(-1px);
-}
-
-/* Icon animations */
-.icon-hover:hover {
-  transform: scale(1.1);
-  transition: transform 0.2s ease;
-}
-
-/* Form field animation */
-.form-group {
-  position: relative;
-}
-
-.form-group input:focus+label,
-.form-group input:not(:placeholder-shown)+label {
-  transform: translateY(-1.5rem) scale(0.875);
-  color: #3b82f6;
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  .card-shadow {
-    margin: 1rem;
-    border-radius: 1rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .min-h-screen {
-    background: linear-gradient(-45deg, #1e293b, #334155, #475569, #1e293b);
-  }
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  .min-h-screen {
-    animation: none;
-  }
-
-  .transition-all {
-    transition: none;
-  }
-
-  .btn-primary:hover {
-    transform: none;
-  }
-}
+/* Only essential styles that can't be achieved with Tailwind */
 </style>

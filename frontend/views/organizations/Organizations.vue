@@ -12,16 +12,6 @@
               {{ getPageDescription() }}
             </p>
           </div>
-          <div class="shrink-0" v-if="currentView === 'overview'">
-            <Button variant="primary" size="lg" label="Create Organization" @click="showCreateModal = true">
-              <template #icon>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
-                  </path>
-                </svg>
-              </template>
-            </Button>
-          </div>
         </div>
       </div>
     </div>
@@ -36,13 +26,13 @@
               <h3 class="text-lg font-semibold text-gray-900">Organization Menu</h3>
             </div>
             <nav class="p-4 space-y-2">
-              <button v-for="item in menuItems" :key="item.key" @click="currentView = item.key" :class="[
+              <button v-for="item in menuItems" :key=" item.key " @click="currentView = item.key" :class=" [
                 'w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center space-x-3',
                 currentView === item.key
                   ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              ]">
-                <component :is="item.icon" class="w-5 h-5" />
+              ] ">
+                <component :is=" item.icon " class="w-5 h-5" />
                 <span class="font-medium">{{ item.label }}</span>
                 <span v-if="item.badge" class="ml-auto bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
                   {{ item.badge }}
@@ -69,7 +59,7 @@
 
                 <!-- Organizations Grid -->
                 <div v-else-if="organizations.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  <div v-for="org in organizations" :key="org.id"
+                  <div v-for="org in organizations" :key=" org.id "
                     class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200 group cursor-pointer"
                     @click="selectOrganization(org)">
                     <div class="flex items-center space-x-4 mb-4">
@@ -86,25 +76,12 @@
                       </div>
                     </div>
                     <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ org.description || 'No description available'
-                      }}</p>
+                    }}</p>
                     <div class="flex items-center justify-between text-sm text-gray-500">
                       <span>{{ org.members_count || 0 }} members</span>
                       <span class="px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs">Active</span>
                     </div>
                   </div>
-                </div>
-
-                <!-- Empty State -->
-                <div v-else class="text-center py-12">
-                  <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                    </path>
-                  </svg>
-                  <h3 class="text-lg font-medium text-gray-900 mb-2">No organizations found</h3>
-                  <p class="text-gray-500 mb-4">Get started by creating your first organization.</p>
-                  <Button variant="primary" size="md" label="Create Organization" @click="showCreateModal = true" />
                 </div>
               </div>
             </div>
@@ -133,46 +110,6 @@
       </div>
     </div>
 
-    <!-- Create Organization Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-semibold text-gray-900">Create Organization</h3>
-            <Button variant="ghost" size="sm" @click="showCreateModal = false">
-              <template #icon>
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </template>
-            </Button>
-          </div>
-
-          <form @submit.prevent="createOrganization">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
-                <input v-model="newOrganization.name" type="text" required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter organization name" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea v-model="newOrganization.description" rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter organization description"></textarea>
-              </div>
-            </div>
-
-            <div class="flex justify-end space-x-3 mt-6">
-              <Button variant="secondary" size="md" label="Cancel" @click="showCreateModal = false" />
-              <Button type="submit" variant="primary" size="md" :loading="creating" loadingText="Creating..."
-                label="Create" />
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -192,14 +129,8 @@ const router = useRouter()
 const currentView = ref('overview')
 const organizations = ref([])
 const loading = ref(true)
-const showCreateModal = ref(false)
-const creating = ref(false)
 const selectedOrganization = ref(null)
 
-const newOrganization = reactive({
-  name: '',
-  description: ''
-})
 
 // Menu items with icons
 const menuItems = computed(() => [
@@ -271,8 +202,6 @@ const getPageDescription = () => {
 const fetchOrganizations = async () => {
   try {
     loading.value = true
-
-    // Mock data for demonstration when API is not available
     const mockOrganizations = [
       {
         id: 1,
@@ -302,58 +231,12 @@ const fetchOrganizations = async () => {
 
     organizations.value = mockOrganizations
 
-    // Try to fetch real data if API is available
-    try {
-      const response = await axiosInstance.get('organizations/')
-      organizations.value = response.data.results || response.data
-    } catch (apiError) {
-      console.log('Organizations API not available, using mock data:', apiError.message)
-      // Keep using mock data
-    }
   } catch (error) {
     console.error('Error fetching organizations:', error)
     // Fallback to empty array
     organizations.value = []
   } finally {
     loading.value = false
-  }
-}
-
-const createOrganization = async () => {
-  try {
-    creating.value = true
-
-    // Create mock organization for demonstration
-    const mockOrganization = {
-      id: Date.now(), // Simple ID generation for demo
-      name: newOrganization.name,
-      description: newOrganization.description,
-      created_at: new Date().toISOString(),
-      members_count: 1,
-      tasks_count: 0
-    }
-
-    // Try to create via API first
-    try {
-      const response = await axiosInstance.post('organizations/', newOrganization)
-      organizations.value.unshift(response.data)
-    } catch (apiError) {
-      console.log('Create organization API not available, using mock data:', apiError.message)
-      // Add mock organization to the list
-      organizations.value.unshift(mockOrganization)
-    }
-
-    showCreateModal.value = false
-    // Reset form
-    newOrganization.name = ''
-    newOrganization.description = ''
-    // Show success message
-    console.log('Organization created successfully')
-  } catch (error) {
-    console.error('Error creating organization:', error)
-    // Handle error with toast notification
-  } finally {
-    creating.value = false
   }
 }
 

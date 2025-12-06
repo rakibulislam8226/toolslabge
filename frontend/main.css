@@ -26,12 +26,21 @@ main,
   transition: background-color 300ms ease, color 300ms ease !important;
 }
 
-/* Override common text colors universally */
+/* Override all text colors universally */
 .text-gray-900,
 .text-gray-800,
 .text-gray-700,
-h1, h2, h3, h4, h5, h6 {
+.text-gray-600,
+.text-gray-500,
+h1, h2, h3, h4, h5, h6,
+p, span, div {
   color: var(--text-primary) !important;
+}
+
+/* Override secondary text colors */
+.text-gray-600,
+.text-gray-500 {
+  color: var(--text-secondary) !important;
 }
 
 /* Override common background colors universally */
