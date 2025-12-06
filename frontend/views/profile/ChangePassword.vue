@@ -95,17 +95,17 @@
                                         <span :class=" isDark ? 'text-slate-400' : 'text-gray-600' ">Strength:</span>
                                         <div class="flex gap-1">
                                             <div class="h-1 w-6 rounded"
-                                                :class=" passwordStrength >= 1 ? 'bg-red-500' : (isDark ? 'bg-slate-600' : 'bg-gray-200') ">
+                                                :class=" passwordValidation.strength >= 1 ? 'bg-red-500' : (isDark ? 'bg-slate-600' : 'bg-gray-200') ">
                                             </div>
                                             <div class="h-1 w-6 rounded"
-                                                :class=" passwordStrength >= 2 ? 'bg-yellow-500' : (isDark ? 'bg-slate-600' : 'bg-gray-200') ">
+                                                :class=" passwordValidation.strength >= 2 ? 'bg-yellow-500' : (isDark ? 'bg-slate-600' : 'bg-gray-200') ">
                                             </div>
                                             <div class="h-1 w-6 rounded"
-                                                :class=" passwordStrength >= 3 ? 'bg-green-500' : (isDark ? 'bg-slate-600' : 'bg-gray-200') ">
+                                                :class=" passwordValidation.strength >= 3 ? 'bg-green-500' : (isDark ? 'bg-slate-600' : 'bg-gray-200') ">
                                             </div>
                                         </div>
-                                        <span class="text-xs" :class=" getStrengthColor() ">
-                                            {{ getStrengthText() }}
+                                        <span class="text-xs" :class=" passwordValidation.color ">
+                                            {{ passwordValidation.text }}
                                         </span>
                                     </div>
 
@@ -113,61 +113,61 @@
                                     <div class="space-y-1 text-xs">
                                         <div class="flex items-center gap-2">
                                             <svg class="w-3 h-3"
-                                                :class=" form.new_password.length >= 8 ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
+                                                :class=" passwordValidation.hasMinLength ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
                                                 fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd"
                                                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                                     clip-rule="evenodd" />
                                             </svg>
                                             <span
-                                                :class=" form.new_password.length >= 8 ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">At
+                                                :class=" passwordValidation.hasMinLength ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">At
                                                 least 8 characters</span>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <svg class="w-3 h-3"
-                                                :class=" /[a-z]/.test(form.new_password) ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
+                                                :class=" passwordValidation.hasLowercase ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
                                                 fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd"
                                                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                                     clip-rule="evenodd" />
                                             </svg>
                                             <span
-                                                :class=" /[a-z]/.test(form.new_password) ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Lowercase
+                                                :class=" passwordValidation.hasLowercase ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Lowercase
                                                 letter</span>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <svg class="w-3 h-3"
-                                                :class=" /[A-Z]/.test(form.new_password) ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
+                                                :class=" passwordValidation.hasUppercase ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
                                                 fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd"
                                                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                                     clip-rule="evenodd" />
                                             </svg>
                                             <span
-                                                :class=" /[A-Z]/.test(form.new_password) ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Uppercase
+                                                :class=" passwordValidation.hasUppercase ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Uppercase
                                                 letter</span>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <svg class="w-3 h-3"
-                                                :class=" /[0-9]/.test(form.new_password) ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
+                                                :class=" passwordValidation.hasNumber ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
                                                 fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd"
                                                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                                     clip-rule="evenodd" />
                                             </svg>
                                             <span
-                                                :class=" /[0-9]/.test(form.new_password) ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Number</span>
+                                                :class=" passwordValidation.hasNumber ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Number</span>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <svg class="w-3 h-3"
-                                                :class=" hasSpecialChar ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
+                                                :class=" passwordValidation.hasSpecialChar ? 'text-green-500' : (isDark ? 'text-slate-500' : 'text-gray-400') "
                                                 fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd"
                                                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                                     clip-rule="evenodd" />
                                             </svg>
                                             <span
-                                                :class=" hasSpecialChar ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Special
+                                                :class=" passwordValidation.hasSpecialChar ? 'text-green-500' : (isDark ? 'text-slate-400' : 'text-gray-500') ">Special
                                                 character</span>
                                         </div>
                                     </div>
@@ -260,73 +260,75 @@ const form = reactive({
     confirm_password: ''
 });
 
-// Password validation computed properties
-const passwordStrength = computed(() => {
+// Password validation regex patterns (cached for performance)
+const PASSWORD_PATTERNS = {
+    lowercase: /[a-z]/,
+    uppercase: /[A-Z]/,
+    number: /[0-9]/,
+    special: /[!@#$%^&*(),.?":{}|<>]/
+};
+
+// Combined password validation computed properties
+const passwordValidation = computed(() => {
     const password = form.new_password;
+    const hasLowercase = PASSWORD_PATTERNS.lowercase.test(password);
+    const hasUppercase = PASSWORD_PATTERNS.uppercase.test(password);
+    const hasNumber = PASSWORD_PATTERNS.number.test(password);
+    const hasSpecialChar = PASSWORD_PATTERNS.special.test(password);
+    const hasMinLength = password.length >= 8;
+
     let strength = 0;
+    if (hasMinLength) strength++;
+    if (hasLowercase && hasUppercase) strength++;
+    if (hasNumber && hasSpecialChar) strength++;
 
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
-
-    return strength;
+    return {
+        hasLowercase,
+        hasUppercase,
+        hasNumber,
+        hasSpecialChar,
+        hasMinLength,
+        strength,
+        text: ['Weak', 'Weak', 'Medium', 'Strong'][strength] || 'Weak',
+        color: ['text-red-500', 'text-red-500', 'text-yellow-500', 'text-green-500'][strength] || 'text-red-500'
+    };
 });
 
-const hasSpecialChar = computed(() => {
-    return /[!@#$%^&*(),.?":{}|<>]/.test(form.new_password);
-});
-
-const passwordsMatch = computed(() => {
-    return form.new_password === form.confirm_password && form.confirm_password.length > 0;
-});
+const passwordsMatch = computed(() =>
+    form.new_password === form.confirm_password && form.confirm_password.length > 0
+);
 
 const isFormValid = computed(() => {
+    const validation = passwordValidation.value;
     return form.current_password.length > 0 &&
-        form.new_password.length >= 8 &&
-        form.confirm_password.length > 0 &&
-        passwordsMatch.value &&
-        hasSpecialChar.value &&
-        /[a-z]/.test(form.new_password) &&
-        /[A-Z]/.test(form.new_password) &&
-        /[0-9]/.test(form.new_password);
+        validation.hasMinLength &&
+        validation.hasLowercase &&
+        validation.hasUppercase &&
+        validation.hasNumber &&
+        validation.hasSpecialChar &&
+        passwordsMatch.value;
 });
 
-const getStrengthText = () => {
-    switch (passwordStrength.value) {
-        case 0:
-        case 1: return 'Weak';
-        case 2: return 'Medium';
-        case 3: return 'Strong';
-        default: return 'Weak';
-    }
-};
-
-const getStrengthColor = () => {
-    switch (passwordStrength.value) {
-        case 0:
-        case 1: return 'text-red-500';
-        case 2: return 'text-yellow-500';
-        case 3: return 'text-green-500';
-        default: return 'text-red-500';
-    }
-};
-
 const getErrorMessage = (field) => {
-    // Handle the API response format: { data: { errors: [{ field: "message" }] } }
-    if (errors.value.data?.errors && Array.isArray(errors.value.data.errors)) {
-        for (const errorObj of errors.value.data.errors) {
-            if (errorObj[field]) {
-                return errorObj[field];
-            }
-        }
+    const errorData = errors.value;
+
+    // Handle nested API response format
+    if (errorData.data?.errors?.length) {
+        const fieldError = errorData.data.errors.find(error => error[field]);
+        if (fieldError) return fieldError[field];
     }
 
-    // Handle direct field errors format
-    if (errors.value[field]) {
-        return Array.isArray(errors.value[field]) ? errors.value[field][0] : errors.value[field];
-    }
+    // Handle direct field errors
+    const directError = errorData[field];
+    return Array.isArray(directError) ? directError[0] : directError || '';
+};
 
-    return '';
+const clearForm = () => {
+    Object.assign(form, {
+        current_password: '',
+        new_password: '',
+        confirm_password: ''
+    });
 };
 
 const handleSubmit = async () => {
@@ -336,26 +338,16 @@ const handleSubmit = async () => {
     errors.value = {};
 
     try {
-        const response = await axios.patch('users/password-reset/update-password/', form);
-        console.log('Success response:', response.data); // Debug log
+        const { data } = await axios.patch('users/password-reset/update-password/', form);
+        console.log('Success response:', data);
 
-        const successMessage = response.data?.message || 'Password updated successfully!';
-        $toast.success(successMessage);
-
-        // Clear form and navigate after short delay
-        form.current_password = '';
-        form.new_password = '';
-        form.confirm_password = '';
+        $toast.success(data?.message || 'Password updated successfully!');
+        clearForm();
         router.push('/profile');
 
     } catch (error) {
-        console.log('Error response:', error.response?.data); // Debug log
-
-        if (error.response?.data) {
-            errors.value = error.response.data;
-        } else {
-            errors.value = { general: 'An error occurred. Please try again.' };
-        }
+        console.log('Error response:', error.response?.data);
+        errors.value = error.response?.data || { general: 'An error occurred. Please try again.' };
     } finally {
         loading.value = false;
     }
