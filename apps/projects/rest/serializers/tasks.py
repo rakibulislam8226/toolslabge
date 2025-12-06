@@ -10,6 +10,7 @@ from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
 from ...tasks import (
     process_task_assignment_users,
     process_task_member_removal,
+    process_task_status_change_notification,
 )
 
 User = get_user_model()
@@ -369,8 +370,20 @@ class TaskDetailSerializer(serializers.ModelSerializer):
                     instance.id, removed_user_ids, user.id
                 )
 
-        # Handle status
+        # Handle status change notification
         status = validated_data.get("status")
+        if status and status != instance.status:
+            old_status_name = instance.status.name if instance.status else "No Status"
+            new_status_name = status.name
+            task_url = self.context["request"].build_absolute_uri(
+                f"/projects/{instance.project.slug}/tasks/?task_id={instance.id}"
+            )
+
+            process_task_status_change_notification.delay(
+                instance.id, old_status_name, new_status_name, user.id, task_url
+            )
+
+        # Handle status validation
         if status and status.organization_id != instance.organization_id:
             raise serializers.ValidationError(
                 {"status_id": "Status must belong to this project's organization."}

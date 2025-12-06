@@ -6,10 +6,12 @@ from celery import shared_task
 
 from apps.tasks.models import TaskComment, Task
 from apps.users.models import User
+from apps.projects.models import ProjectMember
+from apps.projects.choices import ProjectMemberRoleChoices
+
 from .utils import process_users_in_bulk
 
 
-CHUNK_SIZE = 50
 logging = logging.getLogger(__name__)
 
 
@@ -149,4 +151,80 @@ def chunk_wise_process_comment_mentions(comment_id, user_ids, task_url):
         task_url,
         comment.author.get_full_name() or comment.author.username,
         comment.task.project.name,
+    )
+
+
+@shared_task
+def send_task_status_change_email(
+    first_name,
+    email,
+    task_title,
+    old_status,
+    new_status,
+    changed_by,
+    project_name,
+    task_url,
+):
+    subject = f"Task status changed in {project_name}"
+
+    html_message = f"""
+        <p>Hi {first_name if first_name else "Dear"},</p>
+        <p>The status of task <strong>{task_title}</strong> has been changed by <strong>{changed_by}</strong> in the project <strong>{project_name}</strong>.</p>
+
+        <p>
+            <strong>Previous Status:</strong> {old_status}<br>
+            <strong>New Status:</strong> {new_status} <br>
+            <strong>{old_status} -&gt; {new_status}</strong>
+        </p>
+        <p>
+            <a href="{task_url}" style="display:inline-block;padding:10px 20px;background-color:#17a2b8;color:#fff;text-decoration:none;border-radius:4px;">
+                View Task
+            </a>
+        </p>
+        <p>
+            Or click the link below:<br>
+            <a href="{task_url}">{task_url}</a>
+        </p>
+        <p>Thanks,<br>{project_name} Team</p>
+    """
+
+    send_mail(
+        subject,
+        "",
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+        fail_silently=False,
+        html_message=html_message,
+    )
+
+
+@shared_task
+def process_task_status_change_notification(
+    task_id, old_status, new_status, changed_by_id, task_url
+):
+    try:
+        task = Task.objects.select_related("project").get(id=task_id)
+        changed_by_user = User.objects.get(id=changed_by_id)
+    except (Task.DoesNotExist, User.DoesNotExist):
+        return
+
+    manager_user_ids = ProjectMember.objects.filter(
+        project=task.project, role=ProjectMemberRoleChoices.MANAGER
+    ).values_list("user_id", flat=True)
+
+    if not manager_user_ids:
+        return
+
+    changed_by_name = changed_by_user.get_full_name() or changed_by_user.username
+
+    process_users_in_bulk(
+        list(manager_user_ids),
+        changed_by_id,
+        send_task_status_change_email,
+        task.title,
+        old_status,
+        new_status,
+        changed_by_name,
+        task.project.name,
+        task_url,
     )
