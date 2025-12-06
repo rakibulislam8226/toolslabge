@@ -16,7 +16,7 @@
         <h3 class="text-lg font-semibold text-red-800 mb-2">Failed to load project</h3>
         <p class="text-red-600 mb-4">{{ error }}</p>
         <div class="space-x-3">
-          <Button variant="danger" size="md" label="Try Again" @click="fetchProject" />
+          <Button variant="danger" size="md" label="Try Again" @click=" fetchProject " />
           <router-link to="/projects"
             class="bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300 inline-block"
             style="color: white !important;">
@@ -56,7 +56,7 @@
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 sm:mr-4 leading-tight">
                   {{ project.name }}
                 </h1>
-                <span :class="getStatusBadgeClass(project.status)"
+                <span :class=" getStatusBadgeClass(project.status) "
                   class="px-3 py-1.5 text-sm font-semibold rounded-full self-start shadow-sm">
                   {{ formatStatus(project.status) }}
                 </span>
@@ -71,7 +71,7 @@
             <!-- Action Buttons -->
             <div
               class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:flex-shrink-0">
-              <Button v-if="hasRole('owner', 'admin', 'manager')" @click="editProject" variant="primary" size="md"
+              <Button v-if="hasRole('owner', 'admin', 'manager')" @click=" editProject " variant="primary" size="md"
                 class="bg-blue-600 px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
                 style="color: white !important;" label="Edit Project">
                 <template #prepend>
@@ -82,7 +82,7 @@
                   </svg>
                 </template>
               </Button>
-              <router-link :to="`/projects/${project.slug}/tasks`"
+              <router-link :to=" `/projects/${ project.slug }/tasks` "
                 class="bg-indigo-600 px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 style="color: white !important;">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ getStaticTasksCount(project) }}</p>
+              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ project.total_tasks }}</p>
               <p class="text-sm font-medium text-gray-600">Tasks</p>
             </div>
 
@@ -123,7 +123,7 @@
                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.239"></path>
                 </svg>
               </div>
-              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ getStaticMembersCount(project) }}</p>
+              <p class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ project.total_members }}</p>
               <p class="text-sm font-medium text-gray-600">Members</p>
             </div>
 
@@ -201,7 +201,7 @@
               <div class="w-full bg-gray-200 rounded-full h-4 shadow-inner">
                 <div
                   class="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 h-4 rounded-full transition-all duration-700 shadow-sm"
-                  :style="{ width: `${getStaticProgress(project)}%` }"></div>
+                  :style=" { width: `${ getStaticProgress(project) }%` } "></div>
               </div>
             </div>
           </div>
@@ -241,7 +241,7 @@
             <div
               class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
               <span class="text-gray-600 font-medium mb-2 sm:mb-0">Status</span>
-              <span :class="getStatusBadgeClass(project.status)"
+              <span :class=" getStatusBadgeClass(project.status) "
                 class="px-3 py-1.5 text-sm font-semibold rounded-full shadow-sm self-start sm:self-center">
                 {{ formatStatus(project.status) }}
               </span>
@@ -275,7 +275,7 @@
               </div>
               Recent Tasks
             </h2>
-            <button @click="viewAllTasks"
+            <button @click=" viewAllTasks "
               class="text-green-600 hover:text-green-800 text-md font-semibold transition-colors duration-200 hover:underline self-start sm:self-center">
               View All →
             </button>
@@ -290,7 +290,7 @@
               </svg>
             </div>
             <p class="text-gray-600 font-medium mb-4">Tasks will be displayed here</p>
-            <Button @click="viewAllTasks"
+            <Button @click=" viewAllTasks "
               class="bg-green-600 px-6 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               style="color: white !important;">
               View Tasks
@@ -312,7 +312,7 @@
               </div>
               Project Members
             </h2>
-            <button @click="manageMembers"
+            <button @click=" manageMembers "
               class="text-purple-600 hover:text-purple-800 text-md font-semibold transition-colors duration-200 hover:underline self-start sm:self-center">
               Manage →
             </button>
@@ -326,7 +326,7 @@
               </svg>
             </div>
             <p class="text-gray-600 font-medium mb-4">Project members will be displayed here</p>
-            <Button @click="manageMembers"
+            <Button @click=" manageMembers "
               class="bg-purple-600 px-6 py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               style="color: white !important;">
               View Members
@@ -392,20 +392,11 @@ const fetchProject = async () => {
   }
 }
 
-// Static data functions (same as in ProjectsList)
-const getStaticTasksCount = (project) => {
-  const counts = [3, 5, 8, 12, 15, 7, 4, 9, 11, 6]
-  return counts[project.id % counts.length] || 5
-}
-
-const getStaticMembersCount = (project) => {
-  const counts = [2, 3, 5, 4, 6, 3, 2, 4, 7, 5]
-  return counts[project.id % counts.length] || 3
-}
-
 const getStaticProgress = (project) => {
-  const progressValues = [25, 45, 60, 75, 30, 85, 40, 90, 65, 50]
-  return progressValues[project.id % progressValues.length] || 50
+  if (project.total_tasks > 0) {
+    return Math.round((project.completed_tasks / project.total_tasks) * 100)
+  }
+  return 0
 }
 
 // Get status badge CSS class (same as in ProjectsList)
@@ -474,19 +465,16 @@ const getDaysLabel = () => {
 
 // Action functions
 const editProject = () => {
-  // Navigate to edit project page using backend slug
   const slug = project.value.slug
   router.push(`/projects/${slug}/edit`)
 }
 
 const viewAllTasks = () => {
-  // Navigate to tasks page for this project
   const slug = project.value.slug
   router.push(`/projects/${slug}/tasks`)
 }
 
 const manageMembers = () => {
-  // Navigate to project members management page
   const slug = project.value.slug
   router.push({ name: 'projects.members', params: { slug } })
 }

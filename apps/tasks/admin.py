@@ -15,7 +15,7 @@ from .models import (
 
 @admin.register(TaskStatus)
 class TaskStatusAdmin(admin.ModelAdmin):
-    list_display = ("name", "organization")
+    list_display = ("name", "organization", "slug")
     list_filter = ("organization",)
     search_fields = ("name",)
     ordering = ("organization", "name")

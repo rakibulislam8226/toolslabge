@@ -132,6 +132,9 @@ import { useTheme } from '@/composables/useTheme.js'
 import axios from '@/plugins/axiosConfig.js'
 import Button from '@/components/Button.vue'
 import { BaseInput, BaseSelect } from '@/components/forms'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const { user, fetchUserProfile } = useAuth()
 const { isDark } = useTheme()
@@ -234,7 +237,7 @@ const handleSubmit = async () => {
         if (fileInput.value) {
             fileInput.value.value = ''
         }
-
+        router.push('/dashboard')
         toast.success('Profile updated successfully!')
 
     } catch (error) {

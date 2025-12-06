@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from apps.organizations.models import Organization, OrganizationMember
 from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
+from apps.tasks.models import Task
 
 from ...choices import ProjectMemberRoleChoices
 from ...models import Project, ProjectMember
@@ -216,6 +217,9 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     manager = serializers.SerializerMethodField()
     members = ProjectMemberSerializer(many=True, read_only=True)
     my_project_role = serializers.SerializerMethodField(read_only=True)
+    total_tasks = serializers.SerializerMethodField(read_only=True)
+    total_members = serializers.SerializerMethodField(read_only=True)
+    completed_tasks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Project
@@ -231,6 +235,9 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "organization",
             "members",
             "my_project_role",
+            "total_tasks",
+            "completed_tasks",
+            "total_members",
             "created_at",
             "updated_at",
         ]
@@ -243,6 +250,19 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_total_tasks(self, obj):
+        return obj.tasks.count()
+
+    def get_completed_tasks(self, obj):
+        completed_status_names = ["Done", "Closed"]
+        completed_tasks_count = Task.objects.filter(
+            project=obj, status__name__in=completed_status_names
+        ).count()
+        return completed_tasks_count
+
+    def get_total_members(self, obj):
+        return obj.memberships.count()
 
     def get_my_project_role(self, obj):
         """Get the role of the requesting user in this project."""

@@ -218,7 +218,7 @@
                     </template>
 
                     <!-- Mobile Menu Button -->
-                    <button @click="mobileMenuOpen = !mobileMenuOpen"
+                    <button @click.stop="mobileMenuOpen = !mobileMenuOpen"
                         class="md:hidden p-2 rounded-lg transition-all duration-300 hover:scale-105"
                         :class=" isDark ? 'text-slate-300 hover:bg-slate-700' : 'text-gray-800 hover:bg-gray-100 hover:text-gray-900' ">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -354,10 +354,13 @@ function handleLogout() {
 
 // Close dropdown when clicking outside
 const handleClickOutside = (event) => {
-    if (dropdownOpen.value) {
+    // Check if click is on mobile menu button or its children
+    const mobileMenuButton = event.target.closest('button[class*="md:hidden"]');
+
+    if (dropdownOpen.value && !event.target.closest('.relative')) {
         dropdownOpen.value = false;
     }
-    if (mobileMenuOpen.value) {
+    if (mobileMenuOpen.value && !mobileMenuButton && !event.target.closest('.md\:hidden')) {
         mobileMenuOpen.value = false;
     }
 }
