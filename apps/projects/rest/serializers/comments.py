@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.conf import settings
 
@@ -8,7 +9,9 @@ from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
 from apps.tasks.models import TaskComment, Task, TasksCommentAttachments
 from apps.users.models import User
 
-from ...tasks import send_task_comment_mentioned_email
+from ...tasks import chunk_wise_process_comment_mentions
+
+logging = logging.getLogger(__name__)
 
 
 class TasksCommentAttachmentsSlimSerializer(serializers.ModelSerializer):
@@ -144,46 +147,33 @@ class TaskCommentListSerializer(serializers.ModelSerializer):
 
     def process_mentions(self, comment, mentions_data):
         """
-        Process mentions and send notifications
+        Process mentions and send notifications via parent task
         """
-        for mention in mentions_data:
-            user_id = mention.get("user")
-            user_email = mention.get("email")
-            user_name = mention.get("user_name")
+        if not mentions_data:
+            return
 
-            try:
-                if user_id:
-                    mentioned_user = User.objects.get(id=user_id)
-                elif user_email:
-                    mentioned_user = User.objects.get(email=user_email)
-                elif user_name:
-                    mentioned_user = User.objects.get(username=user_name)
-                else:
-                    continue
+        try:
+            task_url = self.context["request"].build_absolute_uri(
+                f"/projects/{comment.task.project.slug}/tasks/?task_id={comment.task.id}"
+            )
 
-                print(f"   Task: {comment.task.title}")
-                print(f"   Comment by: {comment.author.email}")
-                print(f"   Mentioned user: {mentioned_user.email}")
-                print(f"   User ID: {mentioned_user.id}")
-                print(f"   Comment content: {comment.content[:50]}...")
-                task_url = self.context["request"].build_absolute_uri(
-                    f"/projects/{comment.task.project.slug}/tasks/?task_id={comment.task.id}"
-                )
-                send_task_comment_mentioned_email.delay(
-                    first_name=mentioned_user.first_name,
-                    email=mentioned_user.email,
-                    task_title=comment.task.title,
-                    task_url=task_url,
-                    mentioned_by=comment.author.get_full_name()
-                    or comment.author.username,
-                    project_name=comment.task.project.name,
-                )
+            # Extract user IDs from mentions data
+            user_ids = []
+            for mention in mentions_data:
+                if isinstance(mention, dict) and "user" in mention:
+                    user_ids.append(mention["user"])
+                elif isinstance(mention, (int, str)):
+                    user_ids.append(mention)
 
-                # TODO: Uncomment these lines to enable notifications
-                # from mention_notifications_example import MentionNotificationService
-                # MentionNotificationService.send_mention_email(mentioned_user, comment)
-                # MentionNotificationService.create_in_app_notification(mentioned_user, comment)
+            if not user_ids:
+                return
 
-            except User.DoesNotExist:
-                print(f"⚠️  User not found for mention: {mention}")
-                continue
+            logging.info(
+                f"Preparing to queue mention processing for comment {comment.id} with user IDs: {user_ids}"
+            )
+
+            chunk_wise_process_comment_mentions.delay(
+                comment_id=comment.id, user_ids=user_ids, task_url=task_url
+            )
+        except Exception as e:
+            logging.error(f"Error queuing mention processing: {e}")

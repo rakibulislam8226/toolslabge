@@ -1,7 +1,14 @@
+import logging
 from django.core.mail import send_mail
 from django.conf import settings
 
 from celery import shared_task
+
+from apps.tasks.models import TaskComment
+from apps.users.models import User
+
+
+CHUNK_SIZE = 50
 
 
 @shared_task
@@ -87,3 +94,42 @@ def send_task_comment_mentioned_email(
         fail_silently=False,
         html_message=html_message,
     )
+
+
+@shared_task
+def chunk_wise_process_comment_mentions(comment_id, user_ids, task_url):
+    try:
+        comment = TaskComment.objects.select_related("task__project", "author").get(
+            id=comment_id
+        )
+    except TaskComment.DoesNotExist:
+        return
+
+    task_title = comment.task.title
+    project_name = comment.task.project.name
+    mentioned_by = comment.author.get_full_name() or comment.author.username
+
+    users = User.objects.filter(id__in=user_ids).values("id", "first_name", "email")
+
+    if not users.exists():
+        return
+
+    user_list = list(users)
+
+    for i in range(0, len(user_list), CHUNK_SIZE):
+        chunk = user_list[i : i + CHUNK_SIZE]
+
+        for user in chunk:
+            # Don't send email to the comment author
+            if user["id"] == comment.author.id:
+                continue
+
+            send_task_comment_mentioned_email.delay(
+                user["first_name"],
+                user["email"],
+                task_title,
+                task_url,
+                mentioned_by,
+                project_name,
+            )
+    logging.info(f"Completed processing mentions for comment {comment_id}.")
