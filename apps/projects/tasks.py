@@ -4,11 +4,13 @@ from django.conf import settings
 
 from celery import shared_task
 
-from apps.tasks.models import TaskComment
+from apps.tasks.models import TaskComment, Task
 from apps.users.models import User
+from .utils import process_users_in_bulk
 
 
 CHUNK_SIZE = 50
+logging = logging.getLogger(__name__)
 
 
 @shared_task
@@ -44,6 +46,24 @@ def send_task_assignment_email(
 
 
 @shared_task
+def process_task_assignment_users(task_id, user_ids, task_url):
+    try:
+        task = Task.objects.select_related("project", "created_by").get(id=task_id)
+    except Task.DoesNotExist:
+        return
+
+    process_users_in_bulk(
+        user_ids,
+        task.created_by_id,
+        send_task_assignment_email,
+        task.title,
+        task_url,
+        task.created_by.get_full_name() or task.created_by.username,
+        task.project.name,
+    )
+
+
+@shared_task
 def send_member_remove_task_email(first_name, email, task_title, project_name):
     subject = f"You've been removed from a task in {project_name}"
 
@@ -61,6 +81,22 @@ def send_member_remove_task_email(first_name, email, task_title, project_name):
         [email],
         fail_silently=False,
         html_message=html_message,
+    )
+
+
+@shared_task
+def process_task_member_removal(task_id, user_ids, remover_id):
+    try:
+        task = Task.objects.select_related("project").get(id=task_id)
+    except Task.DoesNotExist:
+        return
+
+    process_users_in_bulk(
+        user_ids,
+        remover_id,
+        send_member_remove_task_email,
+        task.title,
+        task.project.name,
     )
 
 
@@ -105,31 +141,12 @@ def chunk_wise_process_comment_mentions(comment_id, user_ids, task_url):
     except TaskComment.DoesNotExist:
         return
 
-    task_title = comment.task.title
-    project_name = comment.task.project.name
-    mentioned_by = comment.author.get_full_name() or comment.author.username
-
-    users = User.objects.filter(id__in=user_ids).values("id", "first_name", "email")
-
-    if not users.exists():
-        return
-
-    user_list = list(users)
-
-    for i in range(0, len(user_list), CHUNK_SIZE):
-        chunk = user_list[i : i + CHUNK_SIZE]
-
-        for user in chunk:
-            # Don't send email to the comment author
-            if user["id"] == comment.author.id:
-                continue
-
-            send_task_comment_mentioned_email.delay(
-                user["first_name"],
-                user["email"],
-                task_title,
-                task_url,
-                mentioned_by,
-                project_name,
-            )
-    logging.info(f"Completed processing mentions for comment {comment_id}.")
+    process_users_in_bulk(
+        user_ids,
+        comment.author.id,
+        send_task_comment_mentioned_email,
+        comment.task.title,
+        task_url,
+        comment.author.get_full_name() or comment.author.username,
+        comment.task.project.name,
+    )

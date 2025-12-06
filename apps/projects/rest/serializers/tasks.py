@@ -7,7 +7,10 @@ from apps.projects.models import Project, ProjectMember
 from apps.tasks.models import Task, TaskMember, TaskStatus, TaskDeadlineExtension
 from apps.users.rest.serializers.slim_serializers import UserSlimSerializer
 
-from ...tasks import send_task_assignment_email, send_member_remove_task_email
+from ...tasks import (
+    process_task_assignment_users,
+    process_task_member_removal,
+)
 
 User = get_user_model()
 
@@ -172,26 +175,14 @@ class TaskSerializer(serializers.ModelSerializer):
         TaskMember.objects.bulk_create(
             [TaskMember(task=task, member=m, created_by=user) for m in members]
         )
-        # Send assignment emails
-        for member in members:
-            if user.id == member.user.id:
-                continue  # don't send email to self
+
+        # Send assignment emails using bulk processing
+        if members:
             task_url = self.context["request"].build_absolute_uri(
                 f"/projects/{project.slug}/tasks/?task_id={task.id}"
             )
-            created_by = (
-                user.first_name + " " + user.last_name
-                if user.first_name and user.last_name
-                else user.email
-            )
-            send_task_assignment_email.delay(
-                member.user.first_name,
-                member.user.email,
-                task.title,
-                task_url,
-                created_by,
-                project.name,
-            )
+            member_user_ids = [member.user.id for member in members]
+            process_task_assignment_users.delay(task.id, member_user_ids, task_url)
 
         return task
 
@@ -357,41 +348,25 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             if to_remove:
                 instance.task_members.filter(member_id__in=to_remove).delete()
 
-            # send to new members
-            for member in members:
-                if member.id in to_add:
-                    if user.id == member.user.id:
-                        continue  # don't send email to self
-                    task_url = self.context["request"].build_absolute_uri(
-                        f"/projects/{instance.project.slug}/tasks/?task_id={instance.id}"
-                    )
-                    created_by = (
-                        user.first_name + " " + user.last_name
-                        if user.first_name and user.last_name
-                        else user.email
-                    )
-                    send_task_assignment_email.delay(
-                        member.user.first_name,
-                        member.user.email,
-                        instance.title,
-                        task_url,
-                        created_by,
-                        instance.project.name,
-                    )
-
-            # send to removed members
-            for member_id in to_remove:
-                if user.id == current_members[member_id].member.user.id:
-                    continue  # don't send email to self
-                member = current_members[member_id]
+            # send to new members using bulk processing
+            if to_add:
                 task_url = self.context["request"].build_absolute_uri(
-                    f"/projects/{instance.project.slug}/tasks/"
+                    f"/projects/{instance.project.slug}/tasks/?task_id={instance.id}"
                 )
-                send_member_remove_task_email.delay(
-                    member.member.user.first_name,
-                    member.member.user.email,
-                    instance.title,
-                    instance.project.name,
+                new_member_user_ids = [
+                    member.user.id for member in members if member.id in to_add
+                ]
+                process_task_assignment_users.delay(
+                    instance.id, new_member_user_ids, task_url
+                )
+
+            # send to removed members using bulk processing
+            if to_remove:
+                removed_user_ids = [
+                    current_members[member_id].member.user.id for member_id in to_remove
+                ]
+                process_task_member_removal.delay(
+                    instance.id, removed_user_ids, user.id
                 )
 
         # Handle status
@@ -401,7 +376,6 @@ class TaskDetailSerializer(serializers.ModelSerializer):
                 {"status_id": "Status must belong to this project's organization."}
             )
 
-        # Update allowed fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
