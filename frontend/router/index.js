@@ -116,6 +116,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/change-password",
+    name: "profile.change-password",
+    component: () => import("@/views/profile/ChangePassword.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import("@views/errors/404.vue"),

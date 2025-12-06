@@ -55,16 +55,9 @@
                             </div>
 
                             <!-- Photo Controls -->
-                            <div class="flex-1">
-                                <!-- Photo Actions -->
-                                <Button
-                                    v-if="(form.photo || user?.photo) && !shouldRemovePhoto"
-                                    class="mt-2 px-3 py-1 text-xs rounded"
-                                    type="button"
-                                    variant="secondary"
-                                    size="small"
-                                    @click="removePhoto"
-                                >
+                            <div class="flex-1" v-if="(form.photo || user?.photo) && !shouldRemovePhoto">
+                                <Button class="mt-2 px-3 py-1 text-xs rounded" type="button" variant="secondary"
+                                    size="small" @click=" removePhoto ">
                                     Remove Photo
                                 </Button>
                             </div>
@@ -73,7 +66,6 @@
 
                     <!-- Personal Information -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <!-- First Name -->
                         <div>
                             <label for="first_name"
                                 class="block text-sm font-medium mb-2 transition-colors duration-300"
@@ -94,7 +86,6 @@
                             </p>
                         </div>
 
-                        <!-- Last Name -->
                         <div>
                             <label for="last_name" class="block text-sm font-medium mb-2 transition-colors duration-300"
                                 :class=" isDark ? 'text-white' : 'text-gray-900' ">
@@ -122,7 +113,6 @@
                         </BaseInput>
                     </div>
 
-                    <!-- Submit Button -->
                     <div class="flex justify-end pt-6 border-t transition-colors duration-300"
                         :class=" isDark ? 'border-slate-700' : 'border-gray-200' ">
                         <Button type="submit" variant="primary" :loading=" loading ">
@@ -207,7 +197,6 @@ const removePhoto = () => {
     if (fileInput.value) {
         fileInput.value.value = ''
     }
-    handleSubmit()
 }
 
 

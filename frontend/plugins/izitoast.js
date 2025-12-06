@@ -2,7 +2,7 @@ import izitoast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 izitoast.settings({
-    timeout: 3000,
+    timeout: 2000,
     displayMode: 2,
     position: 'topRight',
 });

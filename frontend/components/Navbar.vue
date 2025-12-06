@@ -58,7 +58,8 @@
                                     :class=" isDark ? 'hover:bg-slate-800' : 'hover:bg-gray-100 hover:shadow-md' ">
                                     <!-- Avatar -->
                                     <div class="relative">
-                                        <img v-if="user?.photo" :src=" user.photo " :alt=" user?.first_name || user?.email "
+                                        <img v-if="user?.photo" :src=" user.photo "
+                                            :alt=" user?.first_name || user?.email "
                                             class="w-8 h-8 rounded-full object-cover shadow-md"
                                             :class=" isDark ? 'ring-2 ring-slate-600' : 'ring-2 ring-gray-500' " />
                                         <div v-else
@@ -142,6 +143,17 @@
                                                     </path>
                                                 </svg>
                                                 View Profile
+                                            </router-link>
+                                            <router-link to="/change-password" @click="dropdownOpen = false"
+                                                class="flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                                                :class=" isDark ? 'text-slate-300 hover:bg-slate-700 hover:text-slate-100' : 'text-gray-900 hover:bg-gray-100 hover:text-black' ">
+                                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                                Change Password
                                             </router-link>
                                             <div v-if="hasRole('owner', 'admin')">
                                                 <router-link to="/organizations" @click="dropdownOpen = false"
