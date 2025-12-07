@@ -156,7 +156,8 @@ const inputClasses = computed(() => {
         'focus:ring-blue-500',
         'focus:border-transparent',
         'transition-colors',
-        'duration-200'
+        'duration-200',
+        "bg-white dark:bg-gray-900",
     ]
 
     // Size classes
@@ -170,13 +171,13 @@ const inputClasses = computed(() => {
     const stateClasses = []
 
     if (props.error) {
-        stateClasses.push('border-red-500', 'bg-red-50')
+        stateClasses.push('border-red-500', 'bg-red-50', 'dark:border-red-400', 'dark:bg-red-900/20')
     } else if (props.disabled) {
-        stateClasses.push('border-gray-300', 'bg-gray-100', 'text-gray-500', 'cursor-not-allowed')
+        stateClasses.push('border-gray-300', 'bg-gray-100', 'text-gray-500', 'cursor-not-allowed', 'dark:border-gray-600', 'dark:bg-gray-800', 'dark:text-gray-400')
     } else if (props.readonly) {
-        stateClasses.push('border-gray-300', 'bg-gray-50', 'text-gray-700')
+        stateClasses.push('border-gray-300', 'bg-gray-50', 'text-gray-700', 'dark:border-gray-600', 'dark:bg-gray-800', 'dark:text-gray-300')
     } else {
-        stateClasses.push('border-gray-300', 'bg-white', 'hover:border-gray-400')
+        stateClasses.push('border-gray-300', 'bg-white', 'hover:border-gray-400', 'dark:border-gray-600', 'dark:bg-gray-900', 'dark:hover:border-gray-500')
     }
 
     return [

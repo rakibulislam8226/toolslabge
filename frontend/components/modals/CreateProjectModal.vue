@@ -19,6 +19,8 @@
       </div>
 
       <!-- Project Manager -->
+      <!-- FIXME: close dropdown on outside click -->
+      <div v-if="showManagerDropdown" class="fixed inset-0" @click="showManagerDropdown = false"></div>
       <div>
         <label for="manager" class="block text-sm font-medium text-gray-700 mb-2">
           Project Manager
