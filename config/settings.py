@@ -195,6 +195,7 @@ REST_FRAMEWORK = {
 DJANGO_VITE_PLUGIN = {
     "DEV_MODE": eval(os.getenv("VITE_DEV_MODE", "False")),
     "BUILD_DIR": "frontend/build",
+    "BUILD_URL_PREFIX": "/static/",
 }
 
 
@@ -252,12 +253,15 @@ CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
+# NOTE: No need to define in .env file, if localhost server is used
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
