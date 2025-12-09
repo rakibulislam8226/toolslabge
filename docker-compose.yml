@@ -10,7 +10,7 @@ services:
     build:
       context: .
       target: final
-    env_file: .env.stage
+    env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"  # allows container to reach host DB
     depends_on:
@@ -28,7 +28,7 @@ services:
     build:
       context: .
       target: final
-    env_file: .env.stage
+    env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -40,7 +40,7 @@ services:
     build:
       context: .
       target: final
-    env_file: .env.stage
+    env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -52,7 +52,7 @@ services:
     build:
       context: .
       target: final
-    env_file: .env.stage
+    env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
