@@ -10,7 +10,7 @@ services:
     build:
       context: .
       target: final
-    env_file: .env.stage  # Use .env.local for dev
+    env_file: .env.stage
     extra_hosts:
       - "host.docker.internal:host-gateway"  # allows container to reach host DB
     depends_on:
